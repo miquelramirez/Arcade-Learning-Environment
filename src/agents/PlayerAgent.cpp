@@ -17,6 +17,7 @@
 #include "RandomAgent.hpp"
 #include "SingleActionAgent.hpp"
 #include "SDLKeyboardAgent.hpp"
+#include "SimpleBanditAgent.hpp"
 
 /* **********************************************************************
     Constructor
@@ -25,7 +26,7 @@ PlayerAgent::PlayerAgent(OSystem* _osystem, RomSettings* _settings) :
     p_osystem(_osystem), p_rom_settings(_settings),
     frame_number(0), episode_frame_number(0), episode_number(0),
     available_actions(_settings->getMinimalActionSet()),
-    m_has_terminated(false) { 
+    m_has_terminated(false), curr_state(NULL) { 
   Settings& settings = p_osystem->settings();
 
   i_max_num_episodes = settings.getInt("max_num_episodes", true);
@@ -48,6 +49,11 @@ PlayerAgent::PlayerAgent(OSystem* _osystem, RomSettings* _settings) :
     Destructor
  ********************************************************************* */
 PlayerAgent::~PlayerAgent() {
+}
+
+void
+PlayerAgent::update_state( const ALEState* s ) {
+	curr_state = s;
 }
 
 /** This methods handles the basic agent functionality: bookeeping
@@ -144,6 +150,8 @@ PlayerAgent* PlayerAgent::generate_agent_instance(OSystem* _osystem,
       new_agent = new SingleActionAgent(_osystem, _settings);
     else if (player_agent == "keyboard_agent")
       new_agent = new SDLKeyboardAgent(_osystem, _settings);
+    else if (player_agent == "simple_bandit" )
+      new_agent = new SimpleBanditAgent( _osystem, _settings );
     else {
       std::cerr << "Invalid agent type requested: " << player_agent << ". Terminating." << std::endl;
       // We can't play without any agent, so exit now.

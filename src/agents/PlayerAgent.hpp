@@ -18,6 +18,7 @@
 #include "../emucore/OSystem.hxx"
 #include "../common/Constants.h"
 #include "../games/RomSettings.hpp"
+#include "../environment/ale_state.hpp"
 
 class PlayerAgent { 
 public:
@@ -57,6 +58,8 @@ public:
     /** Returns true when the agent is done playing the game. */
     virtual bool has_terminated();
 
+    void update_state( const ALEState* s );
+    const ALEState& current_state() { return *curr_state; }
 
 protected:
     virtual Action act() = 0;
@@ -83,6 +86,7 @@ protected:
     ActionVect trajectory;
 
     bool m_has_terminated;
+    const ALEState*		curr_state;
 };
 
 

@@ -10,16 +10,17 @@ def main() :
 		print >> sys.stderr, "Usage: ./run_game.py <internal agent name> <path to ROM>"
 		sys.exit(1)
 
-	agent_name = sys.argv[2]
-	rom_path = sys.argv[3]
+	agent_name = sys.argv[1]
+	rom_path = sys.argv[2]
 
 	if not os.path.exists( rom_path ) :
 		print >> sys.stderr, "Could not find ROM:", rom_path
 		sys.exit(1)
 
 
-	command = './ale -display_screen true -game_controller internal -player_agent %(agent_name)s %(path_to_rom)'%globals()
-
+	command = './ale -display_screen true -game_controller internal -player_agent %(agent_name)s %(rom_path)s'%locals()
+	print >> sys.stdout, "Command:"
+	print >> sys.stdout, command
 	os.system( command)
 
 if __name__ == '__main__' :

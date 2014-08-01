@@ -16,6 +16,7 @@
  **************************************************************************** */
 
 #include "stella_environment.hpp"
+#include <cassert>
 #include "../emucore/m6502/src/System.hxx"
 
 StellaEnvironment::StellaEnvironment(OSystem* osystem, RomSettings* settings):
@@ -152,7 +153,6 @@ reward_t StellaEnvironment::act(Action player_a_action, Action player_b_action) 
   for (size_t i = 0; i < m_frame_skip; i++) {
     sum_rewards += oneStepAct(player_a_action, player_b_action);
   }
-
   return sum_rewards;
 }
 

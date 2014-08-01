@@ -81,12 +81,21 @@ void InternalController::run() {
 
 void InternalController::episodeStep(Action& action_a, Action& action_b) {
   // Request a new action
+  	if ( m_agent_left.get() != nullptr )
+		m_agent_left->update_state( &m_environment.getState() );
+	if ( m_agent_right.get() != nullptr )
+		m_agent_right->update_state( &m_environment.getState() );
   action_a = (m_agent_left.get() != NULL) ? m_agent_left->agent_step() : PLAYER_A_NOOP;
   action_b = (m_agent_right.get() != NULL) ? m_agent_right->agent_step() : PLAYER_B_NOOP;
 }
 
 void InternalController::episodeStart(Action& action_a, Action& action_b) {
   // Poll the agents for their first action
+  	if ( m_agent_left.get() != nullptr )
+		m_agent_left->update_state( &m_environment.getState() );
+	if ( m_agent_right.get() != nullptr )
+		m_agent_right->update_state( &m_environment.getState() );
+  
   action_a = (m_agent_left.get() != NULL) ? m_agent_left->episode_start() : PLAYER_A_NOOP;
   action_b = (m_agent_right.get() != NULL) ? m_agent_right->episode_start() : PLAYER_B_NOOP;
 

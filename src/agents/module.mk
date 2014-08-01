@@ -5,6 +5,7 @@ MODULE_OBJS := \
 	src/agents/RandomAgent.o \
 	src/agents/SingleActionAgent.o \
 	src/agents/SDLKeyboardAgent.o \
+	src/agents/SimpleBanditAgent.o \
 
 MODULE_DIRS += \
 	src/agents
