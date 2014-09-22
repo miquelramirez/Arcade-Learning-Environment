@@ -18,7 +18,7 @@ def main() :
 		sys.exit(1)
 
 
-	command = './ale -display_screen true -game_controller internal -player_agent %(agent_name)s %(rom_path)s'%locals()
+	command = './ale -display_screen true -max_sim_steps_per_frame 2000 -player_agent %(agent_name)s %(rom_path)s'%locals()
 	print >> sys.stdout, "Command:"
 	print >> sys.stdout, command
 	os.system( command)
