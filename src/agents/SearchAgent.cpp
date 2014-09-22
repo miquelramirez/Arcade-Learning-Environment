@@ -89,7 +89,8 @@ Action SearchAgent::act() {
 		assert(search_tree->get_root()->state.equals(state));
 		assert (search_tree->get_root_frame_number() == state.getFrameNumber());
 		search_tree->update_tree();
-	} else {
+	} else 
+	    {
 		// Build a new Search-Tree
 		search_tree->clear(); 
 		search_tree->build(state);

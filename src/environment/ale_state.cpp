@@ -64,12 +64,12 @@ const ALEState&	ALEState::operator=( const ALEState& other )
 	m_frame_number = other.m_frame_number;
 	m_episode_frame_number = other.m_episode_frame_number;
 	m_serialized_state = other.m_serialized_state;
-	if ( other.m_screen == nullptr )
-		m_screen = nullptr;
-	else
-	{
-		m_screen = new ALEScreen( *(other.m_screen) );
-	}
+	// if ( other.m_screen == nullptr )
+	// 	m_screen = nullptr;
+	// else
+	// {
+	// 	m_screen = new ALEScreen( *(other.m_screen) );
+	// }
 	m_ram = other.m_ram;
 
 	return *this;
@@ -105,21 +105,21 @@ ALEState ALEState::save(OSystem* osystem, RomSettings* settings, std::string md5
   }
 
   //if (!m_colour_averaging) 
-  {
+  // {
 
-	  m_screen = new ALEScreen(osystem->console().mediaSource().height(),
-				   osystem->console().mediaSource().width());
-	  // Copy screen over and we're done! 
-	  memcpy(m_screen->getArray(), 
-		 osystem->console().mediaSource().currentFrameBuffer(), m_screen->arraySize());
-  }
+  // 	  m_screen = new ALEScreen(osystem->console().mediaSource().height(),
+  // 				   osystem->console().mediaSource().width());
+  // 	  // Copy screen over and we're done! 
+  // 	  memcpy(m_screen->getArray(), 
+  // 		 osystem->console().mediaSource().currentFrameBuffer(), m_screen->arraySize());
+  // }
   //  m_ram.print();
   
   //  std::cout << "serialized "<<   ser.get_str() << std::endl;
   // Now make a copy of this state, also storing the emulator serialization
-	m_serialized_state = ser.get_str();
-	return *this;
- 	// return ALEState(*this, ser.get_str());
+  m_serialized_state = ser.get_str();
+  return *this;
+  // return ALEState(*this, ser.get_str());
 }
 
 void ALEState::incrementFrame(int steps /* = 1 */) {
