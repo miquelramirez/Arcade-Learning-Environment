@@ -1,6 +1,7 @@
 MODULE := src/agents
 
 MODULE_OBJS := \
+	src/agents/bit_array.o \
 	src/agents/PlayerAgent.o \
 	src/agents/RandomAgent.o \
 	src/agents/SingleActionAgent.o \

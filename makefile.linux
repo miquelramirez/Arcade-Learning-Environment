@@ -50,7 +50,7 @@ DOCDIR := /usr/local/share/doc/stella
 DATADIR := /usr/local/share
 PROFILE := 
 
-HAVE_GCC3 = 1
+HAVE_GCC3 = 0
 HAVE_NASM = 1
 
 INCLUDES += -Isrc/games -Isrc/emucore -Isrc/emucore/m6502/src -Isrc/emucore/m6502/src/bspf/src -Isrc/common -Isrc/controllers -Isrc/agents -Isrc/environment  
