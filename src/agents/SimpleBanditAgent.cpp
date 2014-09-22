@@ -22,7 +22,9 @@ SimpleBanditAgent::~SimpleBanditAgent() {
 
 Action	SimpleBanditAgent::act() {
 	// initialize lookahead environment
-	m_lookahead_env.setState( current_state() );
+    m_lookahead_env.restoreState(  current_state() );
+    std::cout <<  m_lookahead_env.equals_state( current_state() ) ;
+
 	int t = episode_frame_number;
 
 	m_log << "t=" << t << std::endl;
@@ -70,6 +72,6 @@ Action	SimpleBanditAgent::act() {
 	m_log << ( m_last_reward > 0 ? "Positive" : ( m_last_reward < 0 ? "Negative" : " Null" ) ) << " Reward: " << m_last_reward << std::endl;
 
 	m_last_action = selected;
-
+	
 	return selected;
 }

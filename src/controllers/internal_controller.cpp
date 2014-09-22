@@ -31,7 +31,7 @@ InternalController::InternalController(OSystem* osystem):
 }
 
 void InternalController::createAgents() {
-  m_agent_left.reset(PlayerAgent::generate_agent_instance(m_osystem, m_settings.get()));
+    m_agent_left.reset(PlayerAgent::generate_agent_instance(m_osystem, m_settings.get(), &m_environment));
 
   // Right agent is set to NULL. While this isn't necessary, all of the currently implemented
   //  agents return actions for player A. One easy fix would be to add PLAYER_B_NOOP to actions
@@ -81,20 +81,33 @@ void InternalController::run() {
 
 void InternalController::episodeStep(Action& action_a, Action& action_b) {
   // Request a new action
-  	if ( m_agent_left.get() != nullptr )
-		m_agent_left->update_state( &m_environment.getState() );
-	if ( m_agent_right.get() != nullptr )
-		m_agent_right->update_state( &m_environment.getState() );
+    if ( m_agent_left.get() != nullptr ){
+	ALEState new_state = m_environment.cloneState();
+	ALEState* p_new_state = new ALEState(new_state, new_state.serialized() );
+	string kk = new_state.serialized();
+	m_agent_left->update_state( p_new_state );
+    }
+    if ( m_agent_right.get() != nullptr ){
+	ALEState new_state = m_environment.cloneState();
+	ALEState* p_new_state = new ALEState(new_state, new_state.serialized() );
+	m_agent_right->update_state( p_new_state );
+    }
   action_a = (m_agent_left.get() != NULL) ? m_agent_left->agent_step() : PLAYER_A_NOOP;
   action_b = (m_agent_right.get() != NULL) ? m_agent_right->agent_step() : PLAYER_B_NOOP;
 }
 
 void InternalController::episodeStart(Action& action_a, Action& action_b) {
   // Poll the agents for their first action
-  	if ( m_agent_left.get() != nullptr )
-		m_agent_left->update_state( &m_environment.getState() );
-	if ( m_agent_right.get() != nullptr )
-		m_agent_right->update_state( &m_environment.getState() );
+    if ( m_agent_left.get() != nullptr ){
+	ALEState new_state = m_environment.cloneState();
+	ALEState* p_new_state = new ALEState(new_state, new_state.serialized() );
+	m_agent_left->update_state( p_new_state );
+    }
+    if ( m_agent_right.get() != nullptr ){
+	ALEState new_state = m_environment.cloneState();
+	ALEState* p_new_state = new ALEState(new_state, new_state.serialized() );
+	m_agent_right->update_state( p_new_state );
+    }
   
   action_a = (m_agent_left.get() != NULL) ? m_agent_left->episode_start() : PLAYER_A_NOOP;
   action_b = (m_agent_right.get() != NULL) ? m_agent_right->episode_start() : PLAYER_B_NOOP;

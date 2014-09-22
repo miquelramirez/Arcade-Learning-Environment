@@ -59,7 +59,19 @@ reward_t ALEController::applyActions(Action player_a, Action player_b) {
       break;
     default:
       // Pass action to emulator!
-      sum_rewards = m_environment.act(player_a, player_b);
+	// static RomSettings*  new_settings = buildRomRLWrapper(m_osystem->settings().getString("rom_file"));
+	// static StellaEnvironment test(m_osystem,  new_settings );
+	// ALEState new_state = m_environment.cloneState();
+	// //test.reset();
+	// test.restoreState( new_state );
+	// reward_t test_rewards = test.act( player_a, player_b);
+	sum_rewards = m_environment.act(player_a, player_b);
+	// if (sum_rewards != 0 )
+	//     std::cout << "reward: " << sum_rewards << "test-reward: " << test_rewards << std::endl;
+	// assert( test_rewards == sum_rewards );
+	// if (sum_rewards != 0 )
+	//     std::cout << "reward: " << sum_rewards << std::endl;
+
       break;
   }
   return sum_rewards;

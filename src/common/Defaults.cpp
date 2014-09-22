@@ -32,13 +32,23 @@ void setDefaultSettings(Settings &settings) {
 
     // Environment customization settings
     settings.setBool("record_trajectory", false);
-    settings.setBool("restricted_action_set", false);
+    settings.setBool("restricted_action_set", true);
     settings.setBool("use_starting_actions", true);
     settings.setBool("use_environment_distribution", false);
     settings.setString("random_seed", "time");
     settings.setBool("disable_color_averaging", false);
     settings.setInt("frame_skip", 1);
-
+    settings.setBool("normalize_rewards", true);
+    
     // Display Settings
     settings.setBool("display_screen", false);
+
+    // Search settings
+    settings.setInt("sim_steps_per_node", 100);
+    settings.setString("search_method", "fulltree");
+    
+    // Agent settings
+    settings.setString("player_agent", "search_agent");
+    settings.setFloat("discount_factor", 1.0);
+
 }

@@ -24,6 +24,7 @@ SDLKeyboardAgent::SDLKeyboardAgent(OSystem* _osystem, RomSettings* _settings) :
 
   // If not displaying the screen, there is little point in having keyboard control
   bool display_screen = settings.getBool("display_screen", false);
+
   if (display_screen) {
       p_osystem->p_display_screen->registerEventHandler(this);
   }

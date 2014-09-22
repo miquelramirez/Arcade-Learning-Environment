@@ -22,6 +22,8 @@
 #include "../emucore/Event.hxx"
 #include <string>
 #include "../games/RomSettings.hpp"
+#include "ale_ram.hpp"
+#include "ale_screen.hpp"
 
 #define PADDLE_DELTA 23000
 // MGB Values taken from Paddles.cxx (Stella 3.3) - 1400000 * [5,235] / 255
@@ -36,6 +38,8 @@ class ALEState {
     ALEState();
     // Makes a copy of this state, also storing emulator information provided as a string
     ALEState(const ALEState &rhs, std::string serialized);
+    ALEState(ALEState &rhs, std::string serialized);
+	~ALEState(){ if(m_screen) delete m_screen;}
 
     /** Resets the system to its start state. numResetSteps 'RESET' actions are taken after the
       *  start. */
@@ -62,7 +66,10 @@ class ALEState {
     //Get the number of frames executed this episode.
     const int getEpisodeFrameNumber() const { return m_episode_frame_number; }
 
+    ALERAM& getRAM()  { return m_ram; }
+    ALEScreen &getScreen() const { return *m_screen; }
 
+    string serialized() { return m_serialized_state; }
   protected:
     // Let StellaEnvironment access these methods: they are needed for emulation purposes
     friend class StellaEnvironment;
@@ -95,6 +102,9 @@ class ALEState {
     int m_episode_frame_number; // How many frames since the beginning of this episode
 
     string m_serialized_state; // The stored environment state, if this is a saved state
+
+    ALERAM m_ram; // The current ALE RAM
+	ALEScreen* m_screen;
 
 };
 

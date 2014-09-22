@@ -14,6 +14,7 @@
  **************************************************************************** */
 #include <sstream>
 #include "PlayerAgent.hpp"
+#include "SearchAgent.hpp"
 #include "RandomAgent.hpp"
 #include "SingleActionAgent.hpp"
 #include "SDLKeyboardAgent.hpp"
@@ -52,7 +53,8 @@ PlayerAgent::~PlayerAgent() {
 }
 
 void
-PlayerAgent::update_state( const ALEState* s ) {
+PlayerAgent::update_state(  ALEState *s ) {
+        if(curr_state) delete curr_state;
 	curr_state = s;
 }
 
@@ -140,11 +142,14 @@ bool PlayerAgent::has_terminated() {
     Note 2: The caller is responsible for deleting the returned pointer
 ******************************************************************** */
 PlayerAgent* PlayerAgent::generate_agent_instance(OSystem* _osystem,
-                                                RomSettings * _settings) {
+						  RomSettings * _settings,
+						  StellaEnvironment* _env ) {
     string player_agent = _osystem->settings().getString("player_agent");
     PlayerAgent* new_agent = NULL;
 
-    if (player_agent == "random_agent")
+    if (player_agent == "search_agent")
+	new_agent = new SearchAgent(_osystem, _settings, _env);
+    else if (player_agent == "random_agent")
       new_agent = new RandomAgent(_osystem, _settings);
     else if (player_agent == "single_action_agent")
       new_agent = new SingleActionAgent(_osystem, _settings);

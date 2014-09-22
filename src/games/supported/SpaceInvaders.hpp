@@ -54,6 +54,7 @@ class SpaceInvadersSettings : public RomSettings {
         bool m_terminal;
         reward_t m_reward;
         reward_t m_score;
+	unsigned m_lives;
       
         static ActionVect actions;
 };

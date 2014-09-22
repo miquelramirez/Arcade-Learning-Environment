@@ -55,13 +55,16 @@ class StellaEnvironment {
       */
     reward_t act(Action player_a_action, Action player_b_action);
 
+    /** This applies an action exactly one time step. Helper function to act(). */
+    reward_t oneStepAct(Action player_a_action, Action player_b_action);
+
     /** Returns true once we reach a terminal state */
     bool isTerminal();
 
     /** Accessor methods for the environment state. */
     void setState(const ALEState & state);
     const ALEState &getState() const;
-
+    bool equals_state(ALEState& s){ return m_state.equals(s); }
     /** Returns the current screen after processing (e.g. colour averaging) */
     const ALEScreen &getScreen() const { return m_screen; }
     const ALERAM &getRAM() const { return m_ram; }
@@ -70,9 +73,6 @@ class StellaEnvironment {
     int getEpisodeFrameNumber() const { return m_state.getEpisodeFrameNumber(); }
 
   private:
-    /** This applies an action exactly one time step. Helper function to act(). */
-    reward_t oneStepAct(Action player_a_action, Action player_b_action);
-
     /** Actually emulates the emulator for a given number of steps. */
     void emulate(Action player_a_action, Action player_b_action, size_t num_steps = 1);
 

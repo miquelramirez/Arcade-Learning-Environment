@@ -19,6 +19,7 @@
 #include "../common/Constants.h"
 #include "../games/RomSettings.hpp"
 #include "../environment/ale_state.hpp"
+#include "../environment/stella_environment.hpp"
 
 class PlayerAgent { 
 public:
@@ -53,13 +54,14 @@ public:
        Note 2: The caller is resposible for deleting the returned pointer
        ******************************************************************** */
     static PlayerAgent* generate_agent_instance(OSystem* _osystem, 
-                                                RomSettings * _settings);
+						    RomSettings * _settings,
+						    StellaEnvironment* _env );
    
     /** Returns true when the agent is done playing the game. */
     virtual bool has_terminated();
 
-    void update_state( const ALEState* s );
-    const ALEState& current_state() { return *curr_state; }
+    void update_state( ALEState *s );
+    ALEState& current_state() { return *curr_state; }
 
 protected:
     virtual Action act() = 0;
@@ -86,7 +88,7 @@ protected:
     ActionVect trajectory;
 
     bool m_has_terminated;
-    const ALEState*		curr_state;
+    ALEState*		curr_state;
 };
 
 

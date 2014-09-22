@@ -19,6 +19,7 @@
 #define __ALE_RAM_HPP__
 
 #include <string.h>
+#include <bitset>
 
 typedef unsigned char byte_t;
 
@@ -39,9 +40,40 @@ class ALERAM {
     /** Returns the whole array (equivalent to byte(0)). */
     byte_t *array() const { return (byte_t*)(m_ram); }
 
+    void print() const;
+    void print( unsigned int i) const;
+    
     size_t size() const { return sizeof(m_ram); }
     /** Returns whether two copies of the RAM are equal */
     bool equals(const ALERAM &rhs) const;
+
+	void reset(){
+		for (size_t i = 0; i < size(); i++){
+			
+			m_ram[i & 0x7F] = (byte_t)0;
+		}
+
+	}
+	void or_op(const ALERAM &rhs){
+		for (size_t i = 0; i < size(); i++){
+			
+			m_ram[i & 0x7F] = m_ram[i & 0x7F] | rhs.get(i);
+		}
+	}
+
+	bool new_bit(const ALERAM &rhs){
+		for (size_t i = 0; i < size(); i++){
+			
+			byte_t  b = (m_ram[i & 0x7F] ^ rhs.get(i)) & rhs.get(i) ;
+			if (b != (byte_t)0){
+				// std::cout <<"b = "<< (bitset<8>) b << std::endl;
+				// print(i);
+				// rhs.print(i);
+				return true;
+			}
+		}
+		return false;
+	}
 
   protected:
     byte_t m_ram[RAM_SIZE];
@@ -60,6 +92,19 @@ inline ALERAM& ALERAM::operator=(const ALERAM &rhs) {
   memcpy(m_ram, rhs.m_ram, sizeof(m_ram));
 
   return *this;
+}
+
+
+inline void ALERAM::print() const {
+  for (size_t i = 0; i < size(); i++){
+	  std::cout << i <<" = "<< (bitset<8>) m_ram[i & 0x7F] << std::endl;
+  }
+}
+
+inline void ALERAM::print( unsigned int i) const {
+
+	  std::cout << i <<" = "<< (bitset<8>) m_ram[i & 0x7F] << std::endl;
+
 }
 
 inline bool ALERAM::equals(const ALERAM &rhs) const {

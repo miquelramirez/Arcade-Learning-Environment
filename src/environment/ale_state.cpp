@@ -19,7 +19,8 @@ ALEState::ALEState():
   m_left_paddle(PADDLE_DEFAULT_VALUE),
   m_right_paddle(PADDLE_DEFAULT_VALUE),
   m_frame_number(0),
-  m_episode_frame_number(0){
+  m_episode_frame_number(0),
+  m_screen(NULL){
 }
 
 ALEState::ALEState(const ALEState &rhs, std::string serialized):
@@ -27,7 +28,17 @@ ALEState::ALEState(const ALEState &rhs, std::string serialized):
   m_right_paddle(rhs.m_right_paddle),
   m_frame_number(rhs.m_frame_number),
   m_episode_frame_number(rhs.m_episode_frame_number),
-  m_serialized_state(serialized) {
+  m_serialized_state(serialized),
+  m_screen(NULL) {
+}
+
+ALEState::ALEState(ALEState &rhs, std::string serialized):
+  m_left_paddle(rhs.m_left_paddle),
+  m_right_paddle(rhs.m_right_paddle),
+  m_frame_number(rhs.m_frame_number),
+  m_episode_frame_number(rhs.m_episode_frame_number),
+  m_serialized_state(serialized),
+  m_screen(NULL){
 }
 
 /** Restores ALE to the given previously saved state. */ 
@@ -53,7 +64,24 @@ ALEState ALEState::save(OSystem* osystem, RomSettings* settings, std::string md5
   
   osystem->console().system().saveState(md5, ser);
   settings->saveState(ser);
+  
+  //std::cout << "RAM " << std::endl;
+  for (size_t i = 0; i < m_ram.size(); i++){
+	  *m_ram.byte(i) = osystem->console().system().peek(i + 0x80); 
+  }
 
+  //if (!m_colour_averaging) 
+  {
+
+	  m_screen = new ALEScreen(osystem->console().mediaSource().height(),
+				   osystem->console().mediaSource().width());
+	  // Copy screen over and we're done! 
+	  memcpy(m_screen->getArray(), 
+		 osystem->console().mediaSource().currentFrameBuffer(), m_screen->arraySize());
+  }
+  //  m_ram.print();
+  
+  //  std::cout << "serialized "<<   ser.get_str() << std::endl;
   // Now make a copy of this state, also storing the emulator serialization
   return ALEState(*this, ser.get_str());
 }
@@ -439,8 +467,8 @@ void ALEState::resetKeys(Event* event) {
 }
 
 bool ALEState::equals(ALEState &rhs) {
-  return (rhs.m_serialized_state == this->m_serialized_state &&
-    rhs.m_left_paddle == this->m_left_paddle &&
+    return (rhs.m_serialized_state == this->m_serialized_state &&
+	  rhs.m_left_paddle == this->m_left_paddle &&
     rhs.m_right_paddle == this->m_right_paddle &&
     rhs.m_frame_number == this->m_frame_number) &&
   rhs.m_episode_frame_number == this->m_episode_frame_number;

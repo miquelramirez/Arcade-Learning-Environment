@@ -50,6 +50,15 @@ void SpaceInvadersSettings::step(const System& system) {
         int some_byte = readRam(&system, 0x98); 
         int lives = readRam(&system, 0xC9);
         m_terminal = (some_byte & 0x80) || lives == 0;
+	if (m_lives == 0) m_lives = lives;
+	
+	if (lives < m_lives){
+		m_lives = lives;
+		m_reward = -1000;
+		std::cout << "LOST a live" << m_lives<<std::endl;
+	}
+	if(m_terminal)
+		std::cout << "Terminal State"<<std::endl;
     }
 }
 
@@ -90,6 +99,7 @@ void SpaceInvadersSettings::reset() {
     
     m_reward   = 0;
     m_score    = 0;
+    m_lives    = 0;
     m_terminal = false;
 }
 
@@ -98,6 +108,7 @@ void SpaceInvadersSettings::reset() {
 void SpaceInvadersSettings::saveState(Serializer & ser) {
   ser.putInt(m_reward);
   ser.putInt(m_score);
+  ser.putInt(m_lives);
   ser.putBool(m_terminal);
 }
 
@@ -105,6 +116,7 @@ void SpaceInvadersSettings::saveState(Serializer & ser) {
 void SpaceInvadersSettings::loadState(Deserializer & ser) {
   m_reward = ser.getInt();
   m_score = ser.getInt();
+  m_lives = ser.getInt();
   m_terminal = ser.getBool();
 }
 

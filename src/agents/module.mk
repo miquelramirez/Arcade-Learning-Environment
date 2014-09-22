@@ -6,6 +6,10 @@ MODULE_OBJS := \
 	src/agents/SingleActionAgent.o \
 	src/agents/SDLKeyboardAgent.o \
 	src/agents/SimpleBanditAgent.o \
+	src/agents/SearchAgent.o \
+	src/agents/SearchTree.o \
+	src/agents/TreeNode.o \
+	src/agents/FullSearchTree.o 
 
 MODULE_DIRS += \
 	src/agents
