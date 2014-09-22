@@ -43,7 +43,11 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
     initialized(false),
     duplicate(false) 
 {
-    
+    if(parent == NULL)
+	m_depth = 0;
+    else
+	m_depth = parent->m_depth + 1;
+
     if(tree)
 	init(tree, a, num_simulate_steps);
 }
@@ -70,17 +74,4 @@ int TreeNode::num_nodes() {
   }
 
   return numNodes + 1;
-}
-
-int TreeNode::depth() {
-  int max_depth = 0;
-
-  // Base case: no children, depth = 1
-  for (size_t a = 0; a < v_children.size(); a++) {
-    int d = v_children[a]->depth();
-    if (d > max_depth)
-      max_depth = d;
-  }
-
-  return max_depth + 1;
 }

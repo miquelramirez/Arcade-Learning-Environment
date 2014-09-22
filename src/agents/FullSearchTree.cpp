@@ -166,22 +166,24 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 
 				// TODO: FullSearchTree needs to be split into two classes
 				// the new one encapsulating the novelty-based search algorithm
-				if ( check_novelty_1( child->state.getRAM() ) ) {
-				//if ( check_novelty_1( child->state.getScreen() ) ) {
+				if(m_novelty_pruning){
+				    if ( check_novelty_1( child->state.getRAM() ) ) {
+					//if ( check_novelty_1( child->state.getScreen() ) ) {
 					update_novelty_table( child->state.getRAM() );
 					//update_novelty_table( child->state.getScreen() );
-				}
-				else{
+				    }
+				    else{
 					//delete child;
 					curr_node->v_children.push_back(child);
 					child->is_terminal = true;
 					m_pruned_nodes++;
 					continue;
-				
+					
+				    }
 				}
-			
+				if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 				num_simulated_steps += child->num_simulated_steps;
-	
+				
 				curr_node->v_children.push_back(child);
 			}
 			else {
@@ -211,7 +213,7 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
     
 	if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
 
-	std::cout << "expanded=" << m_expanded_nodes << ",generated=" << m_generated_nodes << ",pruned=" << m_pruned_nodes << std::endl;
+	std::cout << "expanded=" << m_expanded_nodes << ",generated=" << m_generated_nodes << ",pruned=" << m_pruned_nodes << ",depth_tree=" << m_max_depth << std::endl;
 	
 	update_branch_return(start_node);
 }

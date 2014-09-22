@@ -22,7 +22,7 @@ void setDefaultSettings(Settings &settings) {
     // Controller settings
     settings.setString("game_controller", "internal");
     settings.setString("player_agent", "random_agent");
-    settings.setInt("max_num_episodes", 10);
+    settings.setInt("max_num_episodes", 2);
     settings.setInt("max_num_frames", 0);
     settings.setInt("max_num_frames_per_episode", 0);
     settings.setInt("system_reset_steps", 4);
@@ -31,12 +31,12 @@ void setDefaultSettings(Settings &settings) {
     settings.setBool("run_length_encoding", true);
 
     // Environment customization settings
-    settings.setBool("record_trajectory", false);
+    settings.setBool("record_trajectory", true);
     settings.setBool("restricted_action_set", true);
     settings.setBool("use_starting_actions", true);
     settings.setBool("use_environment_distribution", false);
     settings.setString("random_seed", "time");
-    settings.setBool("disable_color_averaging", false);
+    settings.setBool("disable_color_averaging", true);
     settings.setInt("frame_skip", 1);
     settings.setBool("normalize_rewards", true);
     
@@ -44,9 +44,9 @@ void setDefaultSettings(Settings &settings) {
     settings.setBool("display_screen", false);
 
     // Search settings
-    settings.setInt( "sim_steps_per_node", 30 ); // every 30 frames, at 60 frames per second, this means 1 action every 0.5 secs
+    settings.setInt( "sim_steps_per_node", 5 ); // every 30 frames, at 60 frames per second, this means 1 action every 0.5 secs
     //settings.setInt("sim_steps_per_node", 100);
-    settings.setString("search_method", "fulltree");
+    settings.setString("search_method", "brfs");
     
     // Agent settings
     settings.setString("player_agent", "search_agent");

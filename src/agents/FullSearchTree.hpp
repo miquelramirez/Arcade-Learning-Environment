@@ -50,7 +50,9 @@ class FullSearchTree : public SearchTree {
 			Re-expands the tree until i_max_sim_steps_per_tree is reached
          ******************************************************************* */
 		virtual void update_tree();
-		
+
+
+
 	protected:	
 
     /* For debugging purposes */
@@ -82,6 +84,8 @@ class FullSearchTree : public SearchTree {
 	ALERAM 			m_ram;
 	aptk::Bit_Matrix*	m_ram_novelty_table;
 	aptk::Bit_Matrix*	m_screen_novelty_table;
+
+
 };
 
 

@@ -59,6 +59,7 @@ void SearchTree::clear(void) {
 		p_root = NULL;
 	}
 	is_built = false;
+	m_max_depth = 0;
 }
 
 /* *********************************************************************

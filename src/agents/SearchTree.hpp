@@ -94,10 +94,12 @@ class SearchTree {
 
     /** Normalizes a reward using the first non-zero reward's magnitude */ 
     return_t normalize(reward_t reward);
-
+    unsigned max_depth(){ return m_max_depth; }
     int num_nodes();
 
-		bool is_built;			// True whe the tree is built
+    void set_novelty_pruning(){ m_novelty_pruning = true;}
+
+    bool is_built;			// True whe the tree is built
 	
     /** Debugging methods */
 
@@ -152,8 +154,11 @@ class SearchTree {
     
     StellaEnvironment* m_env;
 
-	unsigned m_expanded_nodes;
-	unsigned m_generated_nodes;
+    unsigned m_expanded_nodes;
+    unsigned m_generated_nodes;
+    unsigned m_max_depth;
+
+    bool   m_novelty_pruning;
 };
 
 #endif // __SEARCH_TREE_HPP__

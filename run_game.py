@@ -7,10 +7,10 @@ def main() :
 
 	if len(sys.argv) < 3 :
 		print >> sys.stderr, "Missing parameters!"
-		print >> sys.stderr, "Usage: ./run_game.py <internal agent name> <path to ROM>"
+		print >> sys.stderr, "Usage: ./run_game.py <search_method> <path to ROM>"
 		sys.exit(1)
 
-	agent_name = sys.argv[1]
+	search_method = sys.argv[1]
 	rom_path = sys.argv[2]
 
 	if not os.path.exists( rom_path ) :
@@ -18,7 +18,7 @@ def main() :
 		sys.exit(1)
 
 
-	command = './ale -display_screen true -max_sim_steps_per_frame 2000 -player_agent %(agent_name)s %(rom_path)s'%locals()
+	command = './ale -display_screen true -max_sim_steps_per_frame 12000 -player_agent search_agent -search_method %(search_method)s %(rom_path)s'%locals()
 	print >> sys.stdout, "Command:"
 	print >> sys.stdout, command
 	os.system( command)

@@ -25,7 +25,7 @@
 
 class SearchAgent : public PlayerAgent {
     public:
-        SearchAgent(OSystem * _osystem, RomSettings * _settings, StellaEnvironment* _env);
+    SearchAgent(OSystem * _osystem, RomSettings * _settings, StellaEnvironment* _env);
         virtual ~SearchAgent();
 		
         /* *********************************************************************
@@ -45,6 +45,8 @@ class SearchAgent : public PlayerAgent {
         
         int num_available_actions();
         ActionVect &get_available_actions();
+        
+
 
   protected:
     Action m_curr_action;
@@ -55,6 +57,7 @@ class SearchAgent : public PlayerAgent {
     int sim_steps_per_node;
 
     string search_method;
+
 };
 
 #endif // __SEARCH_AGENT_HPP__

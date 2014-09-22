@@ -58,7 +58,7 @@ class TreeNode {
 	bool is_duplicate() { return duplicate; }
 
 	int num_nodes();
-	int depth();
+    int depth(){ return m_depth;}
 
 	ALEState state;
 
@@ -78,6 +78,7 @@ class TreeNode {
 
     	// Whether this node was flagged as a duplicate
     	bool duplicate;
+        int m_depth;
 };
 
 

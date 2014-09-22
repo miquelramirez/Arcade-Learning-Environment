@@ -31,9 +31,16 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
     search_method = p_osystem->settings().getString("search_method", true); 
     
     // Depending on the configuration, create a SearchTree of the requested type
-    if (search_method == "fulltree") {
+    if (search_method == "brfs") {
 	search_tree = new FullSearchTree(_settings, _osystem->settings(),
 					 available_actions, _env);
+	
+    }else if( search_method == "novelty"){
+	search_tree = new FullSearchTree(_settings, _osystem->settings(),
+					 available_actions, _env);
+	
+	search_tree->set_novelty_pruning();
+    
     // } else if (search_method == "uct") {
     // 	search_tree = new UCTSearchTree(_settings, _osystem->settings(),
     // 					available_actions);
@@ -82,14 +89,14 @@ Action SearchAgent::act() {
 
 	state = m_env->cloneState();
 
-	if (search_tree->is_built) {
-		// Re-use the old tree
-		search_tree->move_to_best_sub_branch();
+	// if (search_tree->is_built) {
+	// 	// Re-use the old tree
+	// 	search_tree->move_to_best_sub_branch();
    
-		assert(search_tree->get_root()->state.equals(state));
-		assert (search_tree->get_root_frame_number() == state.getFrameNumber());
-		search_tree->update_tree();
-	} else 
+	// 	assert(search_tree->get_root()->state.equals(state));
+	// 	assert (search_tree->get_root_frame_number() == state.getFrameNumber());
+	// 	search_tree->update_tree();
+	// } else 
 	    {
 		// Build a new Search-Tree
 		search_tree->clear(); 
@@ -97,7 +104,8 @@ Action SearchAgent::act() {
 	}
 
 	m_curr_action = search_tree->get_best_action();
-	std::cout << "Best Action: " << action_to_string( m_curr_action );	
+	std::cout << " Tree Size: " << search_tree->num_nodes(); 
+	std::cout << " Best Action: " << action_to_string( m_curr_action );	
 	std::cout << " branch_reward: " << search_tree->get_root_value() << std::endl;
 
 	m_env->restoreState( state );
