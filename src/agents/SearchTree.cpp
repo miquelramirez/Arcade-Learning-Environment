@@ -109,8 +109,8 @@ void SearchTree::move_to_best_sub_branch(void) {
 	assert(p_root->v_children.size() > 0);
 	assert(p_root->best_branch != -1);
 	
-  // Delete all the other branches
-  for (size_t del = 0; del < p_root->v_children.size(); del++) {
+	// Delete all the other branches
+	for (size_t del = 0; del < p_root->v_children.size(); del++) {
 		if (del != (size_t)p_root->best_branch) {
 			delete_branch(p_root->v_children[del]);
 		}

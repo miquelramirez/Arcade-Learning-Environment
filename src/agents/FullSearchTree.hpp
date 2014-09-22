@@ -75,6 +75,9 @@ class FullSearchTree : public SearchTree {
 
 	void	update_novelty_table( const ALEScreen& screen );
 	bool	check_novelty_1( const ALEScreen& screen );
+
+	virtual void	clear();
+	virtual void	move_to_best_sub_branch();
 	
 	ALERAM 			m_ram;
 	aptk::Bit_Matrix*	m_ram_novelty_table;

@@ -54,7 +54,7 @@ void SpaceInvadersSettings::step(const System& system) {
 	
 	if (lives < m_lives){
 		m_lives = lives;
-		m_reward = -1000;
+		//m_reward = -1000;
 		std::cout << "LOST a live" << m_lives<<std::endl;
 	}
 	if(m_terminal)

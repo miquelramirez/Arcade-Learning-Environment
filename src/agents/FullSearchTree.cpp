@@ -125,14 +125,14 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 	//m_ram.reset();
 	//m_ram.or_op(start_node->state.getRAM());
 	
-	m_ram_novelty_table->clear();
 	update_novelty_table( start_node->state.getRAM() );
+	/*
 	if ( m_screen_novelty_table == nullptr )
 		m_screen_novelty_table = new aptk::Bit_Matrix( start_node->state.getScreen().height() * start_node->state.getScreen().width(), 256 );
 	else
 		m_screen_novelty_table->clear();
 	update_novelty_table( start_node->state.getScreen() );
-
+	*/
 	int num_simulated_steps = 0;
 	int num_actions = available_actions.size();
 
@@ -164,14 +164,12 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 						act,
 						sim_steps_per_node); 
 
-		
-				//if( m_ram.new_bit( child->state.getRAM()) )	{
-				//if ( check_novelty_1( child->state.getRAM() ) ) {
-				if ( check_novelty_1( child->state.getScreen() ) ) {
-					//m_ram.or_op(child->state.getRAM());
-					//update_novelty_table( child->state.getRAM() );
-					update_novelty_table( child->state.getScreen() );
-					//std::cout << "screen size: "<<child->state.getScreen().arraySize() << std::endl;
+				// TODO: FullSearchTree needs to be split into two classes
+				// the new one encapsulating the novelty-based search algorithm
+				if ( check_novelty_1( child->state.getRAM() ) ) {
+				//if ( check_novelty_1( child->state.getScreen() ) ) {
+					update_novelty_table( child->state.getRAM() );
+					//update_novelty_table( child->state.getScreen() );
 				}
 				else{
 					//delete child;
@@ -181,14 +179,21 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 					continue;
 				
 				}
-
-
+			
 				num_simulated_steps += child->num_simulated_steps;
 	
 				curr_node->v_children.push_back(child);
 			}
-			else
+			else {
 				child = curr_node->v_children[a];
+				if ( !child->is_terminal )
+					num_simulated_steps += child->num_simulated_steps;
+
+				// This recreates the novelty table (which gets resetted every time
+				// we change the root of the search tree)
+				update_novelty_table( child->state.getRAM() );
+		
+			}
 
 			// Don't expand duplicate nodes, or terminal nodes
 			if (!child->is_terminal) {
@@ -211,7 +216,18 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 	update_branch_return(start_node);
 }
 
+void FullSearchTree::clear()
+{
+	SearchTree::clear();
+	m_ram_novelty_table->clear();
+}
 
+void FullSearchTree::move_to_best_sub_branch() 
+{
+	SearchTree::move_to_best_sub_branch();
+	m_ram_novelty_table->clear();
+
+}
 
 /* *********************************************************************
    Updates the branch reward for the given node

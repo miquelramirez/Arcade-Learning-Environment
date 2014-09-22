@@ -44,7 +44,8 @@ void setDefaultSettings(Settings &settings) {
     settings.setBool("display_screen", false);
 
     // Search settings
-    settings.setInt("sim_steps_per_node", 100);
+    settings.setInt( "sim_steps_per_node", 30 ); // every 30 frames, at 60 frames per second, this means 1 action every 0.5 secs
+    //settings.setInt("sim_steps_per_node", 100);
     settings.setString("search_method", "fulltree");
     
     // Agent settings

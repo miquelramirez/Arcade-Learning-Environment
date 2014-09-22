@@ -71,19 +71,23 @@ Action SearchAgent::agent_step() {
     Returns a random action from the set of possible actions
  ******************************************************************** */
 Action SearchAgent::act() {
-  // Generate a new action every sim_steps_per node; otherwise return the
-  //  current selected action  
-  if (frame_number % sim_steps_per_node != 0)
-    return m_curr_action;
-  
-  state = m_env->cloneState();
+	// Generate a new action every sim_steps_per node; otherwise return the
+	//  current selected action 
+		
+	if (frame_number % sim_steps_per_node != 0)
+		return m_curr_action;
+	
+	std::cout << "Search Agent action selection: frame=" << frame_number << std::endl;
+	std::cout << "Evaluating actions: " << std::endl;
 
-  if (search_tree->is_built) {
+	state = m_env->cloneState();
+
+	if (search_tree->is_built) {
 		// Re-use the old tree
 		search_tree->move_to_best_sub_branch();
    
-    assert(search_tree->get_root()->state.equals(state));
-    assert (search_tree->get_root_frame_number() == state.getFrameNumber());
+		assert(search_tree->get_root()->state.equals(state));
+		assert (search_tree->get_root_frame_number() == state.getFrameNumber());
 		search_tree->update_tree();
 	} else {
 		// Build a new Search-Tree
@@ -92,12 +96,12 @@ Action SearchAgent::act() {
 	}
 
 	m_curr_action = search_tree->get_best_action();
+	std::cout << "Best Action: " << action_to_string( m_curr_action );	
+	std::cout << " branch_reward: " << search_tree->get_root_value() << std::endl;
+
+	m_env->restoreState( state );
 	
-	std::cout << m_curr_action<<" branch_reward: "<<search_tree->get_root_value() << " ";
-
-  m_env->restoreState( state );
-
-  return m_curr_action;
+	return m_curr_action;
 }
 
 
