@@ -18,6 +18,7 @@
 #define __FULL_SEARCH_TREE_HPP__
 
 #include "SearchTree.hpp"
+#include "bit_matrix.hxx"
 #include "../environment/ale_ram.hpp"
 
 
@@ -68,9 +69,12 @@ class FullSearchTree : public SearchTree {
 		void update_branch_return(TreeNode* node);
 
     void set_terminal_root(TreeNode* node); 
-	
-	ALERAM m_ram;
 
+	void	update_novelty_table( const ALERAM &machine_state );
+	bool	check_novelty_1( const ALERAM& machine_state );
+	
+	ALERAM 			m_ram;
+	aptk::Bit_Matrix*	m_novelty_table;
 };
 
 

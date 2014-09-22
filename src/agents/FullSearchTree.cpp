@@ -26,14 +26,14 @@
 FullSearchTree::FullSearchTree(RomSettings *rom_settings, Settings &settings,
 			       ActionVect &actions, StellaEnvironment* _env) :
     SearchTree(rom_settings, settings, actions, _env) {
-	
+	m_novelty_table = new aptk::Bit_Matrix( RAM_SIZE, 256 );	
 }
 
 /* *********************************************************************
    Destructor
    ******************************************************************* */
 FullSearchTree::~FullSearchTree() {
-
+	delete m_novelty_table;
 }
 
 /* *********************************************************************
@@ -72,6 +72,21 @@ void FullSearchTree::update_tree() {
     expand_tree(p_root);
 }
 
+void FullSearchTree::update_novelty_table( const ALERAM& machine_state )
+{
+	for ( size_t i = 0; i < machine_state.size(); i++ )
+		m_novelty_table->set( i, machine_state.get(i) );
+}
+
+bool FullSearchTree::check_novelty_1( const ALERAM& machine_state )
+{
+	for ( size_t i = 0; i < machine_state.size(); i++ )
+		if ( !m_novelty_table->isset( i, machine_state.get(i) ) )
+			return true;
+	return false;
+}
+
+
 /* *********************************************************************
    Expands the tree from the given node until i_max_sim_steps_per_frame
    is reached
@@ -88,8 +103,11 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
     queue<TreeNode*> q;
     q.push(start_node);
 
-    m_ram.reset();
-    m_ram.or_op(start_node->state.getRAM());
+    //m_ram.reset();
+    //m_ram.or_op(start_node->state.getRAM());
+
+	m_novelty_table->clear();
+	update_novelty_table( start_node->state.getRAM() );
 
 
     int num_simulated_steps = 0;
@@ -121,14 +139,14 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 				     sim_steps_per_node); 
 
 		
-		if( m_ram.new_bit( child->state.getRAM()) )
-			{
-				m_new_RAM++;
-				m_ram.or_op(child->state.getRAM());
-				std::cout << "screen size: "<<child->state.getScreen().arraySize() << std::endl;
-				
-				
-			}
+		//if( m_ram.new_bit( child->state.getRAM()) )	{
+		if ( check_novelty_1( child->state.getRAM() ) ) {
+			m_new_RAM++;
+			//m_ram.or_op(child->state.getRAM());
+			update_novelty_table( child->state.getRAM() );
+
+			//std::cout << "screen size: "<<child->state.getScreen().arraySize() << std::endl;
+		}
 		else{
 			//delete child;
 			curr_node->v_children.push_back(child);
