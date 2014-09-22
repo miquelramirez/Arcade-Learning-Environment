@@ -26,14 +26,17 @@
 FullSearchTree::FullSearchTree(RomSettings *rom_settings, Settings &settings,
 			       ActionVect &actions, StellaEnvironment* _env) :
     SearchTree(rom_settings, settings, actions, _env) {
-	m_novelty_table = new aptk::Bit_Matrix( RAM_SIZE, 256 );	
+	m_ram_novelty_table = new aptk::Bit_Matrix( RAM_SIZE, 256 );
+	m_screen_novelty_table = nullptr;	
 }
 
 /* *********************************************************************
    Destructor
    ******************************************************************* */
 FullSearchTree::~FullSearchTree() {
-	delete m_novelty_table;
+	delete m_ram_novelty_table;
+	if ( m_screen_novelty_table )
+		delete m_screen_novelty_table;
 }
 
 /* *********************************************************************
@@ -75,17 +78,33 @@ void FullSearchTree::update_tree() {
 void FullSearchTree::update_novelty_table( const ALERAM& machine_state )
 {
 	for ( size_t i = 0; i < machine_state.size(); i++ )
-		m_novelty_table->set( i, machine_state.get(i) );
+		m_ram_novelty_table->set( i, machine_state.get(i) );
 }
 
 bool FullSearchTree::check_novelty_1( const ALERAM& machine_state )
 {
 	for ( size_t i = 0; i < machine_state.size(); i++ )
-		if ( !m_novelty_table->isset( i, machine_state.get(i) ) )
+		if ( !m_ram_novelty_table->isset( i, machine_state.get(i) ) )
 			return true;
 	return false;
 }
 
+void FullSearchTree::update_novelty_table( const ALEScreen& screen )
+{
+
+	for ( size_t i = 0; i < screen.height(); i++ )
+		for ( size_t j = 0; j < screen.width(); j++ )
+			m_screen_novelty_table->set( i * screen.width() + j, screen.get(i,j) );
+}
+
+bool FullSearchTree::check_novelty_1( const ALEScreen& screen )
+{
+	for ( size_t i = 0; i < screen.height(); i++ )
+		for ( size_t j = 0; j < screen.width(); j++ )
+			if ( m_screen_novelty_table->isset( i * screen.width() + j, screen.get(i,j) ) )
+				return true;
+	return false;
+}
 
 /* *********************************************************************
    Expands the tree from the given node until i_max_sim_steps_per_frame
@@ -93,96 +112,103 @@ bool FullSearchTree::check_novelty_1( const ALERAM& machine_state )
 	
    ******************************************************************* */
 void FullSearchTree::expand_tree(TreeNode* start_node) {
-    // If the root is terminal, we will not expand any of its children; deal with this
-    //  appropriately
-    if (start_node->is_terminal) {
-	set_terminal_root(start_node);
-	return;
-    }
-
-    queue<TreeNode*> q;
-    q.push(start_node);
-
-    //m_ram.reset();
-    //m_ram.or_op(start_node->state.getRAM());
-
-	m_novelty_table->clear();
-	update_novelty_table( start_node->state.getRAM() );
-
-
-    int num_simulated_steps = 0;
-    int num_actions = available_actions.size();
-
-    m_expanded_nodes = 0;
-    m_generated_nodes = 0;
-    int m_new_RAM = 0;
-    while(!q.empty()) {
-	// Pop a node to expand
-	TreeNode* curr_node = q.front();
-	q.pop();
-
-       
-	bool leaf_node = (curr_node->v_children.empty());
-	m_expanded_nodes++;
-	// Expand all of its children (simulates the result)
-	for (int a = 0; a < num_actions; a++) {
-	    Action act = available_actions[a];
-
-	    TreeNode * child;
-
-	    // If re-expanding an internal node, don't creates new nodes
-	    if (leaf_node) {
-		child = new TreeNode(curr_node,	
-				     curr_node->state,
-				     this,
-				     act,
-				     sim_steps_per_node); 
-
-		
-		//if( m_ram.new_bit( child->state.getRAM()) )	{
-		if ( check_novelty_1( child->state.getRAM() ) ) {
-			m_new_RAM++;
-			//m_ram.or_op(child->state.getRAM());
-			update_novelty_table( child->state.getRAM() );
-
-			//std::cout << "screen size: "<<child->state.getScreen().arraySize() << std::endl;
-		}
-		else{
-			//delete child;
-			curr_node->v_children.push_back(child);
-			child->is_terminal = true;
-			m_generated_nodes++;
-			continue;
-				
-		}
-
-
-		num_simulated_steps += child->num_simulated_steps;
-
-		curr_node->v_children.push_back(child);
-		m_generated_nodes++;
-	    }
-	    else
-		child = curr_node->v_children[a];
-
-	    // Don't expand duplicate nodes, or terminal nodes
-	    if (!child->is_terminal) {
-		if (! (ignore_duplicates && test_duplicate(child)) )
-		    q.push(child);
-	    }
+	// If the root is terminal, we will not expand any of its children; deal with this
+	//  appropriately
+	if (start_node->is_terminal) {
+		set_terminal_root(start_node);
+		return;
 	}
+
+	queue<TreeNode*> q;
+	q.push(start_node);
+
+	//m_ram.reset();
+	//m_ram.or_op(start_node->state.getRAM());
 	
-	// Stop once we have simulated a maximum number of steps
-	if (num_simulated_steps >= max_sim_steps_per_frame) {
-	    break;
-	}
+	m_ram_novelty_table->clear();
+	update_novelty_table( start_node->state.getRAM() );
+	if ( m_screen_novelty_table == nullptr )
+		m_screen_novelty_table = new aptk::Bit_Matrix( start_node->state.getScreen().height() * start_node->state.getScreen().width(), 256 );
+	else
+		m_screen_novelty_table->clear();
+	update_novelty_table( start_node->state.getScreen() );
+
+	int num_simulated_steps = 0;
+	int num_actions = available_actions.size();
+
+	m_expanded_nodes = 0;
+	m_generated_nodes = 0;
+
+	int m_pruned_nodes = 0;
+
+	while(!q.empty()) {
+		// Pop a node to expand
+		TreeNode* curr_node = q.front();
+		q.pop();
+	
+       
+		bool leaf_node = (curr_node->v_children.empty());
+		m_expanded_nodes++;
+		// Expand all of its children (simulates the result)
+		for (int a = 0; a < num_actions; a++) {
+			Action act = available_actions[a];
+	
+		    	TreeNode * child;
+
+			// If re-expanding an internal node, don't creates new nodes
+			if (leaf_node) {
+				m_generated_nodes++;
+				child = new TreeNode(curr_node,	
+						curr_node->state,
+						this,
+						act,
+						sim_steps_per_node); 
+
 		
-    }
+				//if( m_ram.new_bit( child->state.getRAM()) )	{
+				//if ( check_novelty_1( child->state.getRAM() ) ) {
+				if ( check_novelty_1( child->state.getScreen() ) ) {
+					//m_ram.or_op(child->state.getRAM());
+					//update_novelty_table( child->state.getRAM() );
+					update_novelty_table( child->state.getScreen() );
+					//std::cout << "screen size: "<<child->state.getScreen().arraySize() << std::endl;
+				}
+				else{
+					//delete child;
+					curr_node->v_children.push_back(child);
+					child->is_terminal = true;
+					m_pruned_nodes++;
+					continue;
+				
+				}
+
+
+				num_simulated_steps += child->num_simulated_steps;
+	
+				curr_node->v_children.push_back(child);
+			}
+			else
+				child = curr_node->v_children[a];
+
+			// Don't expand duplicate nodes, or terminal nodes
+			if (!child->is_terminal) {
+				if (! (ignore_duplicates && test_duplicate(child)) )
+					q.push(child);
+			}
+		}
+	
+		// Stop once we have simulated a maximum number of steps
+		if (num_simulated_steps >= max_sim_steps_per_frame) {
+			break;
+		}
+		
+	}
     
-    if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
-    
-    std::cout << "new_Rams "<<m_new_RAM << " out of " << m_generated_nodes << std::endl;
-    update_branch_return(start_node);
+	if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
+
+	std::cout << "expanded=" << m_expanded_nodes << ",generated=" << m_generated_nodes << ",pruned=" << m_pruned_nodes << std::endl;
+	
+	update_branch_return(start_node);
 }
 
 

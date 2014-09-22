@@ -72,9 +72,13 @@ class FullSearchTree : public SearchTree {
 
 	void	update_novelty_table( const ALERAM &machine_state );
 	bool	check_novelty_1( const ALERAM& machine_state );
+
+	void	update_novelty_table( const ALEScreen& screen );
+	bool	check_novelty_1( const ALEScreen& screen );
 	
 	ALERAM 			m_ram;
-	aptk::Bit_Matrix*	m_novelty_table;
+	aptk::Bit_Matrix*	m_ram_novelty_table;
+	aptk::Bit_Matrix*	m_screen_novelty_table;
 };
 
 

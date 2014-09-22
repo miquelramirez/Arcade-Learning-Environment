@@ -35,10 +35,14 @@
 
 class ALEState {
   public:
-    ALEState();
-    // Makes a copy of this state, also storing emulator information provided as a string
-    ALEState(const ALEState &rhs, std::string serialized);
-    ALEState(ALEState &rhs, std::string serialized);
+    	ALEState();
+    	// Makes a copy of this state, also storing emulator information provided as a string
+    	ALEState(const ALEState &rhs, std::string serialized);
+    	ALEState(ALEState &rhs, std::string serialized);
+
+	ALEState( const ALEState& rhs );
+	const ALEState& operator=( const ALEState& other );
+
 	~ALEState(){ if(m_screen) delete m_screen;}
 
     /** Resets the system to its start state. numResetSteps 'RESET' actions are taken after the
