@@ -161,56 +161,57 @@ bool SearchTree::test_duplicate(TreeNode *node) {
   }
 }
 
-int SearchTree::simulate_game(ALEState & state, Action act, int num_steps, 
-			       return_t &traj_return, bool &game_ended, 
-                bool discount_return) {
-  // Load the state into the emulator - a copy of the parent state
-    m_env->restoreState(state);
+int SearchTree::simulate_game(	ALEState & state, Action act, int num_steps, 
+			       	return_t &traj_return, bool &game_ended, 
+                		bool discount_return) {
+
+	// Load the state into the emulator - a copy of the parent state
+	m_env->restoreState(state);
 
 
 	// For discounting purposes
-  float g = 1.0;
-  traj_return = 0.0;
+	float g = 1.0;
+	traj_return = 0.0;
 	game_ended = false;
-  Action a;
+	Action a;
 
-  // So that the compiler doesn't complain
-  if (act == RANDOM) a = PLAYER_A_NOOP; 
-  else a = act; 
+	// So that the compiler doesn't complain
+	if (act == RANDOM) a = PLAYER_A_NOOP; 
+	else a = act; 
 
-  int i;
+	int i;
 
 	for (i = 0; i < num_steps; i++) {
 		 if (act == RANDOM && i % sim_steps_per_node == 0)
 			a = choice(&available_actions);
 
-    // Move state forward using action a
-    reward_t curr_reward = m_env->oneStepAct(a, PLAYER_B_NOOP);
-    game_ended = m_env->isTerminal();
-
-    // Save the result
-    state = m_env->cloneState();
-
-    return_t r = normalize_rewards ? normalize(curr_reward) : curr_reward;
+		// Move state forward using action a
+		reward_t curr_reward = m_env->oneStepAct(a, PLAYER_B_NOOP);
+		game_ended = m_env->isTerminal();
+			
+		return_t r = normalize_rewards ? normalize(curr_reward) : curr_reward;
     
-    // Add curr_reward to the trajectory return
-    if (discount_return) {
-      traj_return += r * g;
-      // Update the discount factor every sim_steps_per_ndoe
-      if ((i+1) % sim_steps_per_node == 0)
-        g *= discount_factor;
-    }
-    else
-      traj_return += r;
+		// Add curr_reward to the trajectory return
+		if (discount_return) {
+			traj_return += r * g;
+			// Update the discount factor every sim_steps_per_ndoe
+			if ((i+1) % sim_steps_per_node == 0)
+				g *= discount_factor;
+		}
+		else
+			traj_return += r;
 
-    // Early exit if we reach termination
+		// Early exit if we reach termination
 		if (game_ended) {
-      i++;
+			i++;
 			break;
 		}
 	}
 
-  return i;
+	// Save the result
+	state = m_env->cloneState();
+
+	return i;
 }
 
 return_t SearchTree::normalize(reward_t reward) {
