@@ -32,7 +32,7 @@ void setDefaultSettings(Settings &settings) {
 
     // Environment customization settings
     settings.setBool("record_trajectory", true);
-    settings.setBool("restricted_action_set", true);
+    settings.setBool("restricted_action_set", false);
     settings.setBool("use_starting_actions", true);
     settings.setBool("use_environment_distribution", false);
     settings.setString("random_seed", "time");
