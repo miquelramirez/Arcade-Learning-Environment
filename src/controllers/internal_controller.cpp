@@ -15,6 +15,9 @@
  **************************************************************************** */
 
 #include "internal_controller.hpp"
+#include "time.hxx"
+#include <fstream>
+#include <sstream>
 
 InternalController::InternalController(OSystem* osystem):
   ALEController(osystem),
@@ -115,17 +118,26 @@ void InternalController::episodeStart(Action& action_a, Action& action_b) {
   // Some bookkeeping
   m_episode_score = 0;
   m_episode_number++;
+	m_episode_t0 = aptk::time_used();
 }
 
 void InternalController::episodeEnd() {
-  // Notify the agents that this is the end
-  if (m_agent_left.get() != NULL) m_agent_left->episode_end();
-  if (m_agent_right.get() != NULL) m_agent_right->episode_end();
+	m_episode_tf = aptk::time_used();
+	// Notify the agents that this is the	 end
+	if (m_agent_left.get() != NULL) m_agent_left->episode_end();
+	if (m_agent_right.get() != NULL) m_agent_right->episode_end();
+	
+	// Reset environment
+	m_environment.reset();
 
-  // Reset environment
-  m_environment.reset();
+	// Produce some meaningful output
+	fprintf (stderr, "Episode %d ended, score: %d\n", m_episode_number, m_episode_score);
 
-  // Produce some meaningful output
-  fprintf (stderr, "Episode %d ended, score: %d\n", m_episode_number, m_episode_score);
+	std::stringstream filename;
+	filename << "episode." << m_episode_number;
+	
+	std::ofstream output( filename.str().c_str() );
+	output << "elapsed_time=" << m_episode_tf - m_episode_t0 << ",score=" << m_episode_score << std::endl;
+	output.close();	
 }
 

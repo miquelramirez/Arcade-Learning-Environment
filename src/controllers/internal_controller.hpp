@@ -21,29 +21,33 @@
 #include "../agents/PlayerAgent.hpp"
 
 class InternalController : public ALEController {
-  public:
-    InternalController(OSystem* osystem);
-    virtual ~InternalController() {}
+public:
+	InternalController(OSystem* osystem);
+	virtual ~InternalController() {}
 
-    virtual void run();
+	virtual void run();
 
-  private:
-    bool isDone();
-    void createAgents();
+private:
+	bool isDone();
+	void createAgents();
+	
+	void episodeEnd();
+	void episodeStart(Action& action_a, Action& action_b);
+	void episodeStep(Action& action_a, Action& action_b);
 
-    void episodeEnd();
-    void episodeStart(Action& action_a, Action& action_b);
-    void episodeStep(Action& action_a, Action& action_b);
+private:
+	int m_max_num_frames; // Maximum number of total frames before we stop
+	int m_max_num_episodes; // Maximum number of episodes before we stop
 
-  private:
-    int m_max_num_frames; // Maximum number of total frames before we stop
-    int m_max_num_episodes; // Maximum number of episodes before we stop
+	float m_episode_t0;
+	float m_episode_tf;
 
-    int m_episode_score; // Keeping track of score
-    int m_episode_number; // Keeping track of episode 
 
-    std::auto_ptr<PlayerAgent> m_agent_left; // Agents 
-    std::auto_ptr<PlayerAgent> m_agent_right; 
+    	int m_episode_score; // Keeping track of score
+	int m_episode_number; // Keeping track of episode 
+
+	std::auto_ptr<PlayerAgent> m_agent_left; // Agents 
+	std::auto_ptr<PlayerAgent> m_agent_right; 
 };
 
 #endif // __INTERNAL_CONTROLLER_HPP__
