@@ -10,7 +10,10 @@ MODULE_OBJS := \
 	src/agents/SearchAgent.o \
 	src/agents/SearchTree.o \
 	src/agents/TreeNode.o \
-	src/agents/FullSearchTree.o 
+	src/agents/FullSearchTree.o \
+	src/agents/UCTSearchTree.o \
+	src/agents/UCTTreeNode.o 
+
 
 MODULE_DIRS += \
 	src/agents

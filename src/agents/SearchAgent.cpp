@@ -22,7 +22,7 @@
 #include <sstream>
 
 #include "FullSearchTree.hpp"
-//#include "UCTSearchTree.hpp"
+#include "UCTSearchTree.hpp"
 #include "time.hxx"
 
 SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnvironment* _env) : 
@@ -44,9 +44,9 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 	search_tree->set_novelty_pruning();
 	m_trace.open( "novelty.search-agent.trace" );
     
-    // } else if (search_method == "uct") {
-    // 	search_tree = new UCTSearchTree(_settings, _osystem->settings(),
-    // 					available_actions);
+    } else if (search_method == "uct") {
+	    search_tree = new UCTSearchTree(_settings, _osystem->settings(),
+					    available_actions, _env);
     } else {
 	cerr << "Unknown search Method: " << search_method << endl;
 		exit(-1);

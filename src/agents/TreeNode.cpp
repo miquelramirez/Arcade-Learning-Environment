@@ -29,7 +29,8 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
 	best_branch(-1),
 	p_parent(parent),
   initialized(false),
-  duplicate(false) {
+  duplicate(false),
+  m_depth(0){
 }
 
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState, 
