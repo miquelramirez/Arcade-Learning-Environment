@@ -52,7 +52,11 @@ class FullSearchTree : public SearchTree {
 		virtual void update_tree();
 
 
+	int expanded() const { return m_expanded_nodes; }
+	int generated() const { return m_generated_nodes; }
+	int pruned() const { return m_pruned_nodes; }
 
+	virtual	void print_frame_data( int frame_number, float elapsed, Action curr_action, std::ostream& output );
 	protected:	
 
     /* For debugging purposes */
@@ -84,6 +88,7 @@ class FullSearchTree : public SearchTree {
 	ALERAM 			m_ram;
 	aptk::Bit_Matrix*	m_ram_novelty_table;
 	aptk::Bit_Matrix*	m_screen_novelty_table;
+	unsigned		m_pruned_nodes;
 
 
 };

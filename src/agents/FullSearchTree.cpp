@@ -47,8 +47,6 @@ void FullSearchTree::build(ALEState & state) {
     p_root = new TreeNode(NULL, state, NULL, UNDEFINED, 0);
     update_tree();
     is_built = true;	
-    std::cout << "Expanded: "<< m_expanded_nodes  << " Generated: "<< m_generated_nodes;
-			
 }
 
 void FullSearchTree::print_path(TreeNode * node, int a) {
@@ -122,24 +120,16 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 	queue<TreeNode*> q;
 	q.push(start_node);
 
-	//m_ram.reset();
-	//m_ram.or_op(start_node->state.getRAM());
 	
-	update_novelty_table( start_node->state.getRAM() );
-	/*
-	if ( m_screen_novelty_table == nullptr )
-		m_screen_novelty_table = new aptk::Bit_Matrix( start_node->state.getScreen().height() * start_node->state.getScreen().width(), 256 );
-	else
-		m_screen_novelty_table->clear();
-	update_novelty_table( start_node->state.getScreen() );
-	*/
+	if ( m_novelty_pruning )
+		update_novelty_table( start_node->state.getRAM() );
 	int num_simulated_steps = 0;
 	int num_actions = available_actions.size();
 
 	m_expanded_nodes = 0;
 	m_generated_nodes = 0;
 
-	int m_pruned_nodes = 0;
+	m_pruned_nodes = 0;
 
 	while(!q.empty()) {
 		// Pop a node to expand
@@ -168,9 +158,7 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 				// the new one encapsulating the novelty-based search algorithm
 				if(m_novelty_pruning){
 				    if ( check_novelty_1( child->state.getRAM() ) ) {
-					//if ( check_novelty_1( child->state.getScreen() ) ) {
 					update_novelty_table( child->state.getRAM() );
-					//update_novelty_table( child->state.getScreen() );
 				    }
 				    else{
 					//delete child;
@@ -193,7 +181,8 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
 
 				// This recreates the novelty table (which gets resetted every time
 				// we change the root of the search tree)
-				update_novelty_table( child->state.getRAM() );
+				if ( m_novelty_pruning )
+					update_novelty_table( child->state.getRAM() );
 		
 			}
 
@@ -213,7 +202,6 @@ void FullSearchTree::expand_tree(TreeNode* start_node) {
     
 	if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
 
-	std::cout << "expanded=" << m_expanded_nodes << ",generated=" << m_generated_nodes << ",pruned=" << m_pruned_nodes << ",depth_tree=" << m_max_depth << std::endl;
 	
 	update_branch_return(start_node);
 }
@@ -293,4 +281,17 @@ void FullSearchTree::set_terminal_root(TreeNode * node) {
   
     // Now we have at least one child, set the 'best branch' to the first action
     node->best_branch = 0; 
+}
+
+void	FullSearchTree::print_frame_data( int frame_number, float elapsed, Action curr_action, std::ostream& output )
+{
+	output << "frame=" << frame_number;
+	output << ",expanded=" << expanded_nodes();
+	output << ",generated=" << generated_nodes();
+	output << ",pruned=" << pruned();
+	output << ",depth_tree=" << max_depth();
+	output << ",tree_size=" <<  num_nodes(); 
+	output << ",best_action=" << action_to_string( curr_action );
+	output << ",branch_reward=" << get_root_value();
+	output << ",elapsed=" << elapsed << std::endl;
 }

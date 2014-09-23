@@ -23,6 +23,7 @@
 #include "../environment/ale_state.hpp"
 #include "../environment/stella_environment.hpp"
 #include "Settings.hxx"
+#include <fstream>
 
 class SearchAgent;
 
@@ -95,6 +96,8 @@ class SearchTree {
     /** Normalizes a reward using the first non-zero reward's magnitude */ 
     return_t normalize(reward_t reward);
     unsigned max_depth(){ return m_max_depth; }
+    unsigned expanded_nodes() const { return m_expanded_nodes; }
+    unsigned generated_nodes() const { return m_generated_nodes; }
     int num_nodes();
 
     void set_novelty_pruning(){ m_novelty_pruning = true;}
@@ -110,6 +113,8 @@ class SearchTree {
     /** Returns the number of simulation steps used since the last call to 
       *  this function. */
     long num_simulation_steps();
+
+	virtual	void print_frame_data( int frame_number, float elapsed, Action curr_action, std::ostream& output );
 
 	protected:	
 

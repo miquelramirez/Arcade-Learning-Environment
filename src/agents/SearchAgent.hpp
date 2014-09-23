@@ -22,6 +22,7 @@
 #include "OSystem.hxx"
 #include "../environment/ale_state.hpp"
 #include "SearchTree.hpp"
+#include <fstream>
 
 class SearchAgent : public PlayerAgent {
     public:
@@ -45,19 +46,18 @@ class SearchAgent : public PlayerAgent {
         
         int num_available_actions();
         ActionVect &get_available_actions();
-        
-
-
-  protected:
-    Action m_curr_action;
-    ALEState state;
-    RomSettings * m_rom_settings;
-    SearchTree * search_tree;
-    StellaEnvironment* m_env;
-    int sim_steps_per_node;
-
-    string search_method;
-
+       
+protected:
+	Action m_curr_action;
+	ALEState state;
+	RomSettings * m_rom_settings;
+	SearchTree * search_tree;
+	StellaEnvironment* m_env;
+	int sim_steps_per_node;
+	
+	string search_method;
+	unsigned m_current_episode;
+	std::ofstream m_trace;
 };
 
 #endif // __SEARCH_AGENT_HPP__

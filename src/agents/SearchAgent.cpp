@@ -23,10 +23,11 @@
 
 #include "FullSearchTree.hpp"
 //#include "UCTSearchTree.hpp"
+#include "time.hxx"
 
 SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnvironment* _env) : 
     PlayerAgent(_osystem, _settings),
-  m_curr_action(UNDEFINED)
+  m_curr_action(UNDEFINED), m_current_episode(0)
 {
     search_method = p_osystem->settings().getString("search_method", true); 
     
@@ -34,12 +35,14 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
     if (search_method == "brfs") {
 	search_tree = new FullSearchTree(_settings, _osystem->settings(),
 					 available_actions, _env);
+	m_trace.open( "brfs.search-agent.trace" );
 	
     }else if( search_method == "novelty"){
 	search_tree = new FullSearchTree(_settings, _osystem->settings(),
 					 available_actions, _env);
 	
 	search_tree->set_novelty_pruning();
+	m_trace.open( "novelty.search-agent.trace" );
     
     // } else if (search_method == "uct") {
     // 	search_tree = new UCTSearchTree(_settings, _osystem->settings(),
@@ -56,6 +59,7 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 }
 
 SearchAgent::~SearchAgent() {
+	m_trace.close();
 }
 
 int SearchAgent::num_available_actions() {
@@ -87,6 +91,8 @@ Action SearchAgent::act() {
 	std::cout << "Search Agent action selection: frame=" << frame_number << std::endl;
 	std::cout << "Evaluating actions: " << std::endl;
 
+	float t0 = aptk::time_used();
+
 	state = m_env->cloneState();
 
 	// if (search_tree->is_built) {
@@ -104,16 +110,19 @@ Action SearchAgent::act() {
 	}
 
 	m_curr_action = search_tree->get_best_action();
-	std::cout << " Tree Size: " << search_tree->num_nodes(); 
-	std::cout << " Best Action: " << action_to_string( m_curr_action );	
-	std::cout << " branch_reward: " << search_tree->get_root_value() << std::endl;
-
 	m_env->restoreState( state );
+
+	float tf = aptk::time_used();
+
+	float elapsed = tf - t0;
+	
+	search_tree->print_frame_data( frame_number, elapsed, m_curr_action, m_trace );
+	search_tree->print_frame_data( frame_number, elapsed, m_curr_action, std::cout );
+
+
 	
 	return m_curr_action;
 }
-
-
 
 /* *********************************************************************
     This method is called when the game ends. 
@@ -128,7 +137,7 @@ Action SearchAgent::episode_start(void) {
   Action a = PlayerAgent::episode_start();
 
   state.incrementFrame();
-
+  m_current_episode++;
   return a;
 }
 

@@ -257,3 +257,16 @@ long SearchTree::num_simulation_steps() {
 
   return s;
 }
+
+void SearchTree::print_frame_data( int frame_number, float elapsed, Action curr_action, std::ostream& output )
+{
+	output << "frame=" << frame_number;
+	output << ",expanded=" << expanded_nodes();
+	output << ",generated=" << generated_nodes();
+	output << ",depth_tree=" << max_depth();
+	output << ",tree_size=" <<  num_nodes(); 
+	output << ",best_action=" << action_to_string( curr_action );
+	output << ",branch_reward=" << get_root_value();
+	output << ",elapsed=" << elapsed << std::endl;
+
+}
