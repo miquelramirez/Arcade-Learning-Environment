@@ -20,9 +20,9 @@ def main() :
 	num_runs = 10
 
 
-	command_brfs = './ale -display_screen false -max_sim_steps_per_frame 12000 -player_agent search_agent -search_method brfs %(rom_path)s'%locals()
-	command_novelty = './ale -display_screen false -max_sim_steps_per_frame 12000 -player_agent search_agent -search_method novelty %(rom_path)s'%locals()
-	command_random = './ale -display_screen false -max_sim_steps_per_frame 12000 -player_agent random_agent %(rom_path)s'%locals()
+	command_brfs = './ale -display_screen false -max_sim_steps_per_frame 100000 -player_agent search_agent -search_method brfs %(rom_path)s'%locals()
+	command_novelty = './ale -display_screen false -max_sim_steps_per_frame 100000 -player_agent search_agent -search_method novelty %(rom_path)s'%locals()
+	command_random = './ale -display_screen false -max_sim_steps_per_frame 100000 -player_agent random_agent %(rom_path)s'%locals()
 
 	random_folder = 'experiments/%(game_name)s/random'%locals()
 	brfs_folder = 'experiments/%(game_name)s/brfs'%locals()
