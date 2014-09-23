@@ -22,7 +22,7 @@ void setDefaultSettings(Settings &settings) {
     // Controller settings
     settings.setString("game_controller", "internal");
     settings.setString("player_agent", "random_agent");
-    settings.setInt("max_num_episodes", 2);
+    settings.setInt("max_num_episodes", 1); // One episode per run
     settings.setInt("max_num_frames", 0);
     settings.setInt("max_num_frames_per_episode", 0);
     settings.setInt("system_reset_steps", 4);
@@ -44,7 +44,7 @@ void setDefaultSettings(Settings &settings) {
     settings.setBool("display_screen", false);
 
     // Search settings
-    settings.setInt( "sim_steps_per_node", 5 ); // every 30 frames, at 60 frames per second, this means 1 action every 0.5 secs
+    settings.setInt( "sim_steps_per_node", 5 ); // every 5 frames, at 60 frames per second, this means 1 action every 1/12 secs
     //settings.setInt("sim_steps_per_node", 100);
     settings.setString("search_method", "brfs");
     
