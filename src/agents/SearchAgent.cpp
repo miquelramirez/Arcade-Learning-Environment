@@ -42,11 +42,12 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 					 available_actions, _env);
 	
 	search_tree->set_novelty_pruning();
-	m_trace.open( "novelty.search-agent.trace" );
+	m_trace.open( "iw1.search-agent.trace" );
     
     } else if (search_method == "uct") {
 	    search_tree = new UCTSearchTree(_settings, _osystem->settings(),
 					    available_actions, _env);
+	m_trace.open( "uct.search-agent.trace" );
     } else {
 	cerr << "Unknown search Method: " << search_method << endl;
 		exit(-1);
