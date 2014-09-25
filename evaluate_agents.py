@@ -2,76 +2,57 @@
 
 import os
 import sys
+import glob
 
 def main() :
 
-	if len(sys.argv) < 3 :
+	if len(sys.argv) < 2 :
 		print >> sys.stderr, "Missing parameters!"
-		print >> sys.stderr, "Usage: ./evaluate_agents.py <game> <path to ROM>"
+		print >> sys.stderr, "Usage: ./evaluate_agents.py <path to ROMs>"
 		sys.exit(1)
 
-	game_name = sys.argv[1]
-	rom_path = sys.argv[2]
+	rom_path = sys.argv[1]
 
 	if not os.path.exists( rom_path ) :
 		print >> sys.stderr, "Could not find ROM:", rom_path
 		sys.exit(1)
 
+	rom_bin_files = glob.glob( os.path.join( rom_path, '*.bin' ) )
+	print >> sys.stdout, 'Found %d ROMs in %s'%(len(rom_bin_files), rom_path )
+
+	games = []
+	for filename in rom_bin_files :
+		game_name = os.path.split(filename)[-1].replace('.bin','')
+		games.append( (game_name, filename) )
+		
 	num_runs = 10
 
+	agents = [ 	( 'random', '-player_agent random_agent' ),
+			( 'brfs', '-player_agent search_agent -search_method brfs' ),
+			( 'iw1', '-player_agent search_agent -search_method novelty' ),
+			( 'uct', '-player_agent search_agent -search_method uct' )
+		 ]
 
-	command_brfs = './ale -display_screen false -max_sim_steps_per_frame 100000 -player_agent search_agent -search_method brfs %(rom_path)s'%locals()
-	command_novelty = './ale -display_screen false -max_sim_steps_per_frame 100000 -player_agent search_agent -search_method novelty %(rom_path)s'%locals()
-	command_random = './ale -display_screen false -max_sim_steps_per_frame 100000 -player_agent random_agent %(rom_path)s'%locals()
+	command_template = './ale -display_screen false -max_sim_steps_per_frame 100000 %(agent_cmd)s %(rom_path)s'
 
-	random_folder = 'experiments/%(game_name)s/random'%locals()
-	brfs_folder = 'experiments/%(game_name)s/brfs'%locals()
-	novelty_folder = 'experiments/%(game_name)s/novelty'%locals()
+	for game, rom_path in games :
+		for agent, agent_cmd in agents :
+			folder = 'experiments/%(game)s/%(agent)s'%locals()
+			if not os.path.exists( folder ) :
+				os.system( 'mkdir -p %(folder)s'%locals() )
+			for i in range( 0, num_runs ) :
+				res_filename = 	res_filename = os.path.join( folder, 'episode.%d'%(i+1) )
+				os.system( command_template%locals() )
+				if not os.path.exists( 'episode.1' ) :
+					with open( res_filename) as output :
+						print >> output, "Agent crashed"
+				else :
+					os.system( 'mv episode.1 %s'%res_filename )
 
-	if not os.path.exists( random_folder ) :
-		os.system( 'mkdir -p %(random_folder)s'%locals() )
-	if not os.path.exists( brfs_folder ) :
-		os.system( 'mkdir -p %(brfs_folder)s'%locals() )
-	if not os.path.exists( novelty_folder ) :
-		os.system( 'mkdir -p %(novelty_folder)s'%locals() )
-
-	# random
-	for i in range(0, num_runs ) :
-		res_filename = os.path.join( random_folder, 'episode.%d'%(i+1) )
-		os.system( command_random )
-		if not os.path.exists( 'episode.1' ) :
-			with open( res_filename) as output :
-				print >> output, "Agent crashed"
-		else :
-			os.system( 'mv episode.1 %s'%res_filename )
-
-	# brfs
-	for i in range(0, num_runs ) :
-		res_filename = os.path.join( brfs_folder, 'episode.%d'%(i+1) )
-		os.system( command_brfs )
-		if not os.path.exists( 'episode.1' ) :
-			with open( res_filename ) as output :
-				print >> output, "Agent crashed"
-		else :
-			os.system( 'mv episode.1 %s'%res_filename )
-		trace_filename = 'episode.%d.trace'%(i+1)
-		trace_filename = os.path.join( brfs_folder, trace_filename ) 
-		os.system( 'mv brfs.search-agent.trace %s'%trace_filename )
-
-	# novelty
-	for i in range(0, num_runs ) :
-		res_filename = os.path.join( novelty_folder, 'episode.%d'%(i+1) )
-		os.system( command_brfs )
-		if not os.path.exists( 'episode.1' ) :
-			with open( res_filename ) as output :
-				print >> output, "Agent crashed"
-		else :
-			os.system( 'mv episode.1 %s'%res_filename )
-		trace_filename = 'episode.%d.trace'%(i+1)
-		trace_filename = os.path.join( noveltys_folder, trace_filename ) 
-		os.system( 'mv novelty.search-agent.trace %s'%trace_filename )
-
-	
+				if agent == 'random' : continue
+				trace_filename = 'episode.%d.trace'%(i+1)
+				trace_filename = os.path.join( folder, trace_filename ) 
+				os.system( 'mv %(agent)s.search-agent.trace %(trace_filename)s'%locals() )
 
 if __name__ == '__main__' :
 	main()
