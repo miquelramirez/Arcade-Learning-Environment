@@ -71,7 +71,7 @@ def main() :
 			for i in range( 0, num_runs ) :
                                 inputs.append( (folder, command_template%locals(), agent, rom_path, i ) );
                 
-        print jobs_scheduled
+        print "jobs_scheduled:"
         print '\n'.join( str(input) for input in inputs )        
         print '\n'
         jobs = [ (input, job_server.submit(run_instance, input,(),("benchmark",)) )for input in inputs]
