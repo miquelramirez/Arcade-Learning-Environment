@@ -52,7 +52,7 @@ def main() :
 		game_name = os.path.split(filename)[-1].replace('.bin','')
 		games.append( (game_name, filename) )
 		
-	num_runs = 10
+	num_runs = 5
 
 	agents = [ 	( 'random', '-player_agent random_agent' ),
 			( 'brfs', '-player_agent search_agent -search_method brfs' ),

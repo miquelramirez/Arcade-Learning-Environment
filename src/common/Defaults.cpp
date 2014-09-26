@@ -23,7 +23,7 @@ void setDefaultSettings(Settings &settings) {
     settings.setString("game_controller", "internal");
     settings.setString("player_agent", "random_agent");
     settings.setInt("max_num_episodes", 1); // One episode per run
-    settings.setInt("max_num_frames", 0);
+    settings.setInt("max_num_frames", 18000);
     settings.setInt("max_num_frames_per_episode", 0);
     settings.setInt("system_reset_steps", 4);
 
