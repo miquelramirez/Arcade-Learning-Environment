@@ -80,6 +80,7 @@ void InternalController::run() {
     // Display if necessary
     display();
   }
+  episodeEnd();
 }
 
 void InternalController::episodeStep(Action& action_a, Action& action_b) {
@@ -118,7 +119,7 @@ void InternalController::episodeStart(Action& action_a, Action& action_b) {
   // Some bookkeeping
   m_episode_score = 0;
   m_episode_number++;
-	m_episode_t0 = aptk::time_used();
+  m_episode_t0 = aptk::time_used();
 }
 
 void InternalController::episodeEnd() {
