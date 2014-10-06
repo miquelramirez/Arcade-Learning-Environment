@@ -13,12 +13,6 @@ class Episode :
 		self.time = None
 		self.crashed = False
 
-	def __init__( self, game, algorithm, time, score ) :
-		self.game = game
-		self.algorithm = algorithm
-		self.time = time
-		self.score = float(score)
-		self.crashed = False
 
 	def __lt__( self, other ) :
 		if self.score < other.score : return True
@@ -42,7 +36,9 @@ def retrieve_episodes( experiments_folder ) :
 							break
 						time = line.strip().split('=')[1].split(',')[0]
 						score = line.strip().split('=')[2]
-						e = Episode( game, algorithm, time, score )
+						e = Episode( game, algorithm )
+                                                e.score = float(score)
+                                                e.time = time
 						episodes.append(e)
 	return episodes
 
