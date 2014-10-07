@@ -74,6 +74,7 @@ class ALEState {
     ALEScreen &getScreen() const { return *m_screen; }
 
     string serialized() { return m_serialized_state; }
+    void set_serialized(string s) { m_serialized_state = s; }
   protected:
     // Let StellaEnvironment access these methods: they are needed for emulation purposes
     friend class StellaEnvironment;

@@ -34,8 +34,7 @@ SearchTree::SearchTree(RomSettings * rom_settings, Settings & settings,
     
     sim_steps_per_node = settings.getInt("sim_steps_per_node", true);
     max_sim_steps_per_frame = settings.getInt("max_sim_steps_per_frame",false);
-    num_simulations_per_frame = 
-	settings.getInt("num_simulations_per_frame",false);
+    num_simulations_per_frame = settings.getInt("num_simulations_per_frame",false);
     
 //    std::cout << "max_sim_steps_per_frame: "<< max_sim_steps_per_frame << std::endl;
     assert(max_sim_steps_per_frame != -1 || num_simulations_per_frame != -1);

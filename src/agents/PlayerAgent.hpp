@@ -85,7 +85,8 @@ protected:
     ActionVect & available_actions;
 
     bool record_trajectory;
-    ActionVect trajectory;
+    ActionVect action_trajectory;
+    std::vector<ALEState*> state_trajectory;
 
     bool m_has_terminated;
     ALEState*		curr_state;

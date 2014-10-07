@@ -112,20 +112,38 @@ Action PlayerAgent::episode_start(void) {
 }
 
 void PlayerAgent::record_action(Action a) {
-  if (episode_number == 0)
-    trajectory.push_back(a);
+    if (episode_number == 0){
+	action_trajectory.push_back(a);
+	state_trajectory.push_back( new ALEState(*curr_state, curr_state->serialized() ) );
+    }
 }
 
 void PlayerAgent::end_game() {
   // Post-processing
-  if (record_trajectory) {
-    cout << "Trajectory "; 
-    for (size_t i = 0; i < trajectory.size(); i++) {
-      cout << trajectory[i] << " ";
-    }
-    cout << "\n";
+  if (record_trajectory &&  episode_number == 1 ) {
+      
+      std::stringstream filename;
+      filename << "state_trajectory_episode." << episode_number;
+      
+      std::ofstream output( filename.str().c_str() );
+
+      for (size_t i = 0; i < state_trajectory.size(); i++) {
+	  output << state_trajectory[i]->serialized() << endl;
+	  delete state_trajectory[i];
+	  state_trajectory[i] = NULL;
+      }
+      output.close();	
+
+      cout << "\n";
+      cout << "Action Trajectory "; 
+      for (size_t i = 0; i < action_trajectory.size(); i++) {
+	  cout << action_trajectory[i] << " ";
+      }
+      cout << "\n";
   }
   
+  state_trajectory.clear();
+  action_trajectory.clear();
   m_has_terminated = true;
 }
 

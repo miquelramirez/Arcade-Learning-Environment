@@ -18,6 +18,7 @@ class Episode :
 		self.depth = None
 		self.tree_size = None
 		self.decision_time = None
+		self.branch_reward = None
 		self.crashed = False
 
 
@@ -25,7 +26,7 @@ class Episode :
 		if self.score < other.score : return True
 		return False
 	def __str__(self):
-		return  "game: "+str(self.game)+", alg: "+str(self.algorithm)+", time: "+str(self.time)+", score: "+str(self.score)+", expanded: "+str(self.expanded)+", generated : "+str(self.generated)+", pruned: "+str(self.pruned)+", depth: "+str(self.depth)+", tree_size: "+str(self.tree_size)+", decision_time: "+str(self.decision_time)
+		return  "game: "+str(self.game)+", alg: "+str(self.algorithm)+", time: "+str(self.time)+", score: "+str(self.score)+", expanded: "+str(self.expanded)+", generated : "+str(self.generated)+", pruned: "+str(self.pruned)+", depth: "+str(self.depth)+", tree_size: "+str(self.tree_size)+", decision_time: "+str(self.decision_time)+", branch reward: "+str(self.branch_reward)
 
 def retrieve_episodes( experiments_folder ) :
 	episodes = []
@@ -44,6 +45,7 @@ def retrieve_episodes( experiments_folder ) :
 					depth = []
 					tree_size = []
 					decision_time = []
+					branch_reward = []
 		
 					for line in instream :
 						if "expanded" in line:
@@ -52,6 +54,7 @@ def retrieve_episodes( experiments_folder ) :
 							depth.append( int(line.strip().split("depth_tree=")[1].split(',')[0] ) )
 							tree_size.append( int(line.strip().split("tree_size=")[1].split(',')[0] ) )
 							decision_time.append( float(line.strip().split("elapsed=")[1].split(',')[0] ) )
+							branch_reward.append( float(line.strip().split("branch_reward=")[1].split(',')[0] ) )
 						if "pruned" in line: pruned.append( int( line.strip().split("pruned=")[1].split(',')[0] )  )
 						if "score" in line: e.score = float(line.strip().split("score: ")[1]) 
 						if "Time spent" in line: e.time = float(line.strip().split("Time spent: ")[1].split(' ')[0] )
@@ -61,6 +64,7 @@ def retrieve_episodes( experiments_folder ) :
 				e.depth = numpy.mean(depth)
 				e.tree_size = numpy.mean(tree_size)
 				e.decision_time = numpy.mean(decision_time)
+				e.branch_reward = numpy.mean(branch_reward)
 				if e.score is None: e.crashed = True
 				episodes.append(e)
 				#print e
@@ -92,6 +96,7 @@ class Algorithm_Performance :
 		self.avg_pruned = 0.0
 		self.avg_depth = 0.0
 		self.avg_decision_time = 0.0
+		self.avg_branch_reward = 0.0
 		self.episodes = []
 		self.crashes = []
 
@@ -146,6 +151,11 @@ class Algorithm_Performance :
 			self.avg_decision_time += e.decision_time
 		self.avg_decision_time /= float(self.num_episodes())	
 
+		self.avg_branch_reward = 0.0
+		for e in self.episodes :
+			self.avg_branch_reward += e.branch_reward
+		self.avg_branch_reward /= float(self.num_episodes())	
+
 		# 3. compute median
 		self.median = self.episodes[ self.num_episodes()/2 ].score
 		# 4. compute standard deviation
@@ -199,11 +209,11 @@ if __name__ == '__main__':
 		writer = csv.writer( outstream, delimiter = ',' )
 		header = [ 'Game' ]
 		for alg_name in algorithms :
-			header += [ alg_name ] + [ '' ] * 9
+			header += [ alg_name ] + [ '' ] * 10
 		writer.writerow( header )
 		header = [ '' ]
 		for alg_name in algorithms :
-			header += [ 'runs', 'crashes', 'avg expanded','avg generated','avg pruned','avg depth', 'avg decision time','avg', 'median', 'std. dev.' ]
+			header += [ 'runs', 'crashes', 'avg expanded','avg generated','avg pruned','avg depth', 'avg decision time', 'avg branch reward','avg', 'median', 'std. dev.' ]
 		writer.writerow( header )
 
 		for game_name, algs in games.iteritems() :
@@ -218,6 +228,7 @@ if __name__ == '__main__':
 					row += [ str( round(perf.avg_pruned,2) ) ]
 					row += [ str( round(perf.avg_depth,2) ) ]
 					row += [ str( round(perf.avg_decision_time,2) ) ]
+					row += [ str( round(perf.avg_branch_reward,2) ) ]
 					row += [ str( perf.average ) ]
 					row += [ str( perf.median ) ]
 					if perf.std_dev != 'n/a':
