@@ -271,7 +271,7 @@ void Settings::usage() {
        "\n"
        " Main arguments:\n"
        "   -help -- prints out help information\n\n"
-       "   -game_controller [internal|fifo|fifo_named"
+       "   -game_controller [internal|fifo|fifo_named|trajectory"
 #ifdef __USE_RLGLUE
        "|rlglue"
 #endif
@@ -279,6 +279,7 @@ void Settings::usage() {
        "      Defines how Stella communicates with the player agent:\n"                  
        "            - 'internal':   (default) an instance of the PlayerAgent\n"       
        "                            subclass controls the game\n"   
+       "            - 'trajectory': Reads a recorded state_trajectory file\n"
        "            - 'fifo':       Control occurs through FIFO pipes\n"
        "            - 'fifo_named': Control occurs through named FIFO pipes\n"
 #ifdef __USE_RLGLUE
@@ -338,6 +339,8 @@ void Settings::usage() {
        "     Specifies which PlayerAgent to run from the internal controller.\n\n"
        "   -record_trajectory <true|false> -- if true, records the agent's trajectory\n"
        "    default: false\n\n"
+       "   -state_trajectory_filename  -- file with the state trajectory recorded if record_trajectoy was true\n"
+       "    \n\n"
        "   -agent_epsilon ### -- probability of a random action in single_action_agent\n"
        "    default: unset\n\n"
        "\n"
