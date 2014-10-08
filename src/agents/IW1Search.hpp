@@ -5,6 +5,7 @@
 #include "bit_matrix.hxx"
 #include "../environment/ale_ram.hpp"
 
+#include <queue>
 
 class IW1Search : public SearchTree {
     public:
@@ -15,7 +16,7 @@ class IW1Search : public SearchTree {
 	virtual void build(ALEState & state);
 		
 	virtual void update_tree();
-
+	virtual int  expand_node( TreeNode* n, queue<TreeNode*>& q ); 
 
 	int expanded() const { return m_expanded_nodes; }
 	int generated() const { return m_generated_nodes; }
@@ -41,7 +42,8 @@ protected:
 	ALERAM 			m_ram;
 	aptk::Bit_Matrix*	m_ram_novelty_table;
 	unsigned		m_pruned_nodes;
-
+	bool			m_stop_on_first_reward;
+	unsigned		m_reward_horizon;		
 
 };
 

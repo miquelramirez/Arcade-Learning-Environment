@@ -52,11 +52,14 @@ void setDefaultSettings(Settings &settings) {
     settings.setFloat("uct_exploration_constant", 0.1);
     settings.setFloat("uct_search_depth", 300);
     
-    // Agent settings
-    settings.setString("player_agent", "search_agent");
-    settings.setFloat("discount_factor", 1.0);
+    	// Agent settings
+    	settings.setString("player_agent", "search_agent");
+    	settings.setFloat("discount_factor", 0.95);
 
 	// Max reward
 	settings.setInt( "max_reward", 10000 );
 
+	// Stop IW(1) on the first reward found
+	settings.setBool("iw1_stop_on_first_reward", true);
+	settings.setInt("iw1_reward_horizon", 50 );
 }

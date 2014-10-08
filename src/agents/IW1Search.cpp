@@ -1,10 +1,15 @@
 #include "IW1Search.hpp"
 #include "SearchAgent.hpp"
-#include <queue>
+#include <list>
 
 IW1Search::IW1Search(RomSettings *rom_settings, Settings &settings,
 			       ActionVect &actions, StellaEnvironment* _env) :
 	SearchTree(rom_settings, settings, actions, _env) {
+	
+	m_stop_on_first_reward = settings.getBool( "iw1_stop_on_first_reward", true );
+	int val = settings.getInt( "iw1_reward_horizon", -1 );
+	m_reward_horizon = ( val < 0 ? std::numeric_limits<unsigned>::max() : val ); 
+
 	m_ram_novelty_table = new aptk::Bit_Matrix( RAM_SIZE, 256 );
 }
 
@@ -56,6 +61,63 @@ bool IW1Search::check_novelty_1( const ALERAM& machine_state )
 	return false;
 }
 
+int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
+{
+	int num_simulated_steps =0;
+	int num_actions = available_actions.size();
+	bool leaf_node = (curr_node->v_children.empty());
+	m_expanded_nodes++;
+	// Expand all of its children (simulates the result)
+	for (int a = 0; a < num_actions; a++) {
+		Action act = available_actions[a];
+		
+		TreeNode * child;
+	
+		// If re-expanding an internal node, don't creates new nodes
+		if (leaf_node) {
+			m_generated_nodes++;
+			child = new TreeNode(	curr_node,	
+						curr_node->state,
+						this,
+						act,
+						sim_steps_per_node); 
+	
+			if ( check_novelty_1( child->state.getRAM() ) ) {
+					update_novelty_table( child->state.getRAM() );
+			}
+			else{
+				//delete child;
+				curr_node->v_children.push_back(child);
+				child->is_terminal = true;
+				m_pruned_nodes++;
+				continue;				
+			}
+			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
+			num_simulated_steps += child->num_simulated_steps;
+					
+			curr_node->v_children.push_back(child);
+		}
+		else {
+			child = curr_node->v_children[a];
+			if ( !child->is_terminal )
+				num_simulated_steps += child->num_simulated_steps;
+
+			// This recreates the novelty table (which gets resetted every time
+			// we change the root of the search tree)
+			if ( m_novelty_pruning )
+				update_novelty_table( child->state.getRAM() );
+	
+		}
+	
+		// Don't expand duplicate nodes, or terminal nodes
+		if (!child->is_terminal) {
+			if (! (ignore_duplicates && test_duplicate(child)) )
+				q.push(child);
+		}
+	}
+	return num_simulated_steps;
+}
+
 /* *********************************************************************
    Expands the tree from the given node until i_max_sim_steps_per_frame
    is reached
@@ -70,83 +132,64 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 	}
 
 	queue<TreeNode*> q;
-	q.push(start_node);
-
+	std::list< TreeNode* > pivots;
 	
-	if ( m_novelty_pruning )
-		update_novelty_table( start_node->state.getRAM() );
+	//q.push(start_node);
+	pivots.push_back( start_node );
+
+	update_novelty_table( start_node->state.getRAM() );
 	int num_simulated_steps = 0;
-	int num_actions = available_actions.size();
 
 	m_expanded_nodes = 0;
 	m_generated_nodes = 0;
 
 	m_pruned_nodes = 0;
 
-	while(!q.empty()) {
-		// Pop a node to expand
-		TreeNode* curr_node = q.front();
-		q.pop();
-	
-		bool leaf_node = (curr_node->v_children.empty());
-		m_expanded_nodes++;
-		// Expand all of its children (simulates the result)
-		for (int a = 0; a < num_actions; a++) {
-			Action act = available_actions[a];
-	
-		    	TreeNode * child;
-
-			// If re-expanding an internal node, don't creates new nodes
-			if (leaf_node) {
-				m_generated_nodes++;
-				child = new TreeNode(curr_node,	
-						curr_node->state,
-						this,
-						act,
-						sim_steps_per_node); 
-
-				if ( check_novelty_1( child->state.getRAM() ) ) {
-					update_novelty_table( child->state.getRAM() );
-			    	}
-		    		else{
-					//delete child;
-					curr_node->v_children.push_back(child);
-					child->is_terminal = true;
-					m_pruned_nodes++;
-					continue;				
-	    			}
-				if (child->depth() > m_max_depth ) m_max_depth = child->depth();
-				num_simulated_steps += child->num_simulated_steps;
-				
-				curr_node->v_children.push_back(child);
-			}
-			else {
-				child = curr_node->v_children[a];
-				if ( !child->is_terminal )
-					num_simulated_steps += child->num_simulated_steps;
-
-				// This recreates the novelty table (which gets resetted every time
-				// we change the root of the search tree)
-				if ( m_novelty_pruning )
-					update_novelty_table( child->state.getRAM() );
+	do {
 		
-			}
+		std::cout << "# Pivots: " << pivots.size() << std::endl;
+		std::cout << "First pivot reward: " << pivots.front()->node_reward << std::endl;
+		pivots.front()->m_depth = 0;
+		int steps = expand_node( pivots.front(), q );
+		num_simulated_steps += steps;
 
-			// Don't expand duplicate nodes, or terminal nodes
-			if (!child->is_terminal) {
-				if (! (ignore_duplicates && test_duplicate(child)) )
-					q.push(child);
-			}
+		if (num_simulated_steps >= max_sim_steps_per_frame) {
+			break;
 		}
+
+		pivots.pop_front();
+
+		while(!q.empty()) {
+			// Pop a node to expand
+			TreeNode* curr_node = q.front();
+			q.pop();
 	
+			if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
+			if ( m_stop_on_first_reward && curr_node->node_reward != 0 ) 
+			{
+				pivots.push_back( curr_node );
+				continue;
+			}
+			steps = expand_node( curr_node, q );	
+			num_simulated_steps += steps;
+			// Stop once we have simulated a maximum number of steps
+			if (num_simulated_steps >= max_sim_steps_per_frame) {
+				break;
+			}
+		
+		}
+		std::cout << "\tExpanded so far: " << m_expanded_nodes << std::endl;	
+		std::cout << "\tPruned so far: " << m_pruned_nodes << std::endl;	
+		std::cout << "\tGenerated so far: " << m_generated_nodes << std::endl;	
+
+		if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
 		// Stop once we have simulated a maximum number of steps
 		if (num_simulated_steps >= max_sim_steps_per_frame) {
 			break;
 		}
-		
-	}
+
+	} while ( !pivots.empty() );
     
-	if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
 
 	
 	update_branch_return(start_node);
