@@ -56,4 +56,7 @@ void setDefaultSettings(Settings &settings) {
     settings.setString("player_agent", "search_agent");
     settings.setFloat("discount_factor", 1.0);
 
+	// Max reward
+	settings.setInt( "max_reward", 10000 );
+
 }

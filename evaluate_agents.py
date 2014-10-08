@@ -57,6 +57,7 @@ def main() :
 	agents = [ 	( 'random', '-player_agent random_agent' ),
 			( 'brfs', '-player_agent search_agent -search_method brfs' ),
 			( 'iw1', '-player_agent search_agent -search_method iw1' ),
+			( 'ucs', '-player_agent search_agent -search_method ucs' ),
 			( 'uct', '-player_agent search_agent -search_method uct' )
 		 ]
 
