@@ -235,7 +235,7 @@ if __name__ == '__main__':
 					else:
 						row += [ str( perf.std_dev ) ]
 				except KeyError :
-					row += [ 'n/a' ] * 5
+					row += [ 'n/a' ] * 11
 			writer.writerow( row )
 
 
