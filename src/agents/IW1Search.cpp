@@ -88,7 +88,6 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 		TreeNode* curr_node = q.front();
 		q.pop();
 	
-       
 		bool leaf_node = (curr_node->v_children.empty());
 		m_expanded_nodes++;
 		// Expand all of its children (simulates the result)
