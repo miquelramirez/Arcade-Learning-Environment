@@ -18,14 +18,14 @@
 #include "time.hxx"
 #include <fstream>
 #include <sstream>
+#include <iostream>
 
 TrajectoryController::TrajectoryController(OSystem* osystem):
   ALEController(osystem),
   m_max_num_frames(0),
   m_episode_score(0),
-  m_episode_number(0),
-  m_agent_left(NULL),
-  m_agent_right(NULL) {
+  m_episode_number(0)
+ {
 
   m_max_num_frames = m_osystem->settings().getInt("max_num_frames");
   m_max_num_episodes = m_osystem->settings().getInt("max_num_episodes");
@@ -54,20 +54,12 @@ TrajectoryController::TrajectoryController(OSystem* osystem):
 }
 
 void TrajectoryController::createAgents() {
-    m_agent_left.reset(NULL);
-
-  // Right agent is set to NULL. While this isn't necessary, all of the currently implemented
-  //  agents return actions for player A. One easy fix would be to add PLAYER_B_NOOP to actions
-  //  returned by such agents... we'll get around to it.
-  m_agent_right.reset(NULL);
 }
 
 bool TrajectoryController::isDone() {
   // Die once we reach enough samples
 	return ((m_max_num_frames > 0 && m_environment.getFrameNumber() >= m_max_num_frames) ||
 		(m_max_num_episodes > 0 && m_episode_number > m_max_num_episodes) ||
-		(m_agent_left.get() != NULL && m_agent_left->has_terminated()) ||
-		(m_agent_right.get() != NULL && m_agent_right->has_terminated())||
 		m_string_trajectory.empty());
 }
 
@@ -76,6 +68,8 @@ void TrajectoryController::run() {
 
   bool firstStep = true;
 
+  std::cout << "press any key to start...";
+  getchar();
   while (!isDone()) {
     // Start a new episode if we're in a terminal state... assume these agents need to be told
     //  about episode-end
