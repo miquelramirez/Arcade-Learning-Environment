@@ -33,14 +33,21 @@ TrajectoryController::TrajectoryController(OSystem* osystem):
   string trajectory_filename = m_osystem->settings().getString("state_trajectory_filename", true);
   
   std::ifstream input( trajectory_filename.c_str() );
-  bool op = input.is_open();
-  if(op)
-  while(!input.eof())
-  {
-      string state;
-      getline(input,state);
-      m_string_trajectory.push( state );
+
+  std::string state_seq((std::istreambuf_iterator<char>(input)),
+                 std::istreambuf_iterator<char>());
+
+
+  size_t pos = 0;
+  std::string state;
+  std::string delimiter = "<endstate>";
+  while ((pos = state_seq.find(delimiter)) != std::string::npos) {
+	  state = state_seq.substr(0, pos);
+	  //std::cout << state << std::endl;  
+	  m_string_trajectory.push( state );
+	  state_seq.erase(0, pos + delimiter.length());
   }
+
   std::cout << m_string_trajectory.size() << std::endl;
   input.close();
   createAgents();
@@ -57,10 +64,11 @@ void TrajectoryController::createAgents() {
 
 bool TrajectoryController::isDone() {
   // Die once we reach enough samples
-  return ((m_max_num_frames > 0 && m_environment.getFrameNumber() >= m_max_num_frames) ||
-    (m_max_num_episodes > 0 && m_episode_number > m_max_num_episodes) ||
-    (m_agent_left.get() != NULL && m_agent_left->has_terminated()) ||
-    (m_agent_right.get() != NULL && m_agent_right->has_terminated()));
+	return ((m_max_num_frames > 0 && m_environment.getFrameNumber() >= m_max_num_frames) ||
+		(m_max_num_episodes > 0 && m_episode_number > m_max_num_episodes) ||
+		(m_agent_left.get() != NULL && m_agent_left->has_terminated()) ||
+		(m_agent_right.get() != NULL && m_agent_right->has_terminated())||
+		m_string_trajectory.empty());
 }
 
 void TrajectoryController::run() {
@@ -98,6 +106,7 @@ void TrajectoryController::run() {
 
 void TrajectoryController::episodeStep(Action& action_a, Action& action_b) {
  
+
     ALEState new_state = m_environment.cloneState();
 
     string serialized_state = m_string_trajectory.front();

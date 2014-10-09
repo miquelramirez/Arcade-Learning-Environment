@@ -128,7 +128,7 @@ void PlayerAgent::end_game() {
       std::ofstream output( filename.str().c_str() );
 
       for (size_t i = 0; i < state_trajectory.size(); i++) {
-	  output << state_trajectory[i]->serialized() << endl;
+	  output << state_trajectory[i]->serialized() << "<endstate>";
 	  delete state_trajectory[i];
 	  state_trajectory[i] = NULL;
       }
