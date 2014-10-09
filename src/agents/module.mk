@@ -12,8 +12,10 @@ MODULE_OBJS := \
 	src/agents/TreeNode.o \
 	src/agents/FullSearchTree.o \
 	src/agents/UCTSearchTree.o \
-	src/agents/UCTTreeNode.o 
-
+	src/agents/UCTTreeNode.o \
+	src/agents/BreadthFirstSearch.o \
+	src/agents/IW1Search.o \
+	src/agents/UniformCostSearch.o
 
 MODULE_DIRS += \
 	src/agents

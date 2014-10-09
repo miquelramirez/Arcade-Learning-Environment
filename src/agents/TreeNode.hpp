@@ -78,7 +78,9 @@ class TreeNode {
 
     	// Whether this node was flagged as a duplicate
     	bool duplicate;
-        int m_depth;
+        unsigned m_depth;
+
+	unsigned long long	fn; // evaluation function
 };
 
 

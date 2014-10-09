@@ -21,7 +21,9 @@
 #include "System.hxx"
 #include <sstream>
 
-#include "FullSearchTree.hpp"
+#include "BreadthFirstSearch.hpp"
+#include "IW1Search.hpp"
+#include "UniformCostSearch.hpp"
 #include "UCTSearchTree.hpp"
 #include "time.hxx"
 
@@ -29,34 +31,39 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
     PlayerAgent(_osystem, _settings),
   m_curr_action(UNDEFINED), m_current_episode(0)
 {
-    search_method = p_osystem->settings().getString("search_method", true); 
+	search_method = p_osystem->settings().getString("search_method", true); 
     
-    // Depending on the configuration, create a SearchTree of the requested type
-    if (search_method == "brfs") {
-	search_tree = new FullSearchTree(_settings, _osystem->settings(),
-					 available_actions, _env);
-	m_trace.open( "brfs.search-agent.trace" );
+	// Depending on the configuration, create a SearchTree of the requested type
+	if (search_method == "brfs") {
+		search_tree = new BreadthFirstSearch(	_settings, _osystem->settings(),
+					 		available_actions, _env);
+		m_trace.open( "brfs.search-agent.trace" );
+	} else if ( search_method == "ucs" ) {
+		search_tree = new UniformCostSearch(	_settings, _osystem->settings(),
+							available_actions, _env);
 	
-    }else if( search_method == "novelty"){
-	search_tree = new FullSearchTree(_settings, _osystem->settings(),
-					 available_actions, _env);
+		m_trace.open( "ucs.search-agent.trace" );
+			
+	}else if( search_method == "iw1"){
+		search_tree = new IW1Search(	_settings, _osystem->settings(),
+						available_actions, _env);
 	
-	search_tree->set_novelty_pruning();
-	m_trace.open( "iw1.search-agent.trace" );
+		search_tree->set_novelty_pruning();
+		m_trace.open( "iw1.search-agent.trace" );
     
-    } else if (search_method == "uct") {
-	    search_tree = new UCTSearchTree(_settings, _osystem->settings(),
+	} else if (search_method == "uct") {
+		search_tree = new UCTSearchTree(_settings, _osystem->settings(),
 					    available_actions, _env);
-	m_trace.open( "uct.search-agent.trace" );
-    } else {
-	cerr << "Unknown search Method: " << search_method << endl;
+		m_trace.open( "uct.search-agent.trace" );
+	} else {
+		cerr << "Unknown search Method: " << search_method << endl;
 		exit(-1);
-    }
-    m_rom_settings = _settings;
-    m_env = _env;
+	}
+	m_rom_settings = _settings;
+	m_env = _env;
     
-    Settings &settings = _osystem->settings();
-    sim_steps_per_node = settings.getInt("sim_steps_per_node", true);
+	Settings &settings = _osystem->settings();
+	sim_steps_per_node = settings.getInt("sim_steps_per_node", true);
 }
 
 SearchAgent::~SearchAgent() {

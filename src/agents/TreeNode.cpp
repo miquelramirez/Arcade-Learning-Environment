@@ -23,7 +23,7 @@
  ******************************************************************* */
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   state(parentState), // Copy constructor of the parent state
-  node_reward(0),
+  node_reward(0), fn(0),
   branch_return(0),
   is_terminal(false),
 	best_branch(-1),
@@ -36,7 +36,7 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState, 
 			SearchTree * tree, Action a, int num_simulate_steps):
     state(parentState), // Copy constructor of the parent state
-    node_reward(0),
+    node_reward(0), fn(0),
     branch_return(0),
     is_terminal(false),
     best_branch(-1),
@@ -59,7 +59,7 @@ void TreeNode::init(SearchTree * tree, Action a, int num_simulate_steps) {
     num_simulated_steps = tree->simulate_game(state, a, num_simulate_steps, 
 					      step_return, is_terminal, false);
     node_reward = (reward_t)step_return;
-
+  
     // Initialize the branch reward to the received node reward
     branch_return = node_reward;
 
