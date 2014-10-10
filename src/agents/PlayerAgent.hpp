@@ -90,6 +90,8 @@ protected:
 
     bool m_has_terminated;
     ALEState*		curr_state;
+    string           m_alg_name;
+    string           m_rom_name;
 };
 
 

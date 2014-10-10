@@ -93,7 +93,8 @@ Action SearchAgent::act() {
 	// Generate a new action every sim_steps_per node; otherwise return the
 	//  current selected action 
 		
-	if (frame_number % sim_steps_per_node != 0)
+	// should be NO_OP, otherwise it sends best action every frame for sim_steps_frames!!!!
+	if (frame_number % sim_steps_per_node != 0) 
 		return m_curr_action;
 	
 	std::cout << "Search Agent action selection: frame=" << frame_number << std::endl;

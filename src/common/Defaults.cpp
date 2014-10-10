@@ -60,6 +60,9 @@ void setDefaultSettings(Settings &settings) {
 	settings.setInt( "max_reward", 10000 );
 
 	// Stop IW(1) on the first reward found
-	settings.setBool("iw1_stop_on_first_reward", true);
-	settings.setInt("iw1_reward_horizon", 50 );
+	//settings.setBool("iw1_stop_on_first_reward", true);
+	//settings.setInt("iw1_reward_horizon", 50 );
+	settings.setBool("iw1_stop_on_first_reward", false);
+	settings.setInt("iw1_reward_horizon", 500 );
+
 }
