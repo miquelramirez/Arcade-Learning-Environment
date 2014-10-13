@@ -19,6 +19,7 @@
 #include <fstream>
 #include <sstream>
 #include <iostream>
+#include <unistd.h>
 
 TrajectoryController::TrajectoryController(OSystem* osystem):
   ALEController(osystem),
@@ -100,7 +101,7 @@ void TrajectoryController::run() {
 
 void TrajectoryController::episodeStep(Action& action_a, Action& action_b) {
  
-
+    usleep(16667);
     ALEState new_state = m_environment.cloneState();
 
     string serialized_state = m_string_trajectory.front();
