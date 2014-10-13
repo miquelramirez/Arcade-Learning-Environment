@@ -23,6 +23,7 @@
 
 #include "BreadthFirstSearch.hpp"
 #include "IW1Search.hpp"
+#include "IW1DijkstraSearch.hpp"
 #include "UniformCostSearch.hpp"
 #include "UCTSearchTree.hpp"
 #include "time.hxx"
@@ -46,6 +47,13 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 			
 	}else if( search_method == "iw1"){
 		search_tree = new IW1Search(	_settings, _osystem->settings(),
+						available_actions, _env);
+	
+		search_tree->set_novelty_pruning();
+		m_trace.open( "iw1.search-agent.trace" );
+    
+	}else if( search_method == "iw1-ucs"){
+		search_tree = new IW1DijkstraSearch(	_settings, _osystem->settings(),
 						available_actions, _env);
 	
 		search_tree->set_novelty_pruning();
