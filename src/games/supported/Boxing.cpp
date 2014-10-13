@@ -40,7 +40,7 @@ void BoxingSettings::step(const System& system) {
     if (readRam(&system, 0x92) == 0xC0) my_score   = 100;
     if (readRam(&system, 0x93) == 0xC0) oppt_score = 100;
     reward_t score = my_score - oppt_score;
-    m_reward = score - m_score;
+    m_reward = score - m_score;    
     m_score = score;
 
     // update terminal status
@@ -58,15 +58,16 @@ void BoxingSettings::step(const System& system) {
 /* process the latest information from ALE from B player point of view*/
 void BoxingSettings::step_B(const System& system) {
 
+	
     // update the reward
-    int oppt_score   = getDecimalScore(0x92, &system);
-    int my_score = getDecimalScore(0x93, &system);
+    int my_score   = getDecimalScore(0x92, &system);
+    int oppt_score = getDecimalScore(0x93, &system);
 
     // handle KO
-    if (readRam(&system, 0x92) == 0xC0) oppt_score   = 100;
-    if (readRam(&system, 0x93) == 0xC0) my_score = 100;
-    reward_t score = my_score - oppt_score;
-    m_reward = score - m_score;
+    if (readRam(&system, 0x92) == 0xC0) my_score   = 100;
+    if (readRam(&system, 0x93) == 0xC0) oppt_score = 100;
+    reward_t score = oppt_score - my_score;
+    m_reward = score - m_score;    
     m_score = score;
 
     // update terminal status
@@ -79,6 +80,11 @@ void BoxingSettings::step_B(const System& system) {
                       (readRam(&system, 0x91) >> 4) * 10;
         m_terminal = minutes == 0 && seconds == 0;
     }
+    // step(system);
+    // 	m_reward *=-1;
+    // 	m_score *= -1;
+    // 	return;
+    
 }
 
 
@@ -118,6 +124,25 @@ bool BoxingSettings::isMinimal(const Action &a) const {
         case PLAYER_A_UPLEFTFIRE:
         case PLAYER_A_DOWNRIGHTFIRE:
         case PLAYER_A_DOWNLEFTFIRE:
+
+        case PLAYER_B_NOOP:
+        case PLAYER_B_FIRE:
+        case PLAYER_B_UP:
+        case PLAYER_B_RIGHT:
+        case PLAYER_B_LEFT:
+        case PLAYER_B_DOWN:
+        case PLAYER_B_UPRIGHT:
+        case PLAYER_B_UPLEFT:
+        case PLAYER_B_DOWNRIGHT:
+        case PLAYER_B_DOWNLEFT:
+        case PLAYER_B_UPFIRE:
+        case PLAYER_B_RIGHTFIRE:
+        case PLAYER_B_LEFTFIRE:
+        case PLAYER_B_DOWNFIRE:
+        case PLAYER_B_UPRIGHTFIRE:
+        case PLAYER_B_UPLEFTFIRE:
+        case PLAYER_B_DOWNRIGHTFIRE:
+        case PLAYER_B_DOWNLEFTFIRE:
             return true;
         default:
             return false;

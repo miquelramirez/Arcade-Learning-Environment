@@ -99,8 +99,9 @@ void InternalController::episodeStep(Action& action_a, Action& action_b) {
 	ALEState* p_new_state = new ALEState(new_state, new_state.serialized() );
 	m_agent_right->update_state( p_new_state );
     }
-  action_a = (m_agent_left.get() != NULL) ? m_agent_left->agent_step() : PLAYER_A_NOOP;
   action_b = (m_agent_right.get() != NULL) ? m_agent_right->agent_step() : PLAYER_B_NOOP;
+
+  action_a = (m_agent_left.get() != NULL) ? m_agent_left->agent_step() : PLAYER_A_NOOP;
 }
 
 void InternalController::episodeStart(Action& action_a, Action& action_b) {
