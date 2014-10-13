@@ -47,6 +47,7 @@ SearchTree::SearchTree(RomSettings * rom_settings, Settings & settings,
     m_env = _env;
     
     m_novelty_pruning = false;
+    m_player_B = false;
 }
 
 
@@ -188,7 +189,13 @@ int SearchTree::simulate_game(	ALEState & state, Action act, int num_steps,
 			a = choice(&available_actions);
 
 		// Move state forward using action a
-		reward_t curr_reward = m_env->oneStepAct(a, PLAYER_B_NOOP);
+		m_env->set_player_B( m_player_B );
+		reward_t curr_reward;
+		if(m_player_B)
+			curr_reward = m_env->oneStepAct( PLAYER_A_NOOP, a );
+		else
+			curr_reward = m_env->oneStepAct(a, PLAYER_B_NOOP);
+
 		game_ended = m_env->isTerminal();
 			
 		return_t r = normalize_rewards ? normalize(curr_reward) : curr_reward;

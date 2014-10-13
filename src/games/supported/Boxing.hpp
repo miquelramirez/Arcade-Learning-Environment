@@ -43,6 +43,9 @@ class BoxingSettings : public RomSettings {
         // process the latest information from ALE
         void step(const System& system);
 
+        // process the latest information from ALE  from B player point of view
+        void step_B(const System& system);
+
         // saves the state of the rom settings
         void saveState(Serializer & ser);
     

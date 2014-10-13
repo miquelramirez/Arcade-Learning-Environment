@@ -19,9 +19,34 @@
 
 ActionVect RomSettings::actions;
 ActionVect RomSettings::all_actions;
+ActionVect RomSettings::actions_B;
+ActionVect RomSettings::all_actions_B;
 
 bool RomSettings::isLegal(const Action& a) const {
   return true;
+}
+
+ActionVect& RomSettings::getMinimalActionSet_B() {
+
+  if (actions_B.empty()) {
+    for (int a = PLAYER_B_NOOP; a <= PLAYER_B_DOWNLEFTFIRE; a++)
+      if (isMinimal((Action)a) && isLegal((Action)a))
+        actions_B.push_back((Action)a);
+  }
+
+  return actions_B;
+}
+
+ActionVect& RomSettings::getAllActions_B() {
+
+  // Generate the set of all actions
+  if (all_actions_B.empty()) {
+    for (int a = PLAYER_B_NOOP; a <= PLAYER_B_DOWNLEFTFIRE; a++)
+      if (isLegal((Action)a))
+        all_actions_B.push_back((Action)a);
+  }
+
+  return all_actions_B;
 }
 
 ActionVect& RomSettings::getMinimalActionSet() {

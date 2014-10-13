@@ -55,6 +55,32 @@ void BoxingSettings::step(const System& system) {
     }
 }
 
+/* process the latest information from ALE from B player point of view*/
+void BoxingSettings::step_B(const System& system) {
+
+    // update the reward
+    int oppt_score   = getDecimalScore(0x92, &system);
+    int my_score = getDecimalScore(0x93, &system);
+
+    // handle KO
+    if (readRam(&system, 0x92) == 0xC0) oppt_score   = 100;
+    if (readRam(&system, 0x93) == 0xC0) my_score = 100;
+    reward_t score = my_score - oppt_score;
+    m_reward = score - m_score;
+    m_score = score;
+
+    // update terminal status
+    // if either is KO, the game is over
+    if (my_score == 100 || oppt_score == 100) {
+        m_terminal = true;
+    } else {  // otherwise check to see if out of time
+        int minutes = readRam(&system, 0x90) >> 4;
+        int seconds = (readRam(&system, 0x91) & 0xF) + 
+                      (readRam(&system, 0x91) >> 4) * 10;
+        m_terminal = minutes == 0 && seconds == 0;
+    }
+}
+
 
 /* is end of game */
 bool BoxingSettings::isTerminal() const {

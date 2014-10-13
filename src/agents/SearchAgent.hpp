@@ -26,7 +26,7 @@
 
 class SearchAgent : public PlayerAgent {
     public:
-    SearchAgent(OSystem * _osystem, RomSettings * _settings, StellaEnvironment* _env);
+	SearchAgent(OSystem * _osystem, RomSettings * _settings, StellaEnvironment* _env, bool player_B = false);
         virtual ~SearchAgent();
 		
         /* *********************************************************************
@@ -46,7 +46,8 @@ class SearchAgent : public PlayerAgent {
         
         int num_available_actions();
         ActionVect &get_available_actions();
-       
+
+	void set_search_tree_player_B( bool b ){ if(search_tree) search_tree->set_player_B(b); }
 protected:
 	Action m_curr_action;
 	ALEState state;

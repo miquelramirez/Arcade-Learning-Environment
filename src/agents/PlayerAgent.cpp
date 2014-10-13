@@ -57,6 +57,8 @@ PlayerAgent::PlayerAgent(OSystem* _osystem, RomSettings* _settings) :
 
   if (!use_restricted_action_set)
     available_actions = _settings->getAllActions();
+
+  m_player_B = false;
 }
 
 /* **********************************************************************
@@ -174,12 +176,12 @@ bool PlayerAgent::has_terminated() {
 ******************************************************************** */
 PlayerAgent* PlayerAgent::generate_agent_instance(OSystem* _osystem,
 						  RomSettings * _settings,
-						  StellaEnvironment* _env ) {
+						  StellaEnvironment* _env, bool player_B ) {
     string player_agent = _osystem->settings().getString("player_agent");
     PlayerAgent* new_agent = NULL;
 
     if (player_agent == "search_agent")
-	new_agent = new SearchAgent(_osystem, _settings, _env);
+	    new_agent = new SearchAgent(_osystem, _settings, _env, player_B);
     else if (player_agent == "random_agent")
       new_agent = new RandomAgent(_osystem, _settings);
     else if (player_agent == "single_action_agent")
@@ -192,6 +194,11 @@ PlayerAgent* PlayerAgent::generate_agent_instance(OSystem* _osystem,
       std::cerr << "Invalid agent type requested: " << player_agent << ". Terminating." << std::endl;
       // We can't play without any agent, so exit now.
       exit(-1);
+    }
+    
+    if(player_B){
+	    new_agent->available_actions = _settings->getAllActions_B();	    
+	    new_agent->m_player_B = true;
     }
 
     return new_agent;

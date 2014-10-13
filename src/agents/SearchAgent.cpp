@@ -28,12 +28,17 @@
 #include "UCTSearchTree.hpp"
 #include "time.hxx"
 
-SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnvironment* _env) : 
+SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnvironment* _env, bool player_B) : 
     PlayerAgent(_osystem, _settings),
   m_curr_action(UNDEFINED), m_current_episode(0)
-{
+{	
 	search_method = p_osystem->settings().getString("search_method", true); 
-    
+
+	if(player_B){
+		available_actions =  _settings->getAllActions_B() ;
+		search_method = p_osystem->settings().getString("search_method_B", false); 
+	}
+
 	// Depending on the configuration, create a SearchTree of the requested type
 	if (search_method == "brfs") {
 		search_tree = new BreadthFirstSearch(	_settings, _osystem->settings(),
@@ -68,8 +73,10 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 		exit(-1);
 	}
 	m_rom_settings = _settings;
-	m_env = _env;
-    
+	m_env = _env;    
+
+	search_tree->set_player_B ( player_B );
+	
 	Settings &settings = _osystem->settings();
 	sim_steps_per_node = settings.getInt("sim_steps_per_node", true);
 }
