@@ -32,6 +32,7 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   duplicate(false),
   m_depth(0),
   fn(0),
+  novelty(0)
   accumulated_reward(0)
 {
 }
@@ -47,6 +48,7 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
     initialized(false),
     duplicate(false) ,
     fn(0),
+    novelty(0),
     accumulated_reward(0)
 
 {
