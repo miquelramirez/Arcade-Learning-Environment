@@ -47,10 +47,10 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 	
 			if ( check_novelty_1( child->state.getRAM() ) ) {
 			    update_novelty_table( child->state.getRAM() );
-			    curr_node->novelty = 1;
+			    child->novelty = 1;
 			}
 			else{
-			    curr_node->novelty = 2;
+			    child->novelty = 2;
 			}
 			child->fn += ( m_max_reward - child->accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
 
@@ -96,7 +96,14 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 	return;
     }
     
-    q_exploration.push(start_node);
+    while(!q_exploration.empty() ) {	
+	    q_exploration.pop();
+    }
+    while(!q_exploitation.empty() ) {	
+	    q_exploitation.pop();
+    }
+
+    q_exploration.push(start_node);    
     
     bool explore = true;
     
@@ -107,6 +114,7 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     m_generated_nodes = 0;
 
     m_pruned_nodes = 0;
+    
 
     while( !q_exploration.empty() || !q_exploitation.empty() ) {
 	// Pop a node to expand
@@ -114,20 +122,28 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 	if(explore){	    
 	    curr_node = q_exploration.top();
 	    q_exploration.pop();
+	    explore = false;
+
 	}
 	else{
+		if(q_exploitation.top()->fn ==  m_max_reward){
+			explore = true;
+			continue;
+		}
+
+	
 	    curr_node = q_exploitation.top();
 	    q_exploitation.pop();
-	
+	    explore = true;
 	}
+
+	//std::cout << curr_node->depth() << " " << curr_node->novelty << " " << curr_node->fn << " " << std::endl;
 	if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
-	if ( m_stop_on_first_reward && curr_node->node_reward != 0 ) 
-	    {
-		pivots.push_back( curr_node );
-		continue;
-	    }
-	steps = expand_node( curr_node );	
-	num_simulated_steps += steps;
+
+
+	num_simulated_steps +=  expand_node( curr_node );
+	// std::cout << "q_exploration size: "<< q_exploration.size() << std::endl;
+	// std::cout << "q_exploitation size: "<< q_exploitation.size() << std::endl;
 	// Stop once we have simulated a maximum number of steps
 	if (num_simulated_steps >= max_sim_steps_per_frame) {
 	    break;
@@ -139,7 +155,7 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     std::cout << "\tPruned so far: " << m_pruned_nodes << std::endl;	
     std::cout << "\tGenerated so far: " << m_generated_nodes << std::endl;	
 
-    if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
+    if ( q_exploration.empty() && q_exploitation.empty() ) std::cout << "Search Space Exhausted!" << std::endl;
     
 
 	

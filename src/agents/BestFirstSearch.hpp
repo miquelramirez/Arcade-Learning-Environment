@@ -16,7 +16,7 @@ public:
 	
 	bool operator()( TreeNode* a, TreeNode* b ) const 
 	{
-	    if ( a->novelty < b->novelty ) return true;
+	    if ( b->novelty < a->novelty ) return true;
 	    return false;
 	}
     };
