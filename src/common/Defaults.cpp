@@ -16,8 +16,8 @@
 #include "Defaults.hpp"
 
 void setDefaultSettings(Settings &settings) {
-    // General settings
-    settings.setString("random_seed", "time");
+    // General settings	
+
 
     // Controller settings
     settings.setString("game_controller", "internal");
@@ -35,7 +35,7 @@ void setDefaultSettings(Settings &settings) {
     settings.setBool("restricted_action_set", false);
     settings.setBool("use_starting_actions", true);
     settings.setBool("use_environment_distribution", false);
-    settings.setString("random_seed", "time");
+    settings.setString("random_seed", "time");   
     settings.setBool("disable_color_averaging", true);
     settings.setInt("frame_skip", 1);
     settings.setBool("normalize_rewards", true);
@@ -54,7 +54,7 @@ void setDefaultSettings(Settings &settings) {
     
     	// Agent settings
     	settings.setString("player_agent", "search_agent");
-    	settings.setFloat("discount_factor", 1.00);
+    	settings.setFloat("discount_factor", 1);
 
 	// Max reward
 	settings.setInt( "max_reward", 10000 );

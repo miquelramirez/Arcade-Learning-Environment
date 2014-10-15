@@ -24,6 +24,7 @@
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   state(parentState), // Copy constructor of the parent state
   node_reward(0), 
+  discounted_node_reward(0),
   branch_return(0),
   is_terminal(false),
   best_branch(-1),
@@ -33,14 +34,17 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   m_depth(0),
   fn(0),
   novelty(0),
-  accumulated_reward(0)
+  accumulated_reward(0),
+  discounted_accumulated_reward(0),
+  discount(1.0)
 {
 }
 
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState, 
-			SearchTree * tree, Action a, int num_simulate_steps):
+			SearchTree * tree, Action a, int num_simulate_steps, float disc):
     state(parentState), // Copy constructor of the parent state
     node_reward(0), 
+    discounted_node_reward(0),
     branch_return(0),
     is_terminal(false),
     best_branch(-1),
@@ -49,20 +53,30 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
     duplicate(false) ,
     fn(0),
     novelty(0),
-    accumulated_reward(0)
+    accumulated_reward(0),
+    discounted_accumulated_reward(0),
+    discount(disc)
 
 {
-    if(parent == NULL)
-	m_depth = 0;
-    else
-	m_depth = parent->m_depth + 1;
+	if(parent == NULL){
+		m_depth = 0;
+	}
+	else{
+		m_depth = parent->m_depth + 1;
+		discount = parent->discount * discount;
+	}
 
     if(tree){
 	init(tree, a, num_simulate_steps);
-	if(parent == NULL)
+	discounted_node_reward = node_reward * discount;
+	if(parent == NULL){
 		accumulated_reward = node_reward;
-	else
+		discounted_accumulated_reward = discounted_node_reward;
+	}
+	else{
 		accumulated_reward = parent->accumulated_reward + node_reward;
+		discounted_accumulated_reward = parent->discounted_accumulated_reward + discounted_node_reward;
+	}
 
 
     }
@@ -75,6 +89,7 @@ void TreeNode::init(SearchTree * tree, Action a, int num_simulate_steps) {
 					      step_return, is_terminal, false);
     node_reward = (reward_t)step_return;
   
+
     // Initialize the branch reward to the received node reward
     branch_return = node_reward;
 

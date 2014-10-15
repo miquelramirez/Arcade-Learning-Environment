@@ -43,7 +43,8 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 						curr_node->state,
 						this,
 						act,
-						sim_steps_per_node); 
+						sim_steps_per_node,
+						discount_factor); 
 	
 			if ( check_novelty_1( child->state.getRAM() ) ) {
 					update_novelty_table( child->state.getRAM() );
@@ -55,7 +56,7 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 				m_pruned_nodes++;
 				continue;				
 			}
-			child->fn += ( m_max_reward - child->accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
+			child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
 
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 			num_simulated_steps += child->num_simulated_steps;

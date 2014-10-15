@@ -41,7 +41,7 @@ class TreeNode {
 	*  of steps.
 	*/
 	TreeNode(	TreeNode *parent, ALEState &parentState, 
-  	SearchTree *tree, Action a, int num_simulate_steps);	
+  	SearchTree *tree, Action a, int num_simulate_steps, float discount = 1.0);	
 
       	/** Properly generate this node by simulating it from the start state */
 	void init(SearchTree * tree, Action a, int num_simulate_steps);
@@ -66,6 +66,7 @@ class TreeNode {
 	int num_simulated_steps; 
 
 	reward_t node_reward;	// immediate reward recieved in this node
+	reward_t discounted_node_reward;	// immediate reward recieved in this node * discount_factor
 	return_t branch_return;	// estimated (max or average) reward for this subtree 
 	bool is_terminal; // whether this is a terminal node 
 	int best_branch;	// Best sub-branch that can be taken 
@@ -83,6 +84,8 @@ class TreeNode {
 	unsigned long long	fn; // evaluation function
         unsigned                novelty;
 	reward_t	        accumulated_reward; // evaluation function
+	reward_t	        discounted_accumulated_reward; // evaluation function
+	float                   discount;
 };
 
 
