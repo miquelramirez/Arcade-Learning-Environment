@@ -137,7 +137,8 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 	    explore = true;
 	}
 
-	//std::cout << curr_node->depth() << " " << curr_node->novelty << " " << curr_node->fn << " " << std::endl;
+	//if(curr_node->novelty != 1)
+	//	std::cout << curr_node->depth() << " " << curr_node->novelty << " " << curr_node->fn << " " << std::endl;
 	if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
 
 
