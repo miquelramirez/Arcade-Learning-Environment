@@ -35,7 +35,6 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 		Action act = available_actions[a];
 		
 		TreeNode * child;
-	
 		// If re-expanding an internal node, don't creates new nodes
 		if (leaf_node) {
 			m_generated_nodes++;
@@ -60,6 +59,8 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 			curr_node->v_children.push_back(child);
 		}
 		else {
+			
+			//std::cout << curr_node->depth() << " " << curr_node->novelty << " " << curr_node->fn << " " <<  child->is_terminal  << " " << curr_node->v_children.size() <<std::endl;
 			child = curr_node->v_children[a];
 			if ( !child->is_terminal )
 				num_simulated_steps += child->num_simulated_steps;
@@ -116,7 +117,7 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     m_pruned_nodes = 0;
     
 
-    while( !q_exploration.empty() || !q_exploitation.empty() ) {
+    while( ! (q_exploration.empty() && q_exploitation.empty()) ) {
 	// Pop a node to expand
 	TreeNode* curr_node;
 	if(explore){	    
@@ -137,8 +138,15 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 	    explore = true;
 	}
 
+	/**
+	 * check nodes that have been expanded by other queue
+	 */
+	if( !curr_node->v_children.empty()  && curr_node->novelty != 0) continue;
+
+
 	//if(curr_node->novelty != 1)
 	//	std::cout << curr_node->depth() << " " << curr_node->novelty << " " << curr_node->fn << " " << std::endl;
+
 	if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
 
 
@@ -157,7 +165,8 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     std::cout << "\tGenerated so far: " << m_generated_nodes << std::endl;	
 
     if ( q_exploration.empty() && q_exploitation.empty() ) std::cout << "Search Space Exhausted!" << std::endl;
-    
+    std::cout << "q_exploration size: "<< q_exploration.size() << std::endl;
+    std::cout << "q_exploitation size: "<< q_exploitation.size() << std::endl;
 
 	
     update_branch_return(start_node);
