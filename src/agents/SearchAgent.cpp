@@ -23,16 +23,23 @@
 
 #include "BreadthFirstSearch.hpp"
 #include "IW1Search.hpp"
+#include "IW1DijkstraSearch.hpp"
 #include "UniformCostSearch.hpp"
+#include "BestFirstSearch.hpp"
 #include "UCTSearchTree.hpp"
 #include "time.hxx"
 
-SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnvironment* _env) : 
+SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnvironment* _env, bool player_B) : 
     PlayerAgent(_osystem, _settings),
   m_curr_action(UNDEFINED), m_current_episode(0)
-{
+{	
 	search_method = p_osystem->settings().getString("search_method", true); 
-    
+
+	if(player_B){
+		available_actions =  _settings->getAllActions_B() ;
+		search_method = p_osystem->settings().getString("search_method_B", false); 
+	}
+
 	// Depending on the configuration, create a SearchTree of the requested type
 	if (search_method == "brfs") {
 		search_tree = new BreadthFirstSearch(	_settings, _osystem->settings(),
@@ -51,6 +58,20 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 		search_tree->set_novelty_pruning();
 		m_trace.open( "iw1.search-agent.trace" );
     
+	}else if( search_method == "iw1-ucs"){
+		search_tree = new IW1DijkstraSearch(	_settings, _osystem->settings(),
+						available_actions, _env);
+	
+		search_tree->set_novelty_pruning();
+		m_trace.open( "iw1-ucs.search-agent.trace" );
+    
+	}else if( search_method == "bfs"){
+		search_tree = new BestFirstSearch(	_settings, _osystem->settings(),
+						available_actions, _env);
+	
+		search_tree->set_novelty_pruning();
+		m_trace.open( "bfs.search-agent.trace" );
+    
 	} else if (search_method == "uct") {
 		search_tree = new UCTSearchTree(_settings, _osystem->settings(),
 					    available_actions, _env);
@@ -60,8 +81,10 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 		exit(-1);
 	}
 	m_rom_settings = _settings;
-	m_env = _env;
-    
+	m_env = _env;    
+
+	search_tree->set_player_B ( player_B );
+	
 	Settings &settings = _osystem->settings();
 	sim_steps_per_node = settings.getInt("sim_steps_per_node", true);
 }
@@ -93,7 +116,8 @@ Action SearchAgent::act() {
 	// Generate a new action every sim_steps_per node; otherwise return the
 	//  current selected action 
 		
-	if (frame_number % sim_steps_per_node != 0)
+	// should be NO_OP, otherwise it sends best action every frame for sim_steps_frames!!!!
+	if (frame_number % sim_steps_per_node != 0) 
 		return m_curr_action;
 	
 	std::cout << "Search Agent action selection: frame=" << frame_number << std::endl;

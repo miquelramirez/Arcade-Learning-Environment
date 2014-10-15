@@ -39,7 +39,10 @@ void InternalController::createAgents() {
   // Right agent is set to NULL. While this isn't necessary, all of the currently implemented
   //  agents return actions for player A. One easy fix would be to add PLAYER_B_NOOP to actions
   //  returned by such agents... we'll get around to it.
-  m_agent_right.reset(NULL);
+    if (m_osystem->settings().getString("search_method_B",false) != "")
+	    m_agent_right.reset(PlayerAgent::generate_agent_instance(m_osystem, m_settings.get(), &m_environment, true));
+    else
+	    m_agent_right.reset(NULL);
 }
 
 bool InternalController::isDone() {
@@ -96,8 +99,9 @@ void InternalController::episodeStep(Action& action_a, Action& action_b) {
 	ALEState* p_new_state = new ALEState(new_state, new_state.serialized() );
 	m_agent_right->update_state( p_new_state );
     }
-  action_a = (m_agent_left.get() != NULL) ? m_agent_left->agent_step() : PLAYER_A_NOOP;
   action_b = (m_agent_right.get() != NULL) ? m_agent_right->agent_step() : PLAYER_B_NOOP;
+
+  action_a = (m_agent_left.get() != NULL) ? m_agent_left->agent_step() : PLAYER_A_NOOP;
 }
 
 void InternalController::episodeStart(Action& action_a, Action& action_b) {

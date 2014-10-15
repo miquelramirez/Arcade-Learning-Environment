@@ -55,14 +55,15 @@ public:
        ******************************************************************** */
     static PlayerAgent* generate_agent_instance(OSystem* _osystem, 
 						    RomSettings * _settings,
-						    StellaEnvironment* _env );
+						StellaEnvironment* _env, bool player_B = false );
    
     /** Returns true when the agent is done playing the game. */
     virtual bool has_terminated();
 
     void update_state( ALEState *s );
     ALEState& current_state() { return *curr_state; }
-
+    bool is_player_B() {return m_player_B;}
+    void set_player_B( bool b ) { m_player_B = b; }
 protected:
     virtual Action act() = 0;
     /** Completes this run */
@@ -82,7 +83,7 @@ protected:
     int episode_frame_number;
     int episode_number;
         
-    ActionVect & available_actions;
+    ActionVect  available_actions;
 
     bool record_trajectory;
     ActionVect action_trajectory;
@@ -90,6 +91,9 @@ protected:
 
     bool m_has_terminated;
     ALEState*		curr_state;
+    string           m_alg_name;
+    string           m_rom_name;
+    bool             m_player_B;    
 };
 
 

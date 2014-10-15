@@ -23,34 +23,49 @@
  ******************************************************************* */
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   state(parentState), // Copy constructor of the parent state
-  node_reward(0), fn(0),
+  node_reward(0), 
   branch_return(0),
   is_terminal(false),
-	best_branch(-1),
-	p_parent(parent),
+  best_branch(-1),
+  p_parent(parent),
   initialized(false),
   duplicate(false),
-  m_depth(0){
+  m_depth(0),
+  fn(0),
+  novelty(0),
+  accumulated_reward(0)
+{
 }
 
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState, 
 			SearchTree * tree, Action a, int num_simulate_steps):
     state(parentState), // Copy constructor of the parent state
-    node_reward(0), fn(0),
+    node_reward(0), 
     branch_return(0),
     is_terminal(false),
     best_branch(-1),
     p_parent(parent), 
     initialized(false),
-    duplicate(false) 
+    duplicate(false) ,
+    fn(0),
+    novelty(0),
+    accumulated_reward(0)
+
 {
     if(parent == NULL)
 	m_depth = 0;
     else
 	m_depth = parent->m_depth + 1;
 
-    if(tree)
+    if(tree){
 	init(tree, a, num_simulate_steps);
+	if(parent == NULL)
+		accumulated_reward = node_reward;
+	else
+		accumulated_reward = parent->accumulated_reward + node_reward;
+
+
+    }
 }
 
 void TreeNode::init(SearchTree * tree, Action a, int num_simulate_steps) { 

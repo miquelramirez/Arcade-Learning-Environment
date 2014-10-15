@@ -48,8 +48,6 @@ private:
     int m_episode_score; // Keeping track of score
     int m_episode_number; // Keeping track of episode 
 
-    std::auto_ptr<PlayerAgent> m_agent_left; // Agents 
-    std::auto_ptr<PlayerAgent> m_agent_right; 
     queue<string> m_string_trajectory;
 };
 

@@ -51,6 +51,7 @@ StellaEnvironment::StellaEnvironment(OSystem* osystem, RomSettings* settings):
     fprintf (stderr, "Warning: frame skip set to < 1. Setting to 1.\n");
     m_frame_skip = 1;
   }
+  m_player_B = false;
 }
 
 /** Resets the system to its start state. */
@@ -193,7 +194,10 @@ void StellaEnvironment::emulate(Action player_a_action, Action player_b_action, 
       m_state.applyActionPaddles(event, player_a_action, player_b_action);
 
       m_osystem->console().mediaSource().update();
-      m_settings->step(m_osystem->console().system());
+      if(m_player_B)
+	      m_settings->step_B(m_osystem->console().system());
+      else
+	      m_settings->step(m_osystem->console().system());
     }
   }
   else {
@@ -202,7 +206,10 @@ void StellaEnvironment::emulate(Action player_a_action, Action player_b_action, 
 
     for (size_t t = 0; t < num_steps; t++) {
       m_osystem->console().mediaSource().update();
-      m_settings->step(m_osystem->console().system());
+      if(m_player_B)
+	      m_settings->step_B(m_osystem->console().system());
+      else
+	      m_settings->step(m_osystem->console().system());
     }
   }
 

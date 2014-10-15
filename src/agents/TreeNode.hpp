@@ -81,6 +81,8 @@ class TreeNode {
         unsigned m_depth;
 
 	unsigned long long	fn; // evaluation function
+        unsigned                novelty;
+	reward_t	        accumulated_reward; // evaluation function
 };
 
 

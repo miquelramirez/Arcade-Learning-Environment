@@ -50,6 +50,9 @@ struct RomSettings {
     // process the latest information from ALE
     virtual void step(const System &system) = 0;
 
+    // process the latest information from ALE from B player point of view
+	virtual void step_B(const System &system) { step( system); }
+	
     // saves the state of the rom settings
     virtual void saveState(Serializer & ser) = 0;
     
@@ -65,6 +68,12 @@ struct RomSettings {
     // Returns the set of all legal actions
     ActionVect &getAllActions();
 
+    // Returns a restricted (minimal) set of actions. If not overriden, this is all actions.
+    virtual ActionVect &getMinimalActionSet_B();
+
+    // Returns the set of all legal actions
+    ActionVect &getAllActions_B();
+
     // Returns a list of actions that are required to start the game.
     // By default this is an empty list.
     virtual ActionVect getStartingActions();
@@ -72,6 +81,8 @@ struct RomSettings {
     protected:
       static ActionVect actions;
       static ActionVect all_actions;
+      static ActionVect actions_B;
+      static ActionVect all_actions_B;
 };
 
 

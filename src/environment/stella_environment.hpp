@@ -71,7 +71,9 @@ class StellaEnvironment {
 
     int getFrameNumber() const { return m_state.getFrameNumber(); }
     int getEpisodeFrameNumber() const { return m_state.getEpisodeFrameNumber(); }
-
+    
+    bool is_player_B() {return m_player_B;}
+    void set_player_B( bool b ) { m_player_B = b; }
   private:
     /** Actually emulates the emulator for a given number of steps. */
     void emulate(Action player_a_action, Action player_b_action, size_t num_steps = 1);
@@ -108,6 +110,7 @@ class StellaEnvironment {
     size_t m_frame_skip; // How many frames to emulate per act()
 
     bool m_backward_compatible_save; // Enable the save/load mechanism from ALE 0.2 (no stack)
+    bool m_player_B;
 };
 
 #endif // __STELLA_ENVIRONMENT_HPP__

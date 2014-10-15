@@ -40,6 +40,9 @@ void SkiingSettings::step(const System& system) {
     m_reward = reward;
     m_score = score;
 
+    if(minutes != 0)
+	    std::cout << score << " " << minutes << " " << centiseconds << std::endl;  
+
     // update terminal status
     int end_flag = readRam(&system, 0x91);
     m_terminal = end_flag == 0xFF;

@@ -107,7 +107,7 @@ void UniformCostSearch::expand_tree(TreeNode* start_node) {
 						act,
 						sim_steps_per_node); 
 				// Miquel: Let's fix C = 10000
-				child->fn += curr_node->fn + ( m_max_reward - child->node_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
+				child->fn += ( m_max_reward - child->accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
 
 				// TODO: UniformCostSearch needs to be split into two classes
 				// the new one encapsulating the novelty-based search algorithm

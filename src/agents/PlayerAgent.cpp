@@ -39,11 +39,26 @@ PlayerAgent::PlayerAgent(OSystem* _osystem, RomSettings* _settings) :
   record_trajectory = settings.getBool("record_trajectory", false);
 
   // Default: false (not currently implemented)
-  bool use_restricted_action_set = 
-    settings.getBool("restricted_action_set", false);
+  bool use_restricted_action_set =  settings.getBool("restricted_action_set", false);
+
+  m_alg_name = settings.getString( "search_method", false);
+
+  string rom_file = settings.getString( "rom_file", false);
+  size_t pos = 0;
+  std::string delimiter = "/";
+  while ((pos = rom_file.find(delimiter)) != std::string::npos ){
+	  m_rom_name = rom_file.substr(0, pos);
+	  rom_file.erase(0, pos + delimiter.length());	  
+  }
+  delimiter = ".";
+  pos = rom_file.find(delimiter);
+  m_rom_name = rom_file.substr(0, pos);
+
 
   if (!use_restricted_action_set)
     available_actions = _settings->getAllActions();
+
+  m_player_B = false;
 }
 
 /* **********************************************************************
@@ -123,12 +138,12 @@ void PlayerAgent::end_game() {
   if (record_trajectory &&  episode_number == 1 ) {
       
       std::stringstream filename;
-      filename << "state_trajectory_episode." << episode_number;
+      filename << "state_trajectory_"<< m_alg_name << "_" << m_rom_name <<"_episode." << episode_number;
       
       std::ofstream output( filename.str().c_str() );
 
       for (size_t i = 0; i < state_trajectory.size(); i++) {
-	  output << state_trajectory[i]->serialized() << endl;
+	  output << state_trajectory[i]->serialized() << "<endstate>";
 	  delete state_trajectory[i];
 	  state_trajectory[i] = NULL;
       }
@@ -161,12 +176,12 @@ bool PlayerAgent::has_terminated() {
 ******************************************************************** */
 PlayerAgent* PlayerAgent::generate_agent_instance(OSystem* _osystem,
 						  RomSettings * _settings,
-						  StellaEnvironment* _env ) {
+						  StellaEnvironment* _env, bool player_B ) {
     string player_agent = _osystem->settings().getString("player_agent");
     PlayerAgent* new_agent = NULL;
 
     if (player_agent == "search_agent")
-	new_agent = new SearchAgent(_osystem, _settings, _env);
+	    new_agent = new SearchAgent(_osystem, _settings, _env, player_B);
     else if (player_agent == "random_agent")
       new_agent = new RandomAgent(_osystem, _settings);
     else if (player_agent == "single_action_agent")
@@ -179,6 +194,11 @@ PlayerAgent* PlayerAgent::generate_agent_instance(OSystem* _osystem,
       std::cerr << "Invalid agent type requested: " << player_agent << ". Terminating." << std::endl;
       // We can't play without any agent, so exit now.
       exit(-1);
+    }
+    
+    if(player_B){
+	    new_agent->available_actions = _settings->getAllActions_B();	    
+	    new_agent->m_player_B = true;
     }
 
     return new_agent;

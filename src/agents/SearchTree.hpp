@@ -110,6 +110,9 @@ class SearchTree {
     int get_root_frame_number();
     TreeNode *get_root() {return p_root; }
 
+    bool is_player_B() {return m_player_B;}
+    void set_player_B( bool b ) { m_player_B = b; }
+    void set_available_actions( ActionVect acts ){ available_actions = acts;}
     /** Returns the number of simulation steps used since the last call to 
       *  this function. */
     long num_simulation_steps();
@@ -151,7 +154,7 @@ class SearchTree {
 
     RomSettings * m_rom_settings;
 
-    ActionVect &available_actions;
+    ActionVect  available_actions;
 
     // Counting how many simulation steps we have used since the last call
     //   to get_num_simulation_steps() 
@@ -164,6 +167,7 @@ class SearchTree {
     unsigned m_max_depth;
 
     bool   m_novelty_pruning;
+    bool             m_player_B;    
 };
 
 #endif // __SEARCH_TREE_HPP__

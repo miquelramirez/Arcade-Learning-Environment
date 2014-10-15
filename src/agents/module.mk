@@ -15,6 +15,8 @@ MODULE_OBJS := \
 	src/agents/UCTTreeNode.o \
 	src/agents/BreadthFirstSearch.o \
 	src/agents/IW1Search.o \
+	src/agents/IW1DijkstraSearch.o \
+	src/agents/BestFirstSearch.o \
 	src/agents/UniformCostSearch.o
 
 MODULE_DIRS += \
