@@ -27,10 +27,49 @@ class Episode :
 	def __str__(self):
 		return  "game: "+str(self.game)+", alg: "+str(self.algorithm)+", time: "+str(self.time)+", score: "+str(self.score)+", expanded: "+str(self.expanded)+", generated : "+str(self.generated)+", pruned: "+str(self.pruned)+", depth: "+str(self.depth)+", tree_size: "+str(self.tree_size)+", decision_time: "+str(self.decision_time)+", branch reward: "+str(self.branch_reward)
 
+def check_trace( score_file, trace_file, game, algorithm  ):
+
+        e = Episode( game, algorithm )
+        expanded = []
+        generated = []
+        pruned = []
+        depth = []
+        tree_size = []
+        decision_time = []
+        branch_reward = []
+        if os.path.exists(score_file) is True:
+                with open( score_file ) as instream:
+                        for line in instream :
+                                if "score" in line: e.score = float(line.strip().split("score=")[1]) 
+                                if "elapsed_time" in line: e.time = float(line.strip().split("elapsed_time=")[1].split(',')[0] )
+
+        if os.path.exists(trace_file) is True:
+                with open( trace_file ) as instream:
+                        for line in instream :       
+                                if "expanded" in line:
+                                        if line.count("frame") > 1: continue #error due to printing two lines twice.
+                                        expanded.append( int(line.strip().split("expanded=")[1].split(',')[0]) )
+                                        generated.append( int(line.strip().split("generated=")[1].split(',')[0]) )
+                                        depth.append( int(line.strip().split("depth_tree=")[1].split(',')[0] ) )
+                                        tree_size.append( int(line.strip().split("tree_size=")[1].split(',')[0] ) )
+                                        decision_time.append( float(line.strip().split("elapsed=")[1].split(',')[0] ) )
+                                        branch_reward.append( float(line.strip().split("branch_reward=")[1].split(',')[0] ) )
+                                if "pruned" in line: pruned.append( int( line.strip().split("pruned=")[1].split(',')[0] )  )  
+        e.expanded = numpy.mean(expanded)
+        e.generated = numpy.mean(generated)
+        e.pruned = numpy.mean(pruned)
+        e.depth = numpy.mean(depth)
+        e.tree_size = numpy.mean(tree_size)
+        e.decision_time = numpy.mean(decision_time)
+        e.branch_reward = numpy.mean(branch_reward)
+        return e
 def retrieve_episodes( experiments_folder ) :
 	episodes = []
 	for root, dirs, files in os.walk('experiments') :
 		game = os.path.split( root )[-2]
+                if "/" in game:
+                        game = game.split("/")[1]               
+
 		algorithm = os.path.split(root)[-1]
 		for f in files :
 			if "trace" in f : continue
@@ -64,7 +103,12 @@ def retrieve_episodes( experiments_folder ) :
 				e.tree_size = numpy.mean(tree_size)
 				e.decision_time = numpy.mean(decision_time)
 				e.branch_reward = numpy.mean(branch_reward)
-				if e.score is None: e.crashed = True
+				if e.score is None: 
+                                        e = check_trace( root+"/episode."+f.split(".")[1], root+"/episode."+f.split(".")[1]+".trace",  game, algorithm)
+                                        if e.score is None: 
+                                                e.crashed = True
+
+
 				episodes.append(e)
 				#print e
 			# if "episode" in f :
@@ -126,34 +170,70 @@ class Algorithm_Performance :
 		self.average /= float(self.num_episodes())
 
 		self.avg_expanded = 0.0
+                count = 0.0
 		for e in self.episodes :
-			self.avg_expanded += e.expanded	
-		self.avg_expanded /= float(self.num_episodes())	
+                        if math.isnan( e.expanded ) is False:
+                                count+=1.0
+                                self.avg_expanded += e.expanded	
+		if count == 0.0: 
+                        self.avg_expanded = 0 
+                else:
+                        self.avg_expanded /= count	
 
 		self.avg_generated = 0.0
+                count = 0.0
 		for e in self.episodes :
-			self.avg_generated += e.generated	
-		self.avg_generated /= float(self.num_episodes())	
+                        if math.isnan( e.generated ) is False:
+                                count+=1.0
+                                self.avg_generated += e.generated	
+		if count == 0.0: 
+                        self.avg_generated = 0 
+                else:
+                        self.avg_generated /= count
 
 		self.avg_pruned = 0.0
+                count = 0.0
 		for e in self.episodes :
-			self.avg_pruned += e.pruned
-		self.avg_pruned /= float(self.num_episodes())	
+                        if math.isnan( e.pruned ) is False:
+                                count+=1.0
+                                self.avg_pruned += e.pruned
+                if count == 0.0: 
+                        self.avg_pruned = 0 
+                else:
+                        self.avg_pruned /= count
 
 		self.avg_depth = 0.0
+                count = 0.0
 		for e in self.episodes :
-			self.avg_depth += e.depth	
-		self.avg_depth /= float(self.num_episodes())	
+                        if math.isnan( e.depth ) is False:
+                                count+=1.0
+                                self.avg_depth += e.depth	
+		if count == 0.0: 
+                        self.avg_depth = 0 
+                else:
+                        self.avg_depth /= count
 
 		self.avg_decision_time = 0.0
+                count = 0.0
 		for e in self.episodes :
-			self.avg_decision_time += e.decision_time
-		self.avg_decision_time /= float(self.num_episodes())	
+                        if math.isnan( e.decision_time ) is False:
+                                count+=1.0
+                                self.avg_decision_time += e.decision_time
+		if count == 0.0: 
+                        self.avg_decision_time = 0 
+                else:
+                        self.avg_decision_time /= count
 
 		self.avg_branch_reward = 0.0
+                count = 0.0
 		for e in self.episodes :
-			self.avg_branch_reward += e.branch_reward
-		self.avg_branch_reward /= float(self.num_episodes())	
+                        if math.isnan( e.branch_reward ) is False:
+                                count+=1.0
+                                self.avg_branch_reward += e.branch_reward
+                if count == 0.0: 
+                        self.avg_branch_reward = 0 
+                else:
+                        self.avg_branch_reward /= count
 
 		# 3. compute median
 		self.median = self.episodes[ self.num_episodes()/2 ].score
@@ -202,23 +282,32 @@ if __name__ == '__main__':
 		for _, perf in algs.iteritems() :
 			perf.compute_stats()
 
-	algorithms = [ 'random', 'brfs', 'iw1', 'uct' ]
+	algorithms = [ 'random', 'brfs', 'iw1', 'uct', 'bfs', 'ucs' ]
 	# and finally, we write the table summarizing the results
 	with open( 'results.csv', 'w' ) as outstream :
 		writer = csv.writer( outstream, delimiter = ',' )
 		header = [ 'Game' ]
 		for alg_name in algorithms :
-			header += [ alg_name ] + [ '' ] * 10
+			header += [ alg_name ] + [ '' ] * (10 + len(algorithms)-1)
 		writer.writerow( header )
 		header = [ '' ]
 		for alg_name in algorithms :
 			header += [ 'runs', 'crashes', 'avg expanded','avg generated','avg pruned','avg depth', 'avg decision time', 'avg branch reward','avg', 'median', 'std. dev.' ]
+                        compare_to = algorithms[:]
+                        compare_to.remove(alg_name)
+                        for c in compare_to:
+                                header.append( alg_name +" > "+ c)
 		writer.writerow( header )
 
+
 		for game_name, algs in games.iteritems() :
+                        if 'bfs' not in algs.keys(): continue
 			row = [ game_name ]
 			for alg_name in algorithms :
 				try :
+                                        compare_to = algorithms[:]
+                                        compare_to.remove(alg_name)
+
 					perf = algs[ alg_name ]
 					row += [ str( perf.num_episodes() ) ]
 					row += [ str( perf.num_crashes() ) ]
@@ -229,11 +318,13 @@ if __name__ == '__main__':
 					row += [ str( round(perf.avg_decision_time,2) ) ]
 					row += [ str( round(perf.avg_branch_reward,2) ) ]
 					row += [ str( perf.average ) ]
-					row += [ str( perf.median ) ]
+					row += [ str( perf.median ) ]                                        
 					if perf.std_dev != 'n/a':
 						row += [ str( round(perf.std_dev,2) ) ]
 					else:
 						row += [ str( perf.std_dev ) ]
+                                        for c in compare_to:
+                                                row += [str( int(perf.median > games[ game_name ][ c ].median ) )]
 				except KeyError :
 					row += [ 'n/a' ] * 11
 			writer.writerow( row )

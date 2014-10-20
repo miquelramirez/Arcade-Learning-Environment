@@ -82,26 +82,28 @@ Action SearchTree::get_best_action(void) {
 	vector<int> best_branches;
 	best_branches.push_back(best_branch);
 
-  for (size_t c = 0; c < p_root->v_children.size(); c++) {
+	for (size_t c = 0; c < p_root->v_children.size(); c++) {
 		TreeNode* curr_child = p_root->v_children[c];
-
-    // Ignore duplicates if the flag is set
-    if (ignore_duplicates && curr_child->is_duplicate()) continue;
-
+		
+		// Ignore duplicates if the flag is set
+		if (ignore_duplicates && curr_child->is_duplicate()) continue;
+		
 		if (c != (size_t)best_branch && 
-			curr_child->branch_return == best_child->branch_return && 
-			curr_child->is_terminal == best_child->is_terminal) {
+		    curr_child->branch_return == best_child->branch_return && 
+		    curr_child->is_terminal == best_child->is_terminal) {
 			best_branches.push_back(c);
 		}
 	}
+	
 	if (best_branches.size() > 1) {
 		// when we have more than one best-branch, pick one randomly
 		best_branch = choice(&best_branches);
 	}
-
-  p_root->best_branch = best_branch;
-
-  return available_actions[best_branch];
+	
+	
+	p_root->best_branch = best_branch;
+	
+	return available_actions[best_branch];
 }
 
 

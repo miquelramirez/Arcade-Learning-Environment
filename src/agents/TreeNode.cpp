@@ -36,7 +36,8 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   novelty(0),
   accumulated_reward(0),
   discounted_accumulated_reward(0),
-  discount(1.0)
+  discount(1.0),
+  act(Action::PLAYER_A_NOOP)
 {
 }
 
@@ -55,8 +56,8 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
     novelty(0),
     accumulated_reward(0),
     discounted_accumulated_reward(0),
-    discount(disc)
-
+    discount(disc),
+    act(a)
 {
 	if(parent == NULL){
 		m_depth = 0;

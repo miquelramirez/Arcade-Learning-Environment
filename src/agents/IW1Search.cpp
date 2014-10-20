@@ -68,6 +68,7 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 	bool leaf_node = (curr_node->v_children.empty());
 	m_expanded_nodes++;
 	// Expand all of its children (simulates the result)
+	std::random_shuffle ( available_actions.begin(), available_actions.end() );
 	for (int a = 0; a < num_actions; a++) {
 		Action act = available_actions[a];
 		
@@ -82,10 +83,17 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 						act,
 						sim_steps_per_node); 
 	
+			// if(curr_node->m_depth == 1)
+			// 	std::cout << "Parent: " <<  action_to_string( curr_node->act );
 			if ( check_novelty_1( child->state.getRAM() ) ) {
-					update_novelty_table( child->state.getRAM() );
+				update_novelty_table( child->state.getRAM() );
+				// if(curr_node->m_depth == 1)
+				// 	std::cout << " Child: " <<  action_to_string( child->act ) << std::endl;
+					
 			}
 			else{
+				// if(curr_node->m_depth == 1)
+				// 	std::cout << " Child: " <<  action_to_string( child->act ) << " PRUNED"<< std::endl;
 				//delete child;
 				curr_node->v_children.push_back(child);
 				child->is_terminal = true;
@@ -244,7 +252,7 @@ void IW1Search::update_branch_return(TreeNode* node) {
 			return_t child_return = node->v_children[a]->branch_return;
 			if (best_branch == -1 || child_return > best_return) {
 				best_return = child_return;
-				best_branch = a;
+				best_branch = node->v_children[a]->act;
 				avg+=child_return;
 			}
 			if( node->v_children.size() ) avg/=node->v_children.size();
