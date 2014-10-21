@@ -75,7 +75,7 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 			
 			// This recreates the novelty table (which gets resetted every time
 			// we change the root of the search tree)
-			if ( m_novelty_pruning )
+			if ( m_novelty_pruning ){
 				if ( check_novelty_1( child->state.getRAM() ) ){
 					update_novelty_table( child->state.getRAM() );
 					child->is_terminal = false;
@@ -84,7 +84,7 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 					child->is_terminal = true;
 					m_pruned_nodes++;
 				}
-			
+			}
 			child->updateTreeNode();
 			child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
 

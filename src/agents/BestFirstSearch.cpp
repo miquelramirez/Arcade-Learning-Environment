@@ -73,7 +73,7 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 		
 			// This recreates the novelty table (which gets resetted every time
 			// we change the root of the search tree)
-			if ( m_novelty_pruning )
+			if ( m_novelty_pruning ){
 				if ( check_novelty_1( child->state.getRAM() ) ){
 					update_novelty_table( child->state.getRAM() );
 					child->novelty = 1;
@@ -82,6 +82,7 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 					child->novelty = 2;
 					
 				}
+			}
 			
 			child->updateTreeNode();
 			child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
