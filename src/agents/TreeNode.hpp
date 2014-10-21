@@ -46,6 +46,11 @@ class TreeNode {
       	/** Properly generate this node by simulating it from the start state */
 	void init(SearchTree * tree, Action a, int num_simulate_steps);
 
+
+	/**
+	 * Updates Tree Node info if it's reused from previous lookahead
+	 */
+	void updateTreeNode();
 	/* *********************************************************************
 	Returns true if this is a leaf node
 	******************************************************************* */
@@ -68,6 +73,7 @@ class TreeNode {
 	reward_t node_reward;	// immediate reward recieved in this node
 	reward_t discounted_node_reward;	// immediate reward recieved in this node * discount_factor
 	return_t branch_return;	// estimated (max or average) reward for this subtree 
+	return_t branch_depth;	// depth this subtree 
 	bool is_terminal; // whether this is a terminal node 
 	int best_branch;	// Best sub-branch that can be taken 
 				// from the current node
@@ -87,6 +93,8 @@ class TreeNode {
 	reward_t	        discounted_accumulated_reward; // evaluation function
 	float                   discount;
 	Action                  act;
+	ActionVect              available_actions;
+	bool                    already_expanded;
 };
 
 

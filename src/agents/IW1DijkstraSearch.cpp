@@ -30,8 +30,12 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 	int num_actions = available_actions.size();
 	bool leaf_node = (curr_node->v_children.empty());
 	m_expanded_nodes++;
-	// Expand all of its children (simulates the result)
+	// Expand all of its children (simulates the result)	
 	std::random_shuffle ( available_actions.begin(), available_actions.end() );
+	if(leaf_node){
+		curr_node->v_children.resize( num_actions );
+		curr_node->available_actions = available_actions;
+	}
 	for (int a = 0; a < num_actions; a++) {
 		Action act = available_actions[a];
 		
@@ -50,9 +54,8 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 			if ( check_novelty_1( child->state.getRAM() ) ) {
 					update_novelty_table( child->state.getRAM() );
 			}
-			else{
-				//delete child;
-				curr_node->v_children.push_back(child);
+			else{				
+				curr_node->v_children[a] = child;				
 				child->is_terminal = true;
 				m_pruned_nodes++;
 				continue;				
@@ -62,17 +65,31 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 			num_simulated_steps += child->num_simulated_steps;
 					
-			curr_node->v_children.push_back(child);
+			curr_node->v_children[a] = child;
+
 		}
 		else {
 			child = curr_node->v_children[a];
-			if ( !child->is_terminal )
-				num_simulated_steps += child->num_simulated_steps;
-
+			
 			// This recreates the novelty table (which gets resetted every time
 			// we change the root of the search tree)
 			if ( m_novelty_pruning )
-				update_novelty_table( child->state.getRAM() );
+				if ( check_novelty_1( child->state.getRAM() ) ){
+					update_novelty_table( child->state.getRAM() );
+					child->is_terminal = false;
+				}
+				else{
+					child->is_terminal = true;
+					m_pruned_nodes++;
+				}
+			
+			child->updateTreeNode();
+			child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
+
+			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
+
+			if ( !child->is_terminal )
+				num_simulated_steps += child->num_simulated_steps;
 	
 		}
 	
@@ -97,6 +114,7 @@ void IW1DijkstraSearch::expand_tree(TreeNode* start_node) {
 		set_terminal_root(start_node);
 		return;
 	}
+	if(!start_node->v_children.empty()) start_node->updateTreeNode();
 
 	std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparer > q;
 	std::list< TreeNode* > pivots;

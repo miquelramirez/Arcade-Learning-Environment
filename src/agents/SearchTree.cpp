@@ -84,26 +84,40 @@ Action SearchTree::get_best_action(void) {
 
 	for (size_t c = 0; c < p_root->v_children.size(); c++) {
 		TreeNode* curr_child = p_root->v_children[c];
-		
 		// Ignore duplicates if the flag is set
 		if (ignore_duplicates && curr_child->is_duplicate()) continue;
-		
+				
 		if (c != (size_t)best_branch && 
 		    curr_child->branch_return == best_child->branch_return && 
 		    curr_child->is_terminal == best_child->is_terminal) {
 			best_branches.push_back(c);
+			
 		}
 	}
 	
 	if (best_branches.size() > 1) {
-		// when we have more than one best-branch, pick one randomly
-		best_branch = choice(&best_branches);
-	}
+	// 	best_branch = 0;
+	// 	unsigned best_depth = p_root->v_children[ best_branches[0] ]->branch_depth;
+				
+	// 	for( unsigned i = 0; i < best_branches.size(); i++){
+	// 		TreeNode* curr_child = p_root->v_children[ best_branches[i] ];
+
+	// 		std::cout << "Action: " << action_to_string(curr_child->act) << "/" << action_to_string( p_root->available_actions[ best_branches[i] ] ) << " Depth: " << curr_child->branch_depth << " Reward: "<< curr_child->branch_return   << std::endl;
+	// 		if(best_depth <  curr_child->branch_depth ){
+	// 			best_depth = curr_child->branch_depth;
+	// 			best_branch = best_branches[i];
+	// 		}
+		
+	// 	}
+
+	// 	// when we have more than one best-branch, pick one randomly
+	 	best_branch = choice(&best_branches);
+	 }
 	
 	
 	p_root->best_branch = best_branch;
 	
-	return available_actions[best_branch];
+	return p_root->available_actions[best_branch];
 }
 
 
@@ -127,6 +141,7 @@ void SearchTree::move_to_best_sub_branch(void) {
 	old_root->v_children[old_root->best_branch] = NULL;
 	delete old_root;
 	p_root->p_parent = NULL;
+	m_max_depth = 0;
 }
 
 

@@ -26,6 +26,7 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   node_reward(0), 
   discounted_node_reward(0),
   branch_return(0),
+  branch_depth(0),
   is_terminal(false),
   best_branch(-1),
   p_parent(parent),
@@ -37,27 +38,30 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   accumulated_reward(0),
   discounted_accumulated_reward(0),
   discount(1.0),
-  act(Action::PLAYER_A_NOOP)
+  act(Action::PLAYER_A_NOOP),
+  already_expanded(false)
 {
 }
 
 TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState, 
 			SearchTree * tree, Action a, int num_simulate_steps, float disc):
-    state(parentState), // Copy constructor of the parent state
-    node_reward(0), 
-    discounted_node_reward(0),
-    branch_return(0),
-    is_terminal(false),
-    best_branch(-1),
-    p_parent(parent), 
-    initialized(false),
-    duplicate(false) ,
-    fn(0),
-    novelty(0),
-    accumulated_reward(0),
-    discounted_accumulated_reward(0),
-    discount(disc),
-    act(a)
+	state(parentState), // Copy constructor of the parent state
+	node_reward(0), 
+	discounted_node_reward(0),
+	branch_return(0),
+	branch_depth(0),
+	is_terminal(false),
+	best_branch(-1),
+	p_parent(parent), 
+	initialized(false),
+	duplicate(false) ,
+	fn(0),
+	novelty(0),
+	accumulated_reward(0),
+	discounted_accumulated_reward(0),
+	discount(disc),
+	act(a),
+	already_expanded(false)
 {
 	if(parent == NULL){
 		m_depth = 0;
@@ -67,20 +71,43 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
 		discount = parent->discount * discount;
 	}
 
-    if(tree){
-	init(tree, a, num_simulate_steps);
+	if(tree){
+		init(tree, a, num_simulate_steps);
+		discounted_node_reward = node_reward * discount;
+		if(parent == NULL){
+			accumulated_reward = node_reward;
+			discounted_accumulated_reward = discounted_node_reward;
+		}
+		else{
+			accumulated_reward = parent->accumulated_reward + node_reward;
+			discounted_accumulated_reward = parent->discounted_accumulated_reward + discounted_node_reward;
+		}
+
+
+	}
+}
+
+void TreeNode::updateTreeNode(){
+	if(p_parent == NULL){
+		m_depth = 0;
+	}
+	else{
+		m_depth = p_parent->m_depth + 1;
+		discount = p_parent->discount * discount;
+	}
+
 	discounted_node_reward = node_reward * discount;
-	if(parent == NULL){
+	if(p_parent == NULL){
 		accumulated_reward = node_reward;
 		discounted_accumulated_reward = discounted_node_reward;
 	}
 	else{
-		accumulated_reward = parent->accumulated_reward + node_reward;
-		discounted_accumulated_reward = parent->discounted_accumulated_reward + discounted_node_reward;
+		accumulated_reward = p_parent->accumulated_reward + node_reward;
+		discounted_accumulated_reward = p_parent->discounted_accumulated_reward + discounted_node_reward;
 	}
 
 
-    }
+
 }
 
 void TreeNode::init(SearchTree * tree, Action a, int num_simulate_steps) { 

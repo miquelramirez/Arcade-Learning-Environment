@@ -41,6 +41,8 @@ public:
 
 protected:	
 
+    void reset_branch(TreeNode* node);
+    unsigned size_branch(TreeNode* node);
 
     virtual void expand_tree(TreeNode* start);
 

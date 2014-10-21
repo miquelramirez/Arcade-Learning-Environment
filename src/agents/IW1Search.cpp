@@ -69,6 +69,10 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 	m_expanded_nodes++;
 	// Expand all of its children (simulates the result)
 	std::random_shuffle ( available_actions.begin(), available_actions.end() );
+	if(leaf_node){
+		curr_node->v_children.resize( num_actions );
+		curr_node->available_actions = available_actions;
+	}
 	for (int a = 0; a < num_actions; a++) {
 		Action act = available_actions[a];
 		
@@ -83,19 +87,12 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 						act,
 						sim_steps_per_node); 
 	
-			// if(curr_node->m_depth == 1)
-			// 	std::cout << "Parent: " <<  action_to_string( curr_node->act );
 			if ( check_novelty_1( child->state.getRAM() ) ) {
 				update_novelty_table( child->state.getRAM() );
-				// if(curr_node->m_depth == 1)
-				// 	std::cout << " Child: " <<  action_to_string( child->act ) << std::endl;
 					
 			}
 			else{
-				// if(curr_node->m_depth == 1)
-				// 	std::cout << " Child: " <<  action_to_string( child->act ) << " PRUNED"<< std::endl;
-				//delete child;
-				curr_node->v_children.push_back(child);
+				curr_node->v_children[a] = child;
 				child->is_terminal = true;
 				m_pruned_nodes++;
 				continue;				
@@ -103,18 +100,30 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 			num_simulated_steps += child->num_simulated_steps;
 					
-			curr_node->v_children.push_back(child);
+			curr_node->v_children[a] = child;
 		}
 		else {
 			child = curr_node->v_children[a];
-			if ( !child->is_terminal )
-				num_simulated_steps += child->num_simulated_steps;
-
+		
 			// This recreates the novelty table (which gets resetted every time
 			// we change the root of the search tree)
 			if ( m_novelty_pruning )
-				update_novelty_table( child->state.getRAM() );
-	
+				if ( check_novelty_1( child->state.getRAM() ) ){
+					update_novelty_table( child->state.getRAM() );
+					child->is_terminal = false;
+				}
+				else{
+					child->is_terminal = true;
+					m_pruned_nodes++;
+				}
+			
+			child->updateTreeNode();
+
+			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
+
+			if ( !child->is_terminal )
+				num_simulated_steps += child->num_simulated_steps;
+
 		}
 	
 		// Don't expand duplicate nodes, or terminal nodes
@@ -138,6 +147,8 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 		set_terminal_root(start_node);
 		return;
 	}
+
+	if(!start_node->v_children.empty()) start_node->updateTreeNode();
 
 	queue<TreeNode*> q;
 	std::list< TreeNode* > pivots;
@@ -225,6 +236,7 @@ void IW1Search::update_branch_return(TreeNode* node) {
 	if (node->v_children.empty()) {
 		node->branch_return = node->node_reward;
 		node->best_branch = -1;
+		node->branch_depth = node->m_depth;
 		return;
 	}
 
@@ -244,17 +256,21 @@ void IW1Search::update_branch_return(TreeNode* node) {
 
 	// Terminal nodes encur no reward beyond immediate
 	if (node->is_terminal) {
+		node->branch_depth = node->m_depth;
 		best_return = node->node_reward;
-		best_branch = 0;
+		best_branch = 0;		
 	} else {
 	    
-		for (size_t a = 0; a < node->v_children.size(); a++) {
+		for (size_t a = 0; a < node->v_children.size(); a++) {	
 			return_t child_return = node->v_children[a]->branch_return;
 			if (best_branch == -1 || child_return > best_return) {
 				best_return = child_return;
-				best_branch = node->v_children[a]->act;
+				best_branch = a;
 				avg+=child_return;
 			}
+			if( node->v_children[a]->branch_depth > node->branch_depth  ) 
+				node->branch_depth = node->v_children[a]->branch_depth;
+
 			if( node->v_children.size() ) avg/=node->v_children.size();
 		}
 	}

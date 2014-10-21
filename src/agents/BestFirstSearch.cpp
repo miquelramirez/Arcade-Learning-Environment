@@ -32,6 +32,10 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 	m_expanded_nodes++;
 	// Expand all of its children (simulates the result)
 	std::random_shuffle ( available_actions.begin(), available_actions.end() );
+	if(leaf_node){
+		curr_node->v_children.resize( num_actions );
+		curr_node->available_actions = available_actions;
+	}
 	for (int a = 0; a < num_actions; a++) {
 		Action act = available_actions[a];
 		
@@ -58,20 +62,32 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 			num_simulated_steps += child->num_simulated_steps;
 					
-			curr_node->v_children.push_back(child);
+			curr_node->v_children[a] = child;
+
 		}
 		else {
 			
-			//std::cout << curr_node->depth() << " " << curr_node->novelty << " " << curr_node->fn << " " <<  child->is_terminal  << " " << curr_node->v_children.size() <<std::endl;
 			child = curr_node->v_children[a];
-			if ( !child->is_terminal )
-				num_simulated_steps += child->num_simulated_steps;
-
+		
 			// This recreates the novelty table (which gets resetted every time
 			// we change the root of the search tree)
 			if ( m_novelty_pruning )
-				update_novelty_table( child->state.getRAM() );
-	
+				if ( check_novelty_1( child->state.getRAM() ) ){
+					update_novelty_table( child->state.getRAM() );
+					child->novelty = 1;
+				}
+				else{
+					child->novelty = 2;
+					
+				}
+			
+			child->updateTreeNode();
+			child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
+
+			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
+
+			
+			num_simulated_steps += child->num_simulated_steps;
 		}
 	
 		// Don't expand duplicate nodes, or terminal nodes
@@ -82,7 +98,37 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 		    }
 		}
 	}
+
+	curr_node->already_expanded = true;
 	return num_simulated_steps;
+}
+
+/* *********************************************************************
+	update novelty_value to 0 to a node and all its children, all the way down the branch
+ ******************************************************************* */
+void BestFirstSearch::reset_branch(TreeNode* node) {
+	if (!node->v_children.empty()) {
+		for(size_t c = 0; c < node->v_children.size(); c++) {			
+			reset_branch(node->v_children[c]);
+			
+		}
+	}
+	node->novelty = 0;
+	node->fn = 0;	
+	node->already_expanded = false;
+}
+
+unsigned BestFirstSearch::size_branch(TreeNode* node) {
+	unsigned size = 1;
+
+	if (!node->v_children.empty()) {
+		for(size_t c = 0; c < node->v_children.size(); c++) {			
+			size += size_branch(node->v_children[c]);
+			
+		}
+	}
+	return size;	
+
 }
 
 /* *********************************************************************
@@ -99,6 +145,11 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 	return;
     }
     
+    if(!start_node->v_children.empty()) {
+	    start_node->updateTreeNode();
+	    reset_branch( start_node );
+    }
+
     while(!q_exploration.empty() ) {	
 	    q_exploration.pop();
     }
@@ -143,8 +194,10 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 	/**
 	 * check nodes that have been expanded by other queue
 	 */
-	if( !curr_node->v_children.empty()  && curr_node->novelty != 0) continue;
-
+	if(  curr_node->already_expanded ) 
+		continue;
+	
+		
 
 	//if(curr_node->novelty != 1)
 	//	std::cout << curr_node->depth() << " " << curr_node->novelty << " " << curr_node->fn << " " << std::endl;
