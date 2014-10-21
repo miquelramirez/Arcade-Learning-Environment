@@ -31,7 +31,9 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 	bool leaf_node = (curr_node->v_children.empty());
 	m_expanded_nodes++;
 	// Expand all of its children (simulates the result)
-	std::random_shuffle ( available_actions.begin(), available_actions.end() );
+	if(m_randomize_successor)
+	    std::random_shuffle ( available_actions.begin(), available_actions.end() );
+
 	if(leaf_node){
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;

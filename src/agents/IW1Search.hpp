@@ -43,7 +43,8 @@ protected:
 	aptk::Bit_Matrix*	m_ram_novelty_table;
 	unsigned		m_pruned_nodes;
 	bool			m_stop_on_first_reward;
-	unsigned		m_reward_horizon;		
+	unsigned		m_reward_horizon;	
+        bool                    m_randomize_successor;
 
 };
 

@@ -7,6 +7,7 @@ IW1Search::IW1Search(RomSettings *rom_settings, Settings &settings,
 	SearchTree(rom_settings, settings, actions, _env) {
 	
 	m_stop_on_first_reward = settings.getBool( "iw1_stop_on_first_reward", true );
+	m_randomize_successor = settings.getBool( "randomize_successor_novelty", false );
 	int val = settings.getInt( "iw1_reward_horizon", -1 );
 	m_reward_horizon = ( val < 0 ? std::numeric_limits<unsigned>::max() : val ); 
 
@@ -68,7 +69,8 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 	bool leaf_node = (curr_node->v_children.empty());
 	m_expanded_nodes++;
 	// Expand all of its children (simulates the result)
-	std::random_shuffle ( available_actions.begin(), available_actions.end() );
+	if(m_randomize_successor)
+	    std::random_shuffle ( available_actions.begin(), available_actions.end() );
 	if(leaf_node){
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;
