@@ -168,6 +168,7 @@ class SearchTree {
 
     bool   m_novelty_pruning;
     bool             m_player_B;    
+    bool             m_randomize_successor;
 };
 
 #endif // __SEARCH_TREE_HPP__

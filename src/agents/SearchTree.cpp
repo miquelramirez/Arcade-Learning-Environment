@@ -45,7 +45,7 @@ SearchTree::SearchTree(RomSettings * rom_settings, Settings & settings,
     // Default: false
     ignore_duplicates = settings.getBool("ignore_duplicates_nodes", false);
     m_env = _env;
-    
+    m_randomize_successor = settings.getBool( "randomize_successor_novelty", false );
     m_novelty_pruning = false;
     m_player_B = false;
 }

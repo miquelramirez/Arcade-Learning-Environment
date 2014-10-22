@@ -7,7 +7,7 @@ IW1Search::IW1Search(RomSettings *rom_settings, Settings &settings,
 	SearchTree(rom_settings, settings, actions, _env) {
 	
 	m_stop_on_first_reward = settings.getBool( "iw1_stop_on_first_reward", true );
-	m_randomize_successor = settings.getBool( "randomize_successor_novelty", false );
+
 	int val = settings.getInt( "iw1_reward_horizon", -1 );
 	m_reward_horizon = ( val < 0 ? std::numeric_limits<unsigned>::max() : val ); 
 

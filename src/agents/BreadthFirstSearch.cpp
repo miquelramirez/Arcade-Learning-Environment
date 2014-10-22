@@ -81,6 +81,13 @@ void BreadthFirstSearch::expand_tree(TreeNode* start_node) {
 		bool leaf_node = (curr_node->v_children.empty());
 		m_expanded_nodes++;
 		// Expand all of its children (simulates the result)
+
+		if(m_randomize_successor)
+			std::random_shuffle ( available_actions.begin(), available_actions.end() );
+		if(leaf_node){
+			curr_node->v_children.resize( num_actions );
+			curr_node->available_actions = available_actions;
+		}
 		for (int a = 0; a < num_actions; a++) {
 			Action act = available_actions[a];
 	
@@ -100,7 +107,7 @@ void BreadthFirstSearch::expand_tree(TreeNode* start_node) {
 				if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 				num_simulated_steps += child->num_simulated_steps;
 				
-				curr_node->v_children.push_back(child);
+				curr_node->v_children[a] = child;
 			}
 			else {
 				child = curr_node->v_children[a];
