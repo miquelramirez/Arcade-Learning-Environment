@@ -183,7 +183,7 @@ bool SearchTree::test_duplicate(TreeNode *node) {
 
 int SearchTree::simulate_game(	ALEState & state, Action act, int num_steps, 
 			       	return_t &traj_return, bool &game_ended, 
-                		bool discount_return) {
+                		bool discount_return, bool save_state) {
 
 	// Load the state into the emulator - a copy of the parent state
 	m_env->restoreState(state);
@@ -235,7 +235,8 @@ int SearchTree::simulate_game(	ALEState & state, Action act, int num_steps,
 	}
 
 	// Save the result
-	state = m_env->cloneState();
+	if(save_state)
+		state = m_env->cloneState();
 
 	return i;
 }

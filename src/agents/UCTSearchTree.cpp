@@ -109,6 +109,7 @@ Action UCTSearchTree::get_best_action(void) {
 	// Replace the best branch by our actual choice 
 	p_root->best_branch = best_branch;
 
+	std::cout << "Action " << best_branch << std::endl;
 	return available_actions[best_branch];
 }
 
@@ -340,7 +341,7 @@ int UCTSearchTree::do_monte_carlo(UCTTreeNode* start_node,
 	// Return the number of simulated steps (less than num_steps 
 	//  when we reach a terminal state)
 	int steps = simulate_game(start_node->state, RANDOM, num_steps, 
-				  mc_return, is_terminal, true);
+				  mc_return, is_terminal, true, false);
 
 	// Reset its frame number for consistency
 	m_env->restoreState(start_node->state);

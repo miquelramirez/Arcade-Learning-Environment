@@ -97,7 +97,8 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 		if (!child->is_terminal) {
 		    if (! (ignore_duplicates && test_duplicate(child)) ){
 				q_exploration.push(child);
-				q_exploitation.push(child);
+				if( child->fn !=  m_max_reward )
+					q_exploitation.push(child);
 		    }
 		}
 	}
@@ -176,14 +177,16 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     while( ! (q_exploration.empty() && q_exploitation.empty()) ) {
 	// Pop a node to expand
 	TreeNode* curr_node;
-	if(explore){	    
-	    curr_node = q_exploration.top();
-	    q_exploration.pop();
-	    explore = false;
+	if( explore ){	    
+		if( q_exploration.empty() )
+			break;
+		curr_node = q_exploration.top();
+		q_exploration.pop();
+		explore = false;
 
 	}
 	else{
-		if(q_exploitation.top()->fn ==  m_max_reward){
+		if( q_exploitation.empty() ){
 			explore = true;
 			continue;
 		}
