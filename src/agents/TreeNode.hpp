@@ -92,6 +92,7 @@ class TreeNode {
 	reward_t	        accumulated_reward; // evaluation function
 	reward_t	        discounted_accumulated_reward; // evaluation function
 	float                   discount;
+	float                   original_discount;
 	Action                  act;
 	ActionVect              available_actions;
 	bool                    already_expanded;

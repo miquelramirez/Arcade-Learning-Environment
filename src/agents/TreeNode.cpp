@@ -60,6 +60,7 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
 	accumulated_reward(0),
 	discounted_accumulated_reward(0),
 	discount(disc),
+	original_discount(disc),
 	act(a),
 	already_expanded(false)
 {
@@ -93,7 +94,7 @@ void TreeNode::updateTreeNode(){
 	}
 	else{
 		m_depth = p_parent->m_depth + 1;
-		discount = p_parent->discount * discount;
+		discount = p_parent->discount * original_discount;
 	}
 
 	discounted_node_reward = node_reward * discount;

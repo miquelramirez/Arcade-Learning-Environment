@@ -77,6 +77,7 @@ struct RomSettings {
     // Returns a list of actions that are required to start the game.
     // By default this is an empty list.
     virtual ActionVect getStartingActions();
+	virtual void print(std::ostream& output){};
 
     protected:
       static ActionVect actions;

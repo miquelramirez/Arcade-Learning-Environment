@@ -96,23 +96,32 @@ Action SearchTree::get_best_action(void) {
 	}
 	
 	if (best_branches.size() > 1) {
-	// 	best_branch = 0;
-	// 	unsigned best_depth = p_root->v_children[ best_branches[0] ]->branch_depth;
+		best_branch = 0;
+		unsigned best_depth = p_root->v_children[ best_branches[0] ]->branch_depth;
 				
-	// 	for( unsigned i = 0; i < best_branches.size(); i++){
-	// 		TreeNode* curr_child = p_root->v_children[ best_branches[i] ];
+		for( unsigned i = 0; i < best_branches.size(); i++){
+			TreeNode* curr_child = p_root->v_children[ best_branches[i] ];
 
-	// 		std::cout << "Action: " << action_to_string(curr_child->act) << "/" << action_to_string( p_root->available_actions[ best_branches[i] ] ) << " Depth: " << curr_child->branch_depth << " Reward: "<< curr_child->branch_return   << std::endl;
-	// 		if(best_depth <  curr_child->branch_depth ){
-	// 			best_depth = curr_child->branch_depth;
-	// 			best_branch = best_branches[i];
-	// 		}
+			std::cout << "Action: " << action_to_string(curr_child->act) << "/" << action_to_string( p_root->available_actions[ best_branches[i] ] ) << " Depth: " << curr_child->branch_depth << " Reward: "<< curr_child->branch_return   << std::endl;
+			if(best_depth <  curr_child->branch_depth ){
+				best_depth = curr_child->branch_depth;
+				best_branch = best_branches[i];
+			}
 		
-	// 	}
+		}
 
 	// 	// when we have more than one best-branch, pick one randomly
 	 	best_branch = choice(&best_branches);
 	 }
+	else{
+				
+		for (size_t c = 0; c < p_root->v_children.size(); c++) {
+			TreeNode* curr_child = p_root->v_children[ c ];
+
+			std::cout << "Action: " << action_to_string(curr_child->act) << " Depth: " << curr_child->branch_depth  <<" NumNodes: " << curr_child->num_nodes() << " Reward: "<< curr_child->branch_return   << std::endl;
+		
+		}
+	}
 	
 	
 	p_root->best_branch = best_branch;
@@ -155,6 +164,7 @@ void SearchTree::delete_branch(TreeNode* node) {
 		}
 	}
 	delete node;
+
 }
 
 bool SearchTree::test_duplicate(TreeNode *node) {
@@ -293,6 +303,7 @@ void SearchTree::print_frame_data( int frame_number, float elapsed, Action curr_
 	output << ",tree_size=" <<  num_nodes(); 
 	output << ",best_action=" << action_to_string( curr_action );
 	output << ",branch_reward=" << get_root_value();
-	output << ",elapsed=" << elapsed << std::endl;
-
+	output << ",elapsed=" << elapsed;
+	m_rom_settings->print( output );
+	output << std::endl;
 }

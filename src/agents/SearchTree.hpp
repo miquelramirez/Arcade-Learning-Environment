@@ -95,7 +95,7 @@ class SearchTree {
 
     /** Normalizes a reward using the first non-zero reward's magnitude */ 
     return_t normalize(reward_t reward);
-    unsigned max_depth(){ return m_max_depth; }
+    virtual unsigned max_depth(){ return m_max_depth; }
     unsigned expanded_nodes() const { return m_expanded_nodes; }
     unsigned generated_nodes() const { return m_generated_nodes; }
     int num_nodes();

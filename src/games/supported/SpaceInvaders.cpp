@@ -61,7 +61,13 @@ void SpaceInvadersSettings::step(const System& system) {
 	//	std::cout << "Terminal State"<<std::endl;
     }
 }
-
+void SpaceInvadersSettings::print(std::ostream& output){
+	output << ",isTerminal=" << m_terminal;
+	output << ",Lives=" << m_lives;
+	output << ",Score=" << m_score;
+	
+	
+}
 
 /* is end of game */
 bool SpaceInvadersSettings::isTerminal() const {

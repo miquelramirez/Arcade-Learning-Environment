@@ -21,7 +21,13 @@ class IW1Search : public SearchTree {
 	int expanded() const { return m_expanded_nodes; }
 	int generated() const { return m_generated_nodes; }
 	int pruned() const { return m_pruned_nodes; }
+	virtual unsigned max_depth(){ 	
+		for (size_t c = 0; c < p_root->v_children.size(); c++)
+			if(m_max_depth <  p_root->v_children[c]->branch_depth)
+				m_max_depth =   p_root->v_children[c]->branch_depth;
 
+			return m_max_depth;
+	}
 	virtual	void print_frame_data( int frame_number, float elapsed, Action curr_action, std::ostream& output );
 protected:	
 

@@ -7,7 +7,7 @@ class BestFirstSearch : public IW1Search {
 public:
     BestFirstSearch(RomSettings *, Settings &settings, ActionVect &actions, StellaEnvironment* _env);
 
-    virtual ~BestFirstSearch();
+	virtual ~BestFirstSearch();
 
 
     class TreeNodeComparerExploration
@@ -39,15 +39,23 @@ public:
 
     virtual int  expand_node( TreeNode* n ); 
 
+    void clear_queues(){
+	    delete q_exploration;
+	    delete q_exploitation;
+	    q_exploration = new std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploration >;
+	    q_exploitation = new std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploitation >;
+    }
+
 protected:	
 
     void reset_branch(TreeNode* node);
+    int  reuse_branch(TreeNode* node);
     unsigned size_branch(TreeNode* node);
 
     virtual void expand_tree(TreeNode* start);
 
-    std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploration > q_exploration;
-    std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploitation > q_exploitation;
+    std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploration >* q_exploration;
+    std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploitation >* q_exploitation;
 
     reward_t		m_max_reward;
 };

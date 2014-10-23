@@ -49,6 +49,7 @@ class SpaceInvadersSettings : public RomSettings {
         // loads the state of the rom settings
         void loadState(Deserializer & ser);
 
+	virtual void print(std::ostream& output);
     private:
 
         bool m_terminal;

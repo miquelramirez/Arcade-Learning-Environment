@@ -127,12 +127,20 @@ Action SearchAgent::act() {
 
 	state = m_env->cloneState();
 
-	if (search_tree->is_built) {
+	if (search_tree->is_built ) {
 		// Re-use the old tree
 		search_tree->move_to_best_sub_branch();
-		assert(search_tree->get_root()->state.equals(state));
-		assert (search_tree->get_root_frame_number() == state.getFrameNumber());
-		search_tree->update_tree();
+		if( search_tree->get_root()->state.equals(state) ){
+			//assert(search_tree->get_root()->state.equals(state));
+			//assert (search_tree->get_root_frame_number() == state.getFrameNumber());
+			search_tree->update_tree();
+			
+		}
+		else{
+			//std::cout << "\n\n\tDIFFERENT STATE!\n" << std::endl;
+			search_tree->clear(); 
+			search_tree->build(state);
+		}
 	} else 
 	    {
 		// Build a new Search-Tree

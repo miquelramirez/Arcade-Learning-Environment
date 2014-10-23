@@ -308,5 +308,7 @@ void	IW1Search::print_frame_data( int frame_number, float elapsed, Action curr_a
 	output << ",tree_size=" <<  num_nodes(); 
 	output << ",best_action=" << action_to_string( curr_action );
 	output << ",branch_reward=" << get_root_value();
-	output << ",elapsed=" << elapsed << std::endl;
+	output << ",elapsed=" << elapsed;
+	m_rom_settings->print( output );
+	output << std::endl;
 }
