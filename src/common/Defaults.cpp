@@ -32,10 +32,11 @@ void setDefaultSettings(Settings &settings) {
 
     // Environment customization settings
     settings.setBool("record_trajectory", true);
+    //settings.setBool("restricted_action_set", false);
     settings.setBool("restricted_action_set", false);
     settings.setBool("use_starting_actions", true);
     settings.setBool("use_environment_distribution", false);
-    settings.setString("random_seed", "time");   
+    //settings.setString("random_seed", "time");   
     settings.setString("random_seed", "0");   
     settings.setBool("disable_color_averaging", true);
     settings.setInt("frame_skip", 1);
@@ -55,7 +56,7 @@ void setDefaultSettings(Settings &settings) {
     
     	// Agent settings
     	settings.setString("player_agent", "search_agent");
-    	settings.setFloat("discount_factor", 1);
+    	settings.setFloat("discount_factor", .995);
 	//settings.setFloat("discount_factor", 0.995);
 
 	// Max reward

@@ -34,20 +34,22 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 	int num_actions = available_actions.size();
 	bool leaf_node = (curr_node->v_children.empty());
 	m_expanded_nodes++;
-
+	if(curr_node->novelty == 1)
+	    m_exp_count_novelty1++;
+	else
+	    m_exp_count_novelty2++;
 	// Expand all of its children (simulates the result)	
-	if(leaf_node){
-		if(m_randomize_successor)
-			std::random_shuffle ( available_actions.begin(), available_actions.end() );
- 
+	if(leaf_node){ 
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;
+		if(m_randomize_successor)
+			std::random_shuffle ( curr_node->available_actions.begin(), curr_node->available_actions.end() );
 
 	
 	}
 
 	for (int a = 0; a < num_actions; a++) {
-		Action act = available_actions[a];
+		Action act = curr_node->available_actions[a];
 		
 		TreeNode * child;
 		// If re-expanding an internal node, don't creates new nodes
@@ -63,9 +65,11 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 			if ( check_novelty_1( child->state.getRAM() ) ) {
 			    update_novelty_table( child->state.getRAM() );
 			    child->novelty = 1;
+			    m_gen_count_novelty1++;
 			}
 			else{
 			    child->novelty = 2;
+			    m_gen_count_novelty2++;
 			}
 			child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
 
@@ -85,9 +89,11 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 				if ( check_novelty_1( child->state.getRAM() ) ){
 					update_novelty_table( child->state.getRAM() );
 					child->novelty = 1;
+					m_gen_count_novelty1++;
 				}
 				else{
 					child->novelty = 2;
+					m_gen_count_novelty2++;
 					
 				}
 			}
@@ -156,10 +162,13 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 				if ( m_novelty_pruning ){
 					if ( check_novelty_1( child->state.getRAM() ) ){
 						update_novelty_table( child->state.getRAM() );
-						child->novelty = 1;
+						if(!child->already_expanded)
+						    child->novelty = 1;
 					}
 					else{
+					    if(!child->already_expanded)
 						child->novelty = 2;
+
 						
 					}
 				}
@@ -178,8 +187,8 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 						if(!child->already_expanded){
 							if( child->fn !=  m_max_reward )
 								q_exploitation->push(child);
-							else
-								q_exploration->push(child);
+
+							q_exploration->push(child);
 						}
 						else
 							q.push(child);
@@ -235,10 +244,11 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     
     if(!start_node->v_children.empty()) {
 	    start_node->updateTreeNode();
-	    //num_simulated_steps += reuse_branch( start_node );
-	    reset_branch( start_node );
-	    q_exploration->push(start_node);        
-	    update_novelty_table( start_node->state.getRAM() );
+	    num_simulated_steps += reuse_branch( start_node );
+	    std::cout  << "Num_reused_steps: "<< num_simulated_steps << std::endl;
+	    // reset_branch( start_node );
+	    // q_exploration->push(start_node);        
+	    // update_novelty_table( start_node->state.getRAM() );
     }
     else
 	    {
@@ -248,7 +258,10 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 
     m_expanded_nodes = 0;
     m_generated_nodes = 0;
-
+    m_exp_count_novelty1 = 0;
+    m_exp_count_novelty2 = 0;
+    m_gen_count_novelty1 = 0;
+    m_gen_count_novelty2 = 0;
     m_pruned_nodes = 0;
     
 
@@ -303,8 +316,12 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     }
    
     std::cout << "\tExpanded so far: " << m_expanded_nodes << std::endl;	
+    std::cout << "\tExpanded Novelty 1: " << m_exp_count_novelty1 << std::endl;	
+    std::cout << "\tExpanded Novelty 2: " << m_exp_count_novelty2 << std::endl;	
     std::cout << "\tPruned so far: " << m_pruned_nodes << std::endl;	
     std::cout << "\tGenerated so far: " << m_generated_nodes << std::endl;	
+    std::cout << "\tGenerated Novelty 1: " << m_gen_count_novelty1 << std::endl;	
+    std::cout << "\tGenerated Novelty 2: " << m_gen_count_novelty2 << std::endl;	
 
     if ( q_exploration->empty() && q_exploitation->empty() ) std::cout << "Search Space Exhausted!" << std::endl;
     std::cout << "q_exploration size: "<< q_exploration->size() << std::endl;

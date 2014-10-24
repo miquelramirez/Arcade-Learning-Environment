@@ -130,8 +130,9 @@ Action SearchAgent::act() {
 	if (search_tree->is_built ) {
 		// Re-use the old tree
 		search_tree->move_to_best_sub_branch();
+		//assert(search_tree->get_root()->state.equals(state));
 		if( search_tree->get_root()->state.equals(state) ){
-			//assert(search_tree->get_root()->state.equals(state));
+		    //assert(search_tree->get_root()->state.equals(state));
 			//assert (search_tree->get_root_frame_number() == state.getFrameNumber());
 			search_tree->update_tree();
 			
@@ -149,7 +150,10 @@ Action SearchAgent::act() {
 	}
 
 	m_curr_action = search_tree->get_best_action();
+	
+
 	m_env->restoreState( state );
+	
 
 	float tf = aptk::time_used();
 

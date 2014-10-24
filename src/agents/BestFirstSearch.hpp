@@ -18,7 +18,7 @@ public:
 	{
 		if ( b->novelty < a->novelty ) return true;
 		else if( b->novelty == a->novelty && b->fn < a->fn ) return true;
-		//else if( b->fn == a->fn && b->m_depth < a->m_depth ) return true;
+		//else if( b->novelty == a->novelty && b->m_depth < a->m_depth ) return true;
 		return false;
 	}
     };
@@ -58,6 +58,10 @@ protected:
     std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploitation >* q_exploitation;
 
     reward_t		m_max_reward;
+    unsigned m_gen_count_novelty2;
+    unsigned m_gen_count_novelty1;
+    unsigned m_exp_count_novelty2;
+    unsigned m_exp_count_novelty1;
 };
 
 

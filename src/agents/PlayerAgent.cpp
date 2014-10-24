@@ -80,12 +80,19 @@ PlayerAgent::update_state(  ALEState *s ) {
   */
 Action PlayerAgent::agent_step() {
   // Terminate if we have a maximum number of frames
-  if (i_max_num_frames > 0 && frame_number >= i_max_num_frames)
-    end_game();
+    if (i_max_num_frames > 0 && frame_number >= i_max_num_frames){
+	std::cout << "End of game called "<< frame_number << ">=" << i_max_num_frames << std::endl;
+      p_rom_settings->print( std::cout );
+      std::cout << std::endl;
 
+	end_game();
+    }
   // Terminate this episode if we have reached the max. number of frames 
   if (i_max_num_frames_per_episode > 0 && 
       episode_frame_number >= i_max_num_frames_per_episode) {
+      std::cout << "RESET "<< episode_frame_number << ">=" << i_max_num_frames_per_episode << std::endl;
+      p_rom_settings->print( std::cout );
+      std::cout << std::endl;
     return RESET;
   }
 

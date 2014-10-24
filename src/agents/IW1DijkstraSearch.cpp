@@ -31,15 +31,16 @@ int IW1DijkstraSearch::expand_node( TreeNode* curr_node, std::priority_queue<Tre
 	bool leaf_node = (curr_node->v_children.empty());
 	m_expanded_nodes++;
 	// Expand all of its children (simulates the result)	
-	if(m_randomize_successor)
-	    std::random_shuffle ( available_actions.begin(), available_actions.end() );
 
 	if(leaf_node){
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;
+		if(m_randomize_successor)
+		    std::random_shuffle ( curr_node->available_actions.begin(), curr_node->available_actions.end() );
+
 	}
 	for (int a = 0; a < num_actions; a++) {
-		Action act = available_actions[a];
+		Action act = curr_node->available_actions[a];
 		
 		TreeNode * child;
 	
