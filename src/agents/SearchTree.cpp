@@ -37,7 +37,7 @@ SearchTree::SearchTree(RomSettings * rom_settings, Settings & settings,
     num_simulations_per_frame = settings.getInt("num_simulations_per_frame",false);
     
 //    std::cout << "max_sim_steps_per_frame: "<< max_sim_steps_per_frame << std::endl;
-    assert(max_sim_steps_per_frame != -1 || num_simulations_per_frame != -1);
+    assert(max_sim_steps_per_frame != -1 || settings.getInt("uct_monte_carlo_steps",false) != -1);
     
     discount_factor = settings.getFloat("discount_factor", true);
     // Default: false

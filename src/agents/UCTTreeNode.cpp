@@ -17,12 +17,15 @@
 UCTTreeNode::UCTTreeNode(TreeNode *parent, ALEState &parentState): 
   TreeNode(parent, parentState),
   visit_count(0),
-  sum_returns(0) {
+  sum_returns(0),
+  sim_steps(0)
+{
 }
 
 UCTTreeNode::UCTTreeNode(TreeNode *parent, ALEState &parentState, 
     int num_simulate_steps, Action a, SearchTree *tree):
   TreeNode(parent, parentState, tree, a, num_simulate_steps),
   visit_count(0),
-  sum_returns(0) {
+  sum_returns(0),
+  sim_steps(0) {
 }

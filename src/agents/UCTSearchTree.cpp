@@ -51,7 +51,13 @@ void UCTSearchTree::build(ALEState & state) {
    or until we have the required number of UCT simulations. 
    ******************************************************************* */
 void UCTSearchTree::update_tree(void) {
-	int simulation_steps = 0;
+	m_generated_nodes=0;
+	m_expanded_nodes=0;
+	m_max_depth=0;
+	int simulation_steps = ((UCTTreeNode*)p_root)->num_steps();
+	
+	std::cout << "starting with " << simulation_steps << " simulation steps" <<std::endl;
+	
 	int num_iterations = 0;
 	while (true) {
 		int new_sim_steps = single_uct_iteration();
@@ -113,6 +119,14 @@ Action UCTSearchTree::get_best_action(void) {
 	// Replace the best branch by our actual choice 
 	p_root->best_branch = best_branch;
 
+
+	for (size_t c = 0; c < p_root->v_children.size(); c++) {
+	    TreeNode* curr_child = p_root->v_children[ c ];
+	    
+	    std::cout << "Action: " << action_to_string(available_actions[c]) << " Depth: " << curr_child->branch_depth  <<" NumNodes: " << curr_child->num_nodes() << " Reward: "<< curr_child->branch_return   << std::endl;
+
+	}
+	
 	std::cout << "Action " << best_branch << std::endl;
 	return available_actions[best_branch];
 }
@@ -201,7 +215,8 @@ int UCTSearchTree::single_uct_iteration(void) {
 	int mc_steps = uct_search_depth - node_depth; 
   
 	sim_steps += do_monte_carlo((UCTTreeNode*)node, mc_steps, mc_return);
-
+	
+	
 	// Propagate the return back up
 	update_values((UCTTreeNode*)node, mc_return);
 
@@ -346,7 +361,8 @@ int UCTSearchTree::do_monte_carlo(UCTTreeNode* start_node,
 	//  when we reach a terminal state)
 	int steps = simulate_game(start_node->state, RANDOM, num_steps, 
 				  mc_return, is_terminal, true, false);
-
+	
+	start_node->sim_steps += steps;
 	// Reset its frame number for consistency
 	m_env->restoreState(start_node->state);
 
