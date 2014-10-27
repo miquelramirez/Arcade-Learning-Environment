@@ -94,6 +94,7 @@ class UCTSearchTree : public SearchTree {
     void print_path(TreeNode * node, int c);
 
   protected:
+		int uct_max_simulations;
 		int uct_search_depth;// Number of frames to simulate to when performing
       // Monte-Carlo search
 		float uct_exploration_constant;	// Exploration constant

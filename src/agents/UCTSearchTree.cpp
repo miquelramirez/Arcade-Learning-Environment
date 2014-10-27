@@ -20,7 +20,8 @@
 UCTSearchTree::UCTSearchTree(RomSettings * rom_settings, Settings &settings,
 			     ActionVect &actions, StellaEnvironment* _env):
 	SearchTree(rom_settings, settings, actions, _env) {
-  
+ 
+	uct_max_simulations = settings.getInt("uct_monte_carlo_steps",true); 
 	uct_search_depth = settings.getInt("uct_search_depth", true);
 	uct_exploration_constant = 
 		settings.getFloat("uct_exploration_constant", true);
@@ -52,7 +53,6 @@ void UCTSearchTree::build(ALEState & state) {
 void UCTSearchTree::update_tree(void) {
 	int simulation_steps = 0;
 	int num_iterations = 0;
-
 	while (true) {
 		int new_sim_steps = single_uct_iteration();
 		simulation_steps += new_sim_steps; 
@@ -63,16 +63,20 @@ void UCTSearchTree::update_tree(void) {
 		if (max_sim_steps_per_frame != -1 && 
 		    simulation_steps >= max_sim_steps_per_frame)
 			break;
-		else if (num_simulations_per_frame != -1 &&
-			 ((UCTTreeNode*)p_root)->visit_count >= num_simulations_per_frame)
-			break;
+		//else if (num_simulations_per_frame != -1 &&
+		//	 ((UCTTreeNode*)p_root)->visit_count >= num_simulations_per_frame)
+		//	break;
+		else if ( uct_max_simulations != -1 && 
+			((UCTTreeNode*)p_root)->visit_count >= uct_max_simulations)
+			break;	
 		// Handle the case where we cannot simulate further but have not reached the
 		//  maximum number of simulation steps per frame (thanks to Erik Talvitie
 		//  for this one)
 		else if (num_simulations_per_frame == -1 && new_sim_steps == 0)
 			break;
 	}
-
+	std::cout << "Simulation steps: " << simulation_steps << std::endl;
+	std::cout << "Visits to root: " << ((UCTTreeNode*)p_root)->visit_count << std::endl;
 	total_simulation_steps += simulation_steps;
 }
 
