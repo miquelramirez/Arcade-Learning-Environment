@@ -61,7 +61,7 @@ static ALEController* createController(OSystem* osystem, std::string type) {
     return new InternalController(osystem); 
   }
   else if (type == "trajectory") {
-    std::cerr << "Game will be controlled by an internal agent." << std::endl;
+    std::cerr << "Game will be controlled by a recorded trajectory." << std::endl;
     return new TrajectoryController(osystem); 
   }
   else {
