@@ -44,6 +44,35 @@ void IW1Search::print_path(TreeNode * node, int a) {
 	}
 }
 
+// void IW1Search::initialize_tree(TreeNode* node){
+// 	do {
+// 		Action act =  Action::PLAYER_A_NOOP
+// 		m_generated_nodes++;
+
+// 		TreeNode* child = new TreeNode(	curr_node,	
+// 					curr_node->state,
+// 					this,
+// 					act,
+// 					sim_steps_per_node); 
+		
+// 		if ( check_novelty_1( child->state.getRAM() ) ) {
+// 			update_novelty_table( child->state.getRAM() );
+			
+// 		}
+// 		else{
+// 			curr_node->v_children[a] = child;
+// 			child->is_terminal = true;
+// 			m_pruned_nodes++;
+// 			break;
+// 		}
+
+// 		num_simulated_steps += child->num_simulated_steps;					
+// 		node->v_children[a] = child;
+		
+// 		node = child;
+// 	}while( node->depth() < m_max_depth)
+// }
+
 void IW1Search::update_tree() {
 	expand_tree(p_root);
 }
@@ -73,7 +102,7 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;
 		if(m_randomize_successor)
-		    std::random_shuffle ( curr_node->available_actions.begin(), curr_node->available_actions.end() );
+		    std::random_shuffle ( curr_node->available_actions.begin()+1, curr_node->available_actions.end() );
 	
 	}
 	for (int a = 0; a < num_actions; a++) {
