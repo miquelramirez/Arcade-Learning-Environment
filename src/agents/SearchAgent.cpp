@@ -23,6 +23,7 @@
 
 #include "BreadthFirstSearch.hpp"
 #include "IW1Search.hpp"
+#include "IW11Search.hpp"
 #include "IW2Search.hpp"
 #include "IW1DijkstraSearch.hpp"
 #include "UniformCostSearch.hpp"
@@ -59,6 +60,13 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 	
 		search_tree->set_novelty_pruning();
 		m_trace.open( "iw1.search-agent.trace" );
+    
+	}else if( search_method == "iw11"){
+		search_tree = new IW11Search(	_settings, _osystem->settings(),
+						available_actions, _env);
+	
+		search_tree->set_novelty_pruning();
+		m_trace.open( "iw11.search-agent.trace" );
     
 	}else if( search_method == "iw2"){
 		search_tree = new IW2Search(	_settings, _osystem->settings(),

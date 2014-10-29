@@ -19,7 +19,8 @@ MODULE_OBJS := \
 	src/agents/BestFirstSearch.o \
 	src/agents/UniformCostSearch.o \
 	src/agents/IW2Search.o \
-	src/agents/Width2BestFirstSearch.o
+	src/agents/Width2BestFirstSearch.o \
+	src/agents/IW11Search.o
 
 MODULE_DIRS += \
 	src/agents
