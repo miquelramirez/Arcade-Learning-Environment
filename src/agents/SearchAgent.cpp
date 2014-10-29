@@ -27,6 +27,7 @@
 #include "IW1DijkstraSearch.hpp"
 #include "UniformCostSearch.hpp"
 #include "BestFirstSearch.hpp"
+#include "Width2BestFirstSearch.hpp"
 #include "UCTSearchTree.hpp"
 #include "time.hxx"
 
@@ -80,7 +81,14 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 		search_tree->set_novelty_pruning();
 		m_trace.open( "bfs.search-agent.trace" );
     
-	} else if (search_method == "uct") {
+	}else if( search_method == "bfs_w2"){
+		search_tree = new Width2BestFirstSearch(	_settings, _osystem->settings(),
+						available_actions, _env);
+	
+		search_tree->set_novelty_pruning();
+		m_trace.open( "bfs_w2.search-agent.trace" );
+    
+	}  else if (search_method == "uct") {
 		search_tree = new UCTSearchTree(_settings, _osystem->settings(),
 					    available_actions, _env);
 		m_trace.open( "uct.search-agent.trace" );
