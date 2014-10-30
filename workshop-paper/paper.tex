@@ -407,6 +407,37 @@ Randomization? Discount?
 
 \section{Experimental Results in the Atari Games}
 
+\begin{table*}
+%% \addtolength{\tabcolsep}{-2pt}
+{\scriptsize
+\begin{tabular}{@{}l|rr|rrr|rrr|rrr|rrr@{}}
+%% table header
+\hline\\[-3ex]
+\multicolumn{1}{c|}{} & \multicolumn{2}{c|}{Random} & \multicolumn{3}{c|}{BrFS}& \multicolumn{3}{c|}{IW1}& \multicolumn{3}{c|}{BFS}& \multicolumn{3}{c}{UCT} \\[.2ex]
+\hline\\[-3ex]
+%% table body
+\multicolumn{1}{c}{Game}  & \multicolumn{1}{c}{S} & \multicolumn{1}{c|}{Dev}  & \multicolumn{1}{c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev}  & \multicolumn{1}{|c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev}  & \multicolumn{1}{|c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev}  & \multicolumn{1}{|c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev} \\[.2ex]
+\hline\\[-3ex]
+asterix         & 210   & 54.77     & 32.24 & 3900  & 5538.95   & 17.08 & 119000        & 4987.48   & 0.95  & 56320       & 4757.84   & 10.82 & \textbf{296300} & 6657.7    \\
+beam\_rider     & 448.8 & 84.64     & 43.48 & 519.2 & 179.81    & 6.02  & 3000          & 1150.22   & 0.92  & 3804        & 446.18    & 42.91 & \textbf{4320}   & 2175.26   \\
+breakout        & 1     & 0.71      & 51.56 & 2     & 1.41      & 1.37  & 383.6         & 9.84      & 3.95  & 421.2       & 13.66     & 26.03 & \textbf{512.4}  & 193.97    \\
+enduro          & 0     & 0         & 40.92 & 0.4   & 0.89      & 38.13 & \textbf{500}  & 0         & 13.12 & 292.8       & 6.18      & 32.14 & 306.8           & 8.14      \\
+freeway         & 0     & 0         & 71.84 & 0     & 0         & 15.19 & \textbf{29.4} & 0.89      & 4.44  & 19.6        & 3.29      & 90.64 & 1               & 1.41      \\
+pong            & -20.4 & 0.55      & 41.51 & -20.2 & 0.84      & 18.45 & 16.4          & 1.67      & 39.69 & \textbf{21} & 0         & 38.37 & \textbf{21}     & 0         \\
+qbert           & 185   & 345.33    & 42.83 & 160   & 85.88     & 1.82  & 1545          & 1666.06   & 1.76  & 14725       & 7872.1    & 28.61 & \textbf{18730}  & 1127.69   \\
+seaquest        & 192   & 38.99     & 40.01 & 200   & 14.14     & 14.72 & \textbf{4274} & 4206.81   & 1.59  & 4070        & 1939.55   & 26.16 & 3406            & 2402.47   \\
+space\_invaders & 187   & 120.86    & 46.11 & 115   & 61.44     & 12.1  & \textbf{2670} & 637.3     & 2.25  & 1327        & 598.04    & 19.66 & 2634            & 375.66   
+\end{tabular}
+}
+
+ \caption{\small
+   Random, BrFS, IW1, BFS, UCT performance over 5 runs, with
+   seeds 0 to 4.  \textit{T} is the action selection average
+   computation time, \textit{S} is the average score, and
+   \textit{Dev} is the standard deviation.  Numbers in bold show best performer in terms of average score.}
+\label{performance}
+
+\end{table*}
 
 
 ** Results, cold and detached, same format as those reported in jair paper, possibly with
