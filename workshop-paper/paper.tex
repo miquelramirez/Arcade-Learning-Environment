@@ -1,0 +1,429 @@
+  
+\documentclass[letterpaper]{article}
+\usepackage{aaai}
+\usepackage{times}
+\usepackage{helvet}
+\usepackage{courier}
+\frenchspacing
+\setlength{\pdfpagewidth}{8.5in}
+\setlength{\pdfpageheight}{11in}
+
+
+\newcommand{\tuple}[1]{{\langle #1\rangle}}
+\newcommand{\triple}[1]{{\langle #1\rangle}}
+\newcommand{\pair}[1]{{\langle #1\rangle}}
+
+\newcommand{\Omit}[1]{}
+
+\newcommand{\eqdef}{\stackrel{\hbox{\tiny{def}}}{=}}
+\newcommand{\IW}{{\textit{IW}}}
+\newcommand{\SIW}{{\textit{SIW}}}
+\newcommand{\ID}{{\textit{ID}}}
+\newcommand{\BRFS}{{\textit{BrFS}}}
+
+% AAAI (comment for ECAI)
+% \newtheorem{theorem}{Theorem}
+
+
+ \newtheorem{theorem}{Definition}
+% \newtheorem{proposition}[theorem]{Proposition}
+% \newtheorem{lemma}[theorem]{Lemma}
+% \newtheorem{corollary}[theorem]{Corollary}
+ \newtheorem{definition}[theorem]{Definition}
+
+
+ \begin{document}
+% The file aaai.sty is the style file for AAAI Press 
+% proceedings, working notes, and technical reports.
+%
+\pdfinfo{
+/Title (Classical Planning Algorithms on the Atari Video Games: Preliminary Results)
+/Author (Nir Lipovetzky, Miquel Ramirez, Hector Geffner)}
+
+\setcounter{secnumdepth}{0}  
+
+\title{Classical Planning Algorithms ¡ on the Atari Video Games: Preliminary Results}
+
+\author{Nir, Miquel, H}
+%AAAI Press\\
+%Association for the Advancement of Artificial Intelligence\\
+%2275 East Bayshore Road, Suite 160\\
+% Palo Alto, California 94303\\}
+
+\maketitle
+
+
+%% Pending: randomization, discount factor, iw11 ..
+%% iw2 multivalued expands up to 256^2 n^nodes, while iw2 boolean 16^2 n^2 nodes; can iw2 boolean beat iw1 multivalued?
+%% Important. optimization, need Dikjstra por postprocessing .. see emails 
+
+
+\begin{abstract}
+\begin{quote}
+The Atari  2600 games supported in  the Arcade Learning Environment (Bellemare et. al. 2013) 
+all feature a known initial (RAM) state and actions that have deterministic effects. Classical planners, however, 
+cannot be used  for selecting actions  for  two reasons: first,  no  compact PDDL-model of  the games is given, 
+and  more importantly, the actions effects and the goals are  not known a priori. Moreover, in these games there is usually  
+no set of goals to be achieved but rewards to be collected. These features do not preclude the use of   classical  algorithms like
+breadth-first search or Dijkstra's algorithm,  but    these  algorithms are not effective over  large state spaces. We thus turn to a
+different class of classical planning algorithms  introduced recently  that perform a \emph{structured exploration} of the state space; namely,  
+like breadth-first search and Dijkstra's  algorithm they are ``blind'' and hence  do not require prior knowledge of state transitions, 
+costs (rewards) or goals, and yet, like  heuristic search algorithms, they have been shown to be   effective for solving   problems over huge 
+state spaces. The simplest such algorithm, called Iterated Width or IW, consists of  a sequence of calls  IW(1), IW(2), .., IW(k) where  IW(i) is  
+a breadth-first search in which a state is  pruned when it is not the first state in the search  to make true some set of i atoms or less.
+Preliminary empirical results suggest that the performance of IW with the  $k$ parameter fixed to $1$, i.e., IW(1), 
+is much better than random or breadth-first search, and close to the performance of UCT. Other simple variations of IW
+that combine exploration and exploitation are evaluated as well.
+\end{quote}
+\end{abstract}
+
+\section{Introduction}
+
+
+The Arcade Learning Environment (ALE)  provides a challenging  platform for evaluating general, domain-independent AI planners and 
+learners through a convenient interface to hundreds of Atari 2600 games \cite{bellemare:jair2013}. 
+Results have been reported so far for basic planning algorithms like breadth-first 
+search and UCT \cite{bellemare:jair2013}, and for  reinforcement learning
+and evolutionary  methods \cite{bellemare:jair2013,deep-mind-atari,risto-texas:atari-games}.
+The empirical results are impressive in some cases, yet a lot remains to be done, as no method  approaches   the 
+performance of  human players across a broad range of games.
+
+While all  these games feature a known initial (RAM) state and actions that
+have deterministic effects on this state, the problem of selecting the next action
+to be done cannot be addressed with state-of-the-art classical planners for two 
+reasons. First, there is no compact PDDL-like encoding of the domain, and more 
+importantly,  the goal to be achieved in each game  is not given. Indeed, there are 
+often no goals at all but rewards $r(a,s)$ that potentially depend on the action $a$ and 
+the state $s$ in  which  the action is performed, and these rewards are not known a priori either. 
+Thus no model of the  goals  or the  rewards can be used to bias the search, and hence, 
+standard heuristic search and classical planning methods can't be used. 
+
+The action selection problem in the Atari games can be seen as a \emph{reinforcement learning} problem 
+\cite{sutton:book} over a deterministic MDP where the state transitions and rewards are not known, or alternatively,
+as a  \emph{net-benefit planning problem} \cite{ref-net-benefit-planning} with unknown state transitions  and  rewards. Namely, 
+we seek  an action sequence $a_0, a_1, \ldots, a_m$ from the given current  state $s_0$ that generates 
+a state sequence $s_0, s_1, \ldots, s_{m+1}$ with  maximum  total reward $\sum_{i=0}^{m} r(a_i,s_i)$,  
+where $m$ is a sufficiently large planning horizon, and the rewards $r(a_i,s_i)$ and the  state-transitions $s_{i+1}=f(a_i,s_i)$ 
+are known only after the action $a_i$ is applied in the state $s_i$. 
+
+The presence of unknown transition and  rewards in  the Atari games does not preclude the use of blind-search
+methods like breadth-first search, Dijkstra's algorithm \cite{dijkstra},  or learning methods  such as 
+LRTA* \cite{korf:lrta}, UCT \cite{uct}, and Q-learning  \cite{sutton:rl,bertsekas:neuro}. Indeed, 
+the net-benefit planning problem with unknown state transitions and rewards over a given planning
+horizon, can be mapped into a standard \emph{shortest-path problem} which can be solved optimally by Dijkstra's algorithm.
+For this, we just need to  map the unknown rewards $r(a,s)$ into positive (unknown) action costs $c(a,s) = C - r(a,s)$
+where  $C$ is a large constant that exceeds the maximum possible reward. The fact that the state 
+transition and cost functions  $f(a,s)$ and $c(a,s)$ are not known a priori doesn't affect the applicability of 
+Dijkstra's algorithm, which requires the value of these functions precisely when  the action $a$
+is applied in the state $s$. 
+
+The limitation of the   basic blind search  methods is that they are not effective  over very spaces, neither
+for solving problems off-line, nor for guiding  a lookahead search for solving problems on-line. 
+In this work, we thus turn to a recent class of  planning algorithms that combine the scope of blind search
+methods with the performance of state-of-the-art classical planning algorithms: namely, like ``blind'' search algorithms
+they do not require prior knowledge of state transitions, costs, or goals, and yet like heuristic algorithms
+they manage to search large  state spaces effectively. The basic algorithm in this class is 
+called IW for Iterated Width search \cite{nir:ecai2012}. IW consists of a sequence of calls  IW(1), IW(2), .., IW(k), where 
+IW(i) is  a  standard breadth-first search where states are pruned right away when they fail to make true some new tuple (set) 
+of at most $i$ atoms. Namely,   IW(1) is a breadth-first search that keeps  a state only if  the state is   the first  one 
+in the search to make some atom  true; IW(2) keeps a state  only if the state is  the first one to  make  a pair of atoms true, and 
+so on.  Like plain breadth-first  and iterative deepening searches,  IW  is 
+complete, while searching the state space in a way that makes use of the 
+\emph{structure of states} given by the values of a finite set of state variables.
+In the Atari games, the (RAM) state is given by a vector of 128 bytes, which we associate with 128 variables 
+$X_i$, $i=1, \ldots, 128$, each of which may take up to $256$ values $x_j$. A state $s$ makes an atom $X_i=x_{j}$ 
+true when the value of the $i$-th byte in the state vector $s$ is $x_j$. 
+
+While a normal, complete breadth-first search runs in time that is exponential in the total number of variables $X_i$, 
+the procedure $IW(k)$ runs in time that is exponential in the $k$ parameter, $1 \leq k \leq n$. 
+Elsewhere, it has been shown that  IW exhibits   state-of-the-art performance on most existing planning benchmark domains 
+when goals are restricted to be single atoms  where IW provably runs in low polynomial time in the number of
+variables \cite{nir:ecai2012}. For example, in a a block world instance with any number of blocks and any initial
+configuration,  the goal of  placing a given  block on top of another, will be achievable in  quadratic time  
+in the number of blocks as any such instance can be shown to  have \emph{width} 2. This means  that IW(2) will be 
+not only complete then, but also optimal. This is also true for most other benchmark domains in classical planning
+that turn out to be have small, bounded widths for any instance, as long as the goal is atomic. 
+For dealing with the benchmarks where goals are  not single atoms, e.g., where a given \emph{tower} of blocks needs to be built, 
+simple extensions of the basic IW procedure have been developed as well, such as Serialized IW, where IW is 
+used to achieve the goals one at at time \cite{nir:ecai2012,nir:ecai2014}. The extension of IW for problems where there is no goal but an
+additive reward measure   to be optimized is direct.
+
+%%  Each iteration IW(k) keeps track of the accumulated reward up to each state $s$ that has been
+%% generated but  not pruned, as $R(s) = R(s')+ r(a,s')$ where $s'$ and $a$ are  the single parent state
+%% and action $a$ that led to $s$ in IW(k) with $R(s)=0$ for the current state $s$. The best reward 
+
+The sequence of calls IW(1), IW(2), \ldots, IW(k) manages to combine the scope of ``blind'' search algorithms with the performance of 
+heuristic-search algorithms by exploring states  in an  order dictated by the ``width''  parameter $k$; 
+states that have width 1 are explored first in linear time, then states that have  width two are explored in quadratic time, and so on. 
+In classical planning problems, if the goal has a small width (something common in the classical planning domains when the  goal is a single atom, as
+we have seen above), IW will find goal states  in low polynomial time. Similarly, in the reward-based setting, if  there are states of high reward 
+that have small width, IW will find such states in low polynomial time, even if the state space is exponential in the number of variables. 
+In this paper, we aim to test whether these ideas work for the Atari games too  when  the RAM state of the emulator
+is used  as the system state. 
+
+The paper is organized as follows. We review the Iterated Width  algorithm and where it comes from, 
+look at  some simple   variations of the basic algorithm that appear to be convenient  for the Atari
+games, present and analyze the preliminary experimental results, summarize the main lessons, and
+discuss related and future work.
+
+
+\section{Iterated Width}
+
+The Iterative Width  (IW) algorithm has been introduced as a classical planning algorithm
+that takes a planning problem as an input, and computes an action sequence that solves the problem 
+as the output \cite{nir:ecai2012}. The algorithm however
+applies to a broader range of problems. We will characterize such
+problems  by means  a finite and discrete set of states (the state space)
+that correspond to vectors of size $n$. Namely, the 
+states are  \emph{structured} or \emph{factored} , and we take each of the locations in the vector
+to represent a variable $X_i$, and the value at that vector location to 
+represent the value $x_j$ of variable $X_i$ in the state. 
+In addition to the states space, a problem is defined by an initial state $s_0$, 
+a set of actions $A(s)$ applicable in each state, a 
+transition function $f$ such that  $s' = f(a,s)$ is 
+the state that results from applying action $a \in A(s)$ to the state $s$, 
+and rewards $r(a,s)$ represented by real numbers that result from  applying action $a$ in state $s$.
+The transition and reward functions do not  need to be known a priori, yet in that case, the  
+state and  reward that results from the application of an action in a state needs to be \emph{observable}.
+The task is to compute an action sequence $a_0, \ldots, a_m$ for a large horizon $m$
+that generates a state sequence $s_0, \ldots, s_{m+1}$ that  maximizes the accumulated 
+reward $\sum_{i=0}^{m} r(a_i,s_i)$, or that provides a good approximation.
+
+\subsection{The Algorithm}
+
+IW consists of a sequence of calls  $\IW(i)$ for $i=0, 1, 2, \ldots$
+over a problem $P$ until a termination condition is reached. 
+The procedure $\IW(i)$  is a plain forward-state \emph{breadth-first search} with just one change: right after a state 
+$s$ is generated, the state is  pruned if it doesn't pass a simple \emph{novelty test}.
+More precisely,
+
+\begin{itemize}
+\item The \emph{novelty of a newly generate state $s$  in a  breadth-first search}
+is   $1$ when $s$ is the first state generated in the search that makes true an atom $X=x$,
+$2$  when $s$ is the first state that makes a pair of atoms $X=x$ and $Y=y$ true, and so on. 
+
+\item  $\IW(i)$ is a breadth-first search that prunes newly generated states when their novelty measure
+is greater than $i$.
+
+\item $\IW$  calls $\IW(i)$ sequentially for $i=1,2,\ldots$ until a termination condition is reached, 
+returning then the best path found.
+\end{itemize}
+
+For classical planning, the termination condition is the achievement of the goal. In the on-line setting, 
+as in the Atari games, the termination condition is given by a time window or a maximum number of generated nodes.
+The  best path found by IW is the path  that has a  maximum accumulated reward. 
+The accummulated reward $R(s)$  of a state $s$ reached in an iteration of IW is determined by the  unique parent state $s'$ 
+and action $a$ leading to $s$ from $s'$ as $R(s) = R(s') + r(a,s')$. The best state is the state $s$ with maximum reward
+$R(s)$ generated but not pruned by IW, and the best path is the one that leads to the state $s$ from the current state.
+The action selected to be done next is then the first action along such a path  (** see eventually randomization **).
+
+%% Like in standard breadth-first search, each iteration IW(i)  prunes 
+%%% the  duplicate states as well.
+
+\begin{table}
+\begin{center}
+%\resizebox{3in}{!}{
+{\scriptsize
+% \begin{tabular}{r@{}lrrrr@{}}
+\begin{tabular}{llcccc}
+%% table header
+\hline\\[-1.3ex]
+%\toprule
+\# & \multicolumn{1}{c}{Domain} & \multicolumn{1}{c}{I} & \multicolumn{1}{c}{IW(1)} & \multicolumn{1}{c}{IW(2)} & \multicolumn{1}{c}{Neither} \\[.2ex]
+
+\hline\\[-1.3ex]
+%\hline
+%% table body
+1. & 8puzzle	&400	&55\%	&45\%	&0\%\\
+2. & Barman	&232	&9\%	&0\%	&91\%\\
+3. & Blocks World	&598	&26\%	&74\%	&0\%\\
+4. &Cybersecure	&86	&65\%	&0\%	&35\%\\
+% 5. &Depots	&189	&11\%	&66\%	&23\%\\
+% 6. & Driver	&259	&45\%	&55\%	&0\%\\
+% 7. & Elevators	&510	&0\%	&100\%	&0\%\\
+% 8. & Ferry	&650	&36\%	&64\%	&0\%\\
+% 9. & Floortile	&538	&96\%	&4\%	&0\%\\
+% 10. & Freecell	&76	&8\%	&92\%	&0\%\\
+% 11. & Grid	&19	&5\%	&84\%	&11\%\\
+% 12. & Gripper	&1275	&0\%	&100\%	&0\%\\
+% 13. & Logistics	&249	&18\%	&82\%	&0\%\\
+% 14. & Miconic	&650	&0\%	&100\%	&0\%\\
+% 15. & Mprime	&43	&5\%	&95\%	&0\%\\
+% 16. & Mystery	&30	&7\%	&93\%	&0\%\\
+% 17. & NoMystery	&210	&0\%	&100\%	&0\%\\
+% 18. & OpenStacks	&630	&0\%	&0\%	&100\%\\
+% 19. & OpenStacksIPC6	&1230	&5\%	&16\%	&79\%\\
+\ldots & \ldots & \ldots & \ldots & \ldots & \\ 
+20. & ParcPrinter	&975	&85\%	&15\%	&0\%\\
+21. & Parking	&540	&77\%	&23\%	&0\%\\
+22. & Pegsol	&964	&92\%	&8\%	&0\%\\
+23. & Pipes-NonTan	&259	&44\%	&56\%	&0\%\\
+24. & Pipes-Tan	&369	&59\%	&37\%	&3\%\\
+25. & PSRsmall	&316	&92\%	&0\%	&8\%\\
+26. & Rovers	&488	&47\%	&53\%	&0\%\\
+27. & Satellite	&308	&11\%	&89\%	&0\%\\
+28. & Scanalyzer	&624	&100\%	&0\%	&0\%\\
+29. & Sokoban	&153	&37\%	&36\%	&27\%\\
+30. & Storage	&240	&100\%	&0\%	&0\%\\
+31. & Tidybot	&84	&12\%	&39\%	&49\%\\
+32. & Tpp	&315	&0\%	&92\%	&8\%\\
+33. & Transport	&330	&0\%	&100\%	&0\%\\
+34. & Trucks	&345	&0\%	&100\%	&0\%\\
+35. & Visitall	&21859	&100\%	&0\%	&0\%\\
+36. & Woodworking	&1659	&100\%	&0\%	&0\%\\
+37. & Zeno	&219	&21\%	&79\%	&0\%\\[.2ex]
+%\hline
+\hline\\[-1.3ex]
+& Total/Avgs&37921	&37.0\%	&51.3\%	&11.7\%\\
+\hline
+\end{tabular}
+}
+
+\vskip .1cm
+
+
+{\scriptsize
+\begin{tabular}{@{}ccccc@{}}
+\hline\\[-1.3ex]
+\multicolumn{1}{c}{\# Instances}  &\multicolumn{1}{c}{\IW} & \multicolumn{1}{c}{\ID} & \multicolumn{1}{c}{\BRFS} &\multicolumn{1}{c}{\textit{GBFS +} $h_{add}$} \\[.2ex]
+\hline\\[-1.3ex]
+37921  &34627 &9010	&8762 &34849 \\
+\hline
+%\hline
+\end{tabular}
+}
+
+\end{center}
+
+\caption{\small 
+\emph{Top:} Number of classical planning problems  and percentages solved by IW(1), IW(2), or neither. Instances obtained
+by splitting benchmarks  with $N$ atomic goals into $N$ problems with atomic goals.
+\emph{Bottom:} Number of instances solved by \IW\ in comparison with  Iterative Deepening (\ID),  
+Breadth-First Search (\BRFS),   and Greedy Best First Search (\textit{GBFS}) guided by  additive heuristic.
+Time and  memory outs  after 30 minutes and 2 GB resp. From \cite{nir:ecai2102}.
+}
+\label{table1}
+\end{table}
+%%%%
+%%%
+
+\subsection{Performance and Width}
+
+IW is a systematic and complete blind-search algorithm like breadth-first search (BrFS) and iterative deepening (ID),
+but   unlike these algorithms, it uses the factored representation of the states in terms of variables to structure the 
+search in a different way. This structured exploration  has proved to be very effective in classical planning 
+over most of the benchmark domains  when the goals are restricted to be single atoms. Table~\ref{table1} from \cite{nir:ecai2012} shows 
+the percentage of instances that are  solved by  the first iteration of IW, i.e.  IW(1), by the second iteration 
+IW(2), and by neither one.  These are instances that  have been obtained from the existing benchmarks
+by splitting problems with $N$ atomic goals, into $N$ problems with one atomic goal each. As the table shows, 
+$37\%$ of the 37921 instances are solved by IW(1) while $51.3\%$ are  solved by IW(2). Since IW($k$)
+runs in time that is exponential in $k$, this mean that almost $90\%$ of the 37921 instances are  solved in time that
+is either linear or quadratic in the number of problem variables, which in these encodings are all \emph{boolean}.  
+Furthermore, when the performance of \IW\   is compared with  breadth-first search and iterative deepening, 
+on the one hand,  and  with a  Greedy Best First Search guided by the additive heuritstic $h_{add}$
+on the other (this algorithm is similar to one used by  the FF planner when hill climbing search fails \cite{hoffmann:ff}), 
+it turns out that ``blind'' \IW\ solves as many problems as the informed search, 34627 vs. 34849, far ahead
+of the other blind algorithms BrFS and ID  that solve 9010 and 8762 problems each. This is shown in the bottom
+part of the Table~\ref{table1}. Moreover, \IW\ is  faster and results in shorter plans than the heuristic search  
+\cite{nir:ecai2012}.
+
+
+The min $k$ value for which $IW(k)$ solves an instance  is clearly bounded and small in most of
+these instances. This is  actually no  accident and  has a \emph{theoretical explanation.} Lipovetzky and Geffner define
+a structural parameter called the problem \emph{width} and show that for many of these domains,
+\emph{any} solvable instance with atomic goals will  have a bounded and small width that is independent of the number
+of variables and states in the problem. The min value $k$ for which the iteration  $IW(k)$ solves
+the problem cannot exceed the problem width, so that the algorithm \emph{IW will run in time and space
+that are exponential in the problem width.}
+
+Formally, the \emph{width} $w(P)$ of a problem $P$ is $i$
+iff $i$ is the minimum positive integer for which 
+there is a sequence of tuples (sets) with at most $i$ atoms each, $t_0, t_1, \ldots, t_n$
+such that 1)~$t_0$ is true in the initial state of $P$, 2)~any shortest plan $\pi$  that achieves $t_i$ in $P$
+can be extended into a shortest plan that achieves $t_{i+1}$ by extending   $\pi$ with one action, and 
+3)~any shortest plan that achieves $t_n$ is also a shortest plan for $P$. 
+
+One way to understand this definition is that the problem  width $w(P)$ is at most  $i$ if  there is a 
+``trail of  stepping stones''  $t_0, t_1, \ldots, t_n$ to reach the problem goal such that 
+A)~these ``stepping stones''  contain at most $i$ atoms each, B)~each  stepping stone $t_{i+1}$ is 
+at distance 1 from the previous one $t_i$ when $t_i$ has been reached following the ``trail'', 
+C)~the ``trail''  preserves ``optimality''; i.e., no  tuple $t_i$ can be reached in less than $i$ steps. 
+
+While this notion of width and the iterated  width algorithms that are based on it  have been designed
+for problems where a goal state needs to be reached, the notions remain  relevant  in  optimization problems as well.
+Indeed, if a  good path is made of states $s_i$ each of which have a low width, we would like 
+IW to find such path in low polynomial time for a low value of the $k$ parameter. 
+Later on we will discuss the changes required in IW to enforce this property, which
+are not yet implemented in the code that is evaluated below.
+
+
+\section{Width-Based Algorithms for the Atari Games}
+
+Explain: IW(1), 2BFS, and possible IW11. Also, Dijkstra postprocessing over IW(1) graph
+if ran.
+
+
+The number of nodes \emph{generated} by IW(1) is $n \times D \times b$ in the worst case, 
+where $n$ is the number of variables, $D$ is the size of their domains, and $b$ is maximum the number of 
+actions applicable per  state.  This same number in breadth-first search is not linear in $n$
+but exponential. For the Atari games,  $n=128$, $D=256$, and $b=18$, so that the product is
+equal to $589,824$, which is large but feasible. On the other hand, the number
+of nodes generated by IW(2) in the worst case is  $(n \times D)^2 \times b$, which is
+equal to $1,073,741,824$ which is too large, forcing us to consider only a fraction of 
+such states. For classical planning problems, the growth in the number of nodes from 
+IW(1) to IW(2) is not that large, as the variables are boolean. Indeed, we could have
+taken the state vector for the Atari games as a vector of 1024 boolean variables, 
+and apply these algorithms to that representation. The results would be different.
+In such a case, IW(1) would generate $n' \times D' \times b$ states, and 
+IW(2), $(n' \times D') \times b$ states, which for $n'=1024$ and $D=2$
+represent  $36,864$ and $7,5497,472$ states respectively.
+These are both feasible numbers, but we haven't tried yet this representation,
+under the assumption that the correlations among the bits in each one of 
+the 128 words of the state vectors are meaningful. 
+In summary, from the basic IW algorithm we are testing only the first call, IW(1).
+
+
+IW is a purely exploration algorithm that does not take into account  the accumulated 
+reward for selecting the next states to consider. As a simple, variant that combines
+exploration and exploitation, we evaluated a \emph{best-first search} algorithm
+with two queues: one queue  ordered first by  novelty measure 
+(recall, novelty 1 means that the state is the first one to make some atom true),
+and a second queue ordered by accumulated reward. In one iteration, the best first
+search picks up the best node from one queue, and in the second iteration it picks
+up the best node from the other queue. This way for combining multiple heuristics
+is used in the LAMA planner \cite{richter:lama}, and was introduced in the
+planner Fast Downward \cite{malte:fd,malte:alternating}. In addition, we break ties
+in the first queue favoring states with largest accumulated reward, and 
+in the second queue, favoring states with smallest novelty measure. Last, when
+a node is expanded, it is removed from the queue, and its children are placed on 
+both queues. The exception are the nodes with novelty 1 measure that are only
+placed in first queue (** check and revise; but keep accurate and simple **).
+We refer to this best-first algorithm below, as 2BFS.
+
+IW11? 
+
+
+Randomization? Discount?
+
+\section{Experimental Results in the Atari Games}
+
+
+
+** Results, cold and detached, same format as those reported in jair paper, possibly with
+std deviations and times. 
+
+** mention also ideas that have been tried and didn't work (IW2?, discount, randomization, ..)
+
+ 
+\section{Related and Futue Work}
+
+- Relation  to Novelty-based search (Stanley)
+- IW probes vs UCT probes; UCT using novelty with noise in rollout???
+- Structured Exploration of  Factored Spaces
+- Dijkstra postprocessing, properties for optimization
+- Learning in same instance, across diff instances of same game, etc.
+- Learning controllers vs. on-line planning, etc
+
+
+\end{document}
+
