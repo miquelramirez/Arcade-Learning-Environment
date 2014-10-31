@@ -21,7 +21,7 @@
 %\newcommand{\SIW}{{\textit{SIW}}}
 %\newcommand{\ID}{{\textit{ID}}}
 %\newcommand{\BRFS}{{\textit{BrFS}}}
-%\newcommand{\BFS}{{\textit{2BFS}}}
+%\newcommand{\BFS}{{\textit{\BFS}}}
 %\newcommand{\UCT}{{\textit{UCT}}}
 \newcommand{\IW}{{\textsc{IW}}}
 \newcommand{\SIW}{{\textsct{SIW}}}
@@ -89,11 +89,12 @@ breadth-first search or Dijkstra's algorithm,  but    these methods are not effe
 different class of classical planning algorithms  introduced recently  that perform a \emph{structured exploration} of the state space; namely,  
 like breadth-first search and Dijkstra's  algorithm they are ``blind'' and hence  do not require prior knowledge of state transitions, 
 costs (rewards) or goals, and yet, like  heuristic search algorithms, they have been shown to be   effective for solving   problems over huge 
-state spaces. The simplest such algorithm, called Iterated Width or IW, consists of  a sequence of calls  IW(1), IW(2), .., IW(k) where  IW(i) is  
+state spaces. The simplest such algorithm, called Iterated Width or \IW, consists of  a sequence of calls  $\IW(1)$, $\IW(2)$, 
+.., $\IW(k)$ where  $\IW(i)$ is  
 a breadth-first search in which a state is  pruned when it is not the first state in the search  to make true some set of i atoms or less.
-Preliminary empirical results suggest that the performance of IW with the  $k$ parameter fixed to $1$, 
-i.e., IW(1), is much better than random or breadth-first search, and approaches 
-the performance of UCT. A simple best-first variation  of IW,  that combine exploration and exploitation,
+Preliminary empirical results suggest that the performance of \IW\ with the  $k$ parameter fixed to $1$, 
+i.e., $\IW(1)$, is much better than random or breadth-first search, and approaches 
+the performance of \UCT. A simple best-first variation  of \IW,  that combine exploration and exploitation,
 is evaluated as well. 
 \end{quote}
 \end{abstract}
@@ -104,7 +105,7 @@ is evaluated as well.
 The Arcade Learning Environment (ALE)  provides a challenging  platform for evaluating general, domain-independent AI planners and 
 learners through a convenient interface to hundreds of Atari 2600 games \cite{bellemare:jair2013}. 
 Results have been reported so far for basic planning algorithms like breadth-first 
-search and UCT \cite{bellemare:jair2013}, and for  reinforcement learning
+search and \UCT\ \cite{bellemare:jair2013}, and for  reinforcement learning
 and evolutionary  methods \cite{bellemare:jair2013,deep-mind-atari,risto-texas:atari-games}.
 The empirical results are impressive in some cases, yet a lot remains to be done, as no method  approaches   the 
 performance of  human players across a broad range of games.
@@ -131,7 +132,7 @@ are known only after  action $a_i$ is applied in the state $s_i$.
 
 The presence of unknown transition and  rewards in  the Atari games does not preclude the use of blind-search
 methods like breadth-first search, Dijkstra's algorithm \cite{dijkstra},  or learning methods  such as 
-LRTA* \cite{korf:lrta}, UCT \cite{uct}, and Q-learning  \cite{sutton:rl,bertsekas:neuro}. Indeed, 
+LRTA* \cite{korf:lrta}, \UCT\ \cite{uct}, and Q-learning  \cite{sutton:rl,bertsekas:neuro}. Indeed, 
 the net-benefit planning problem with unknown state transitions and rewards over a given planning
 horizon, can be mapped into a standard \emph{shortest-path problem} which can be solved optimally by Dijkstra's algorithm.
 For this, we just need to  map the unknown rewards $r(a,s)$ into positive (unknown) action costs $c(a,s) = C - r(a,s)$
@@ -146,11 +147,11 @@ In this work, we thus turn to a recent class of  planning algorithms that combin
 methods with the performance of state-of-the-art classical planning algorithms: namely, like ``blind'' search algorithms
 they do not require prior knowledge of state transitions, costs, or goals, and yet like heuristic algorithms
 they manage to search large  state spaces effectively. The basic algorithm in this class is 
-called IW for Iterated Width search \cite{nir:ecai2012}. IW consists of a sequence of calls  IW(1), IW(2), .., IW(k), where 
-IW(i) is  a  standard breadth-first search where states are pruned right away when they fail to make true some new tuple (set) 
-of at most $i$ atoms. Namely,   IW(1) is a breadth-first search that keeps  a state only if  the state is   the first  one 
-in the search to make some atom  true; IW(2) keeps a state  only if the state is  the first one to  make  a pair of atoms true, and 
-so on.  Like plain breadth-first  and iterative deepening searches,  IW  is 
+called \IW\ for Iterated Width search \cite{nir:ecai2012}. \IW\ consists of a sequence of calls  $\IW(1)$, $\IW(2)$, .., $\IW(k)$, where 
+$\IW(i)$ is  a  standard breadth-first search where states are pruned right away when they fail to make true some new tuple (set) 
+of at most $i$ atoms. Namely,   $\IW(1)$ is a breadth-first search that keeps  a state only if  the state is   the first  one 
+in the search to make some atom  true; $\IW(2)$ keeps a state  only if the state is  the first one to  make  a pair of atoms true, and 
+so on.  Like plain breadth-first  and iterative deepening searches,  \IW\  is 
 complete, while searching the state space in a way that makes use of the 
 \emph{structure of states} given by the values of a finite set of state variables.
 In the Atari games, the (RAM) state is given by a vector of 128 bytes, which we associate with 128 variables 
@@ -158,18 +159,18 @@ $X_i$, $i=1, \ldots, 128$, each of which may take up to $256$ values $x_j$. A st
 true when the value of the $i$-th byte in the state vector $s$ is $x_j$. 
 
 While a normal, complete breadth-first search runs in time that is exponential in the total number of variables $X_i$, 
-the procedure $IW(k)$ runs in time that is exponential in the $k$ parameter, $1 \leq k \leq n$. 
-Elsewhere, it has been shown that  IW exhibits   state-of-the-art performance on most existing planning benchmark domains 
-when goals are restricted to be single atoms  where IW provably runs in low polynomial time in the number of
+the procedure $\IW(k)$ runs in time that is exponential in the $k$ parameter, $1 \leq k \leq n$. 
+Elsewhere, it has been shown that  \IW\ exhibits   state-of-the-art performance on most existing planning benchmark domains 
+when goals are restricted to be single atoms  where \IW\ provably runs in low polynomial time in the number of
 variables \cite{nir:ecai2012}. For example, in a block world instance with any number of blocks and any initial
 configuration,  the goal of  placing a given  block on top of another will be achievable in  quadratic time  
-in the number of blocks as any such instance can be shown to  have \emph{width} 2. This means  that IW(2) will be 
+in the number of blocks as any such instance can be shown to  have \emph{width} 2. This means  that $\IW(2)$ will be 
 not only complete then, but also optimal. This is also true for most other benchmark domains in classical planning
 that turn out to  have small, bounded widths for any instance, as long as the goal is atomic. 
 For dealing with the benchmarks where goals are  not single atoms, e.g., where a given \emph{tower} of blocks needs to be built, 
-simple extensions of the basic IW procedure have been developed as well, such as Serialized IW, where IW is 
+simple extensions of the basic \IW\ procedure have been developed as well, such as Serialized \IW, where \IW\ is 
 used to achieve the goals one at at time \cite{nir:ecai2012,nir:ecai2014}. 
-The extension of IW for problems where there is no goal but an
+The extension of \IW\ for problems where there is no goal but an
 additive reward measure  to be optimized, like in the Atari games, is direct.
 
 %%  Each iteration IW(k) keeps track of the accumulated reward up to each state $s$ that has been
@@ -193,7 +194,7 @@ games, present and analyze the preliminary experimental results, and discuss rel
 
 \section{Iterated Width}
 
-The Iterative Width  (IW) algorithm has been introduced as a classical planning algorithm
+The Iterative Width  (\IW) algorithm has been introduced as a classical planning algorithm
 that takes a planning problem as an input, and computes an action sequence that solves the problem 
 as the output \cite{nir:ecai2012}. The algorithm however
 applies to a broader range of problems. We will characterize such
@@ -215,7 +216,7 @@ reward $\sum_{i=0}^{m} r(a_i,s_i)$, or that provides a good approximation.
 
 \subsection{The Algorithm}
 
-IW consists of a sequence of calls  $\IW(i)$ for $i=0, 1, 2, \ldots$
+\IW consists of a sequence of calls  $\IW(i)$ for $i=0, 1, 2, \ldots$
 over a problem $P$ until a termination condition is reached. 
 The procedure $\IW(i)$  is a plain forward-state \emph{breadth-first search} with just one change: right after a state 
 $s$ is generated, the state is  pruned if it doesn't pass a simple \emph{novelty test}.
@@ -236,10 +237,10 @@ returning then the best path found.
 
 For classical planning, the termination condition is the achievement of the goal. In the on-line setting, 
 as in the Atari games, the termination condition is given by a time window or a maximum number of generated nodes.
-The  best path found by IW is the path  that has a  maximum accumulated reward. 
-The accummulated reward $R(s)$  of a state $s$ reached in an iteration of IW is determined by the  unique parent state $s'$ 
+The  best path found by \IW is the path  that has a  maximum accumulated reward. 
+The accummulated reward $R(s)$  of a state $s$ reached in an iteration of \IW is determined by the  unique parent state $s'$ 
 and action $a$ leading to $s$ from $s'$ as $R(s) = R(s') + r(a,s')$. The best state is the state $s$ with maximum reward
-$R(s)$ generated but not pruned by IW, and the best path is the one that leads to the state $s$ from the current state.
+$R(s)$ generated but not pruned by \IW, and the best path is the one that leads to the state $s$ from the current state.
 The action selected to be done next is then the first action along such a path.
 
 %% Like in standard breadth-first search, each iteration IW(i)  prunes 
@@ -254,7 +255,7 @@ The action selected to be done next is then the first action along such a path.
 %% table header
 \hline\\[-1.3ex]
 %\toprule
-\# & \multicolumn{1}{c}{Domain} & \multicolumn{1}{c}{I} & \multicolumn{1}{c}{IW(1)} & \multicolumn{1}{c}{IW(2)} & \multicolumn{1}{c}{Neither} \\[.2ex]
+\# & \multicolumn{1}{c}{Domain} & \multicolumn{1}{c}{I} & \multicolumn{1}{c}{$\IW(1)$} & \multicolumn{1}{c}{$\IW(2)$} & \multicolumn{1}{c}{Neither} \\[.2ex]
 
 \hline\\[-1.3ex]
 %\hline
@@ -321,7 +322,7 @@ The action selected to be done next is then the first action along such a path.
 \end{center}
 
 \caption{\small 
-\emph{Top:} Number of classical planning problems  and percentages solved by IW(1), IW(2), or neither. Instances obtained
+\emph{Top:} Number of classical planning problems  and percentages solved by $\IW(1)$, $\IW(2)$, or neither. Instances obtained
 by splitting benchmarks  with $N$ atomic goals into $N$ problems with atomic goals.
 \emph{Bottom:} Number of instances solved by \IW\ in comparison with  Iterative Deepening (\ID),  
 Breadth-First Search (\BRFS),   and Greedy Best First Search (\textit{GBFS}) guided by  additive heuristic.
@@ -334,7 +335,7 @@ Time and  memory outs  after 30 minutes and 2 GB resp. From \cite{nir:ecai2102}.
 
 \subsection{Performance and Width}
 
-IW is a systematic and complete blind-search algorithm like breadth-first search (BrFS) and iterative deepening (ID),
+\IW\ is a systematic and complete blind-search algorithm like breadth-first search (\BRFS) and iterative deepening (ID),
 but   unlike these algorithms, it uses the factored representation of the states in terms of variables to structure the 
 search in a different way. This structured exploration  has proved to be very 
 effective over classical planning benchmark domains  when goals are  single atoms.\footnote{
@@ -342,10 +343,10 @@ Any conjunctive goal can be mapped into a single dummy atomic goal by adding an 
 achieves the dummy goal and that has the original conjunctive goal as a precondition. 
 Yet, this changes the domain.}
 Table~\ref{table1} from \cite{nir:ecai2012} shows 
-the percentage of instances that are  solved by  the first iteration of IW, i.e.  IW(1), by the second iteration 
-IW(2), and by neither one.  These are instances that  have been obtained from the existing benchmarks
+the percentage of instances that are  solved by  the first iteration of \IW, i.e.  $\IW(1)$, by the second iteration 
+$\IW(2)$, and by neither one.  These are instances that  have been obtained from the existing benchmarks
 by splitting problems with $N$ atomic goals, into $N$ problems with one atomic goal each. As the table shows, 
-$37\%$ of the 37921 instances are solved by IW(1) while $51.3\%$ are  solved by IW(2). Since IW($k$)
+$37\%$ of the 37921 instances are solved by $\IW(1)$ while $51.3\%$ are  solved by $\IW(2)$. Since $\IW(k)$
 runs in time that is exponential in $k$, this mean that almost $90\%$ of the 37921 instances are  solved in time that
 is either linear or quadratic in the number of problem variables, which in these encodings are all \emph{boolean}.  
 Furthermore, when the performance of \IW\   is compared with  breadth-first search and iterative deepening, 
@@ -357,12 +358,12 @@ of the other blind algorithms BrFS and ID  that solve 9010 and 8762 problems eac
 part of the Table~\ref{table1}. Moreover, \IW\ is  faster and results in shorter plans than the heuristic search  
 \cite{nir:ecai2012}.
 
-The min $k$ value for which $IW(k)$ solves a problem  is clearly bounded and small in most of
+The min $k$ value for which $\IW(k)$ solves a problem  is clearly bounded and small in most of
 these instances. This is  actually no  accident and  has a \emph{theoretical explanation.} Lipovetzky and Geffner define
 a structural parameter called the problem \emph{width} and show that for many of these domains,
 \emph{any} solvable instance with atomic goals will  have a bounded and small width that is independent of the number
-of variables and states in the problem. The min value $k$ for which the iteration  $IW(k)$ solves
-the problem cannot exceed the problem width, so  the algorithm \emph{IW runs in time and space
+of variables and states in the problem. The min value $k$ for which the iteration  $\IW(k)$ solves
+the problem cannot exceed the problem width, so  the algorithm \emph{\IW\ runs in time and space
 that are exponential in the problem width.}
 
 Formally, the \emph{width} $w(P)$ of a problem $P$ is $i$
@@ -381,36 +382,36 @@ C)~the ``trail''  preserves ``optimality''; i.e., no  tuple $t_i$ can be reached
 While this notion of width and the iterated  width algorithms that are based on it  have been designed
 for problems where a goal state needs to be reached, the notions remain  
 relevant  in  optimization problems as well. Indeed, if a  good path is made of 
-states $s_i$ each of which have a low width, IW can be made 
+states $s_i$ each of which have a low width, \IW\ can be made 
 to find such path in low polynomial time for a small value of the $k$ parameter.
-Later on we will discuss  a slight  change  required in IW to enforce this property
+Later on we will discuss  a slight  change  required in \IW\ to enforce this property
 which is actually  not yet implemented in the code that is tested below.
 
 
 \section{The Algorithms for the Atari Games}
 
-The number of nodes \emph{generated} by IW(1) is $n \times D \times b$ in the worst case, 
+The number of nodes \emph{generated} by $\IW(1)$ is $n \times D \times b$ in the worst case, 
 where $n$ is the number of variables, $D$ is the size of their domains, and $b$ is the number of 
 actions per  state.  This same number in breadth-first search is not linear in $n$
 but exponential. For the Atari games,  $n=128$, $D=256$, and $b=18$, so that the product is
 equal to $589,824$, which is large but feasible. On the other hand, the number
-of nodes generated by IW(2) in the worst case is  $(n \times D)^2 \times b$, which is
+of nodes generated by $\IW(2)$ in the worst case is  $(n \times D)^2 \times b$, which is
 equal to $1,073,741,824$ which is too large, forcing us to consider only a fraction of 
 such states. For classical planning problems, the growth in the number of nodes from 
-IW(1) to IW(2) is not that large, as the variables are boolean. Indeed, we could have
+$\IW(1)$ to $\IW(2)$ is not that large, as the variables are boolean. Indeed, we could have
 taken the state vector for the Atari games as a vector of 1024 boolean variables, 
 and apply these algorithms to that representation. The results would be different.
-In such a case, IW(1) and IW(2)  would generate $n' \times D' \times b$ and 
+In such a case, $\IW(1)$ and $\IW(2)$  would generate $n' \times D' \times b$ and 
 $(n' \times D')^2 \times b$ states, which for $n'=1024$ and $D=2$
 represent  $36,864$ and $7,5497,472$ states respectively.
 These are feasible numbers, but we haven't tried  this representation yet
 under the assumption that the correlations among the bits in each one of 
 the 128 words of the state vectors are meaningful. 
-In summary, from the basic IW algorithm we are testing only the first 
-call IW(1).
+In summary, from the basic \IW\ algorithm we are testing only the first 
+call $\IW(1)$.
 
 
-IW is a purely exploration algorithm that does not take into account  the accumulated 
+\IW\ is a purely exploration algorithm that does not take into account  the accumulated 
 reward for selecting the next states to consider. As a simple, variant that combines
 exploration and exploitation, we evaluated a \emph{best-first search} algorithm
 with two queues: one queue  ordered first by  novelty measure 
@@ -425,15 +426,15 @@ in the second queue, favoring states with smallest novelty measure. Last, when
 a node is expanded, it is removed from the queue, and its children are placed on 
 both queues. The exception are the nodes with no accumulated reward  that are 
 placed in the first queue only. We refer to this best-first algorithm 
-as 2BFS.
+as \BFS.
 
-For  the experiments below, we added two simple variations to  IW(1) and 2BFS.
-First, in the breadth-first search underlying IW(1), we generate the children in 
+For  the experiments below, we added two simple variations to  $\IW(1)$ and \BFS.
+First, in the breadth-first search underlying $\IW(1)$, we generate the children in 
 random order. This makes the executions that results from the
-IW(1) lookahead less susceptible to fall into loops; a potential
+$\IW(1)$ lookahead less susceptible to fall into loops; a potential
 problem in local search algorithms with no memory or learning.
 Second, a discount factor $\gamma=0.995$ is used in both algorithms 
-for discounting future rewards like in UCT. 
+for discounting future rewards like in \UCT. 
 For this, each state $s$ keeps its depth $d(s)$ in the search tree,
 and if state s' is the child of state $s$ and action $a$, 
 $R(s')$ is set to $R(s) + \gamma^d(s´) r(a,s)$.
@@ -494,7 +495,7 @@ is compared with that of \UCT, breadth-first search (\BRFS), and random action s
 Our experimental setup  follows the one in  \cite{bellemare:jair2013} with two exceptions. First, rather than
 considering $10$ episodes of each game, we have considered just $5$ due to time constraints, as the experiments 
 for each  game can take up to $40$ hours of CPU time. Second, while \UCT\ is still limited to perform up to $500$ base policy rollouts 
-of depth $300$, a maximum of budget of  $100,000$ simulated frames is applied to all the algorithms, UCT included. 
+of depth $300$, a maximum of budget of  $100,000$ simulated frames is applied to all the algorithms, \UCT\ included. 
 %% Was not clear; hope this is what you meant, if not fix
 %%% ($150,000$ frames are to be simulated while performing the lookahead), both $\IW(1)$ and \BFS are limited to
 % The other \UCT\ parameters like the exploration constant $C$ and the horizon $m$ are the same ($C=0.1$, $m=300$). 
@@ -548,7 +549,7 @@ The notion of width underlying the iterated width algorithm was developed in the
 of classical planning in order to understand why most of the hundreds of existing benchmarks
 appear to be relatively simple for current planners, even
 though classical planning is PSPACE-complete \cite{bylander}. A  partial answer is that 
-most of these domains have a low width, and hence, can be solved in low polynomial time (by IW)
+most of these domains have a low width, and hence, can be solved in low polynomial time (by \IW)
 when goals contain a single atom.  Benchmark problems with multiple atomic goals tend to be 
 easy too, as the goals can often be achieved one at a time \cite{nir:ecai2012}.
 
@@ -568,20 +569,11 @@ in such a case is domain-dependent; for example, in the evolution of a controlle
 for guiding a robot in a maze, an individual controller  will not be ranked by how
 close it takes the robot to the goal (the greedy measure), but how far it takes
 the robot in relation to the locations that are reached when following the other controllers
-(a diversity measure). The novelty measure used by IW, on the other hand, is domain-independent and it 
+(a diversity measure). The novelty measure used by \IW, on the other hand, is domain-independent and it 
 is determined by the structure of the states as captured by the problem variables. 
 
 
-% @article{lehman:novelty,
-%  title={Abandoning objectives: Evolution through the search for novelty alone},
-%  author={Lehman, Joel and Stanley, Kenneth O},
-%  journal={Evolutionary computation},
-%  volume={19},
-%  number={2},
-%  pages={189--223},
-%  year={2011},
-%  publisher={MIT Press}
-%}
+
 
 
 
@@ -592,24 +584,24 @@ is not needed for optimality purposes, but just for improving the effectiveness 
  lookahead search. Indeed, a best-first search algorithm guided by (discounted)
 accumulated reward will deliver eventually  best moves, but it will not be as effective
 over small time windows, where like breadth-first search it's likely not to find any rewards
-at all. The UCT algorithm provides a method for balancing exploration and exploitation,
-which  is  effective over small time windows. The 2BFS algorithm above with two queues
+at all. The \UCT\ algorithm provides a method for balancing exploration and exploitation,
+which  is  effective over small time windows. The \BFS\ algorithm above with two queues
 that alternate, one guided by the novelty measures  and the other by the accumulated reward,
 provides a different scheme. The first converges to the optimal behavior asymptotically; the 
 second in a bounded number of steps. Alternatively, novelty-guided probes, possibly with 
-some noise added, could potentially pay off as  a  base policy for UCT in replacement 
+some noise added, could potentially pay off as  a  base policy for \UCT\ in replacement 
 of random rollouts, as they apparently manage to exploit the structure of many problems.
 
 \section{Summary and Future Work}
 
-We have shown experimentally that width-based algorithms like IW(1) and 2BFS
+We have shown experimentally that width-based algorithms like $\IW(1)$ and \BFS\ 
 that originate in work in classical planning, can be used in the Atari games
 with a performance that approaches the state-of-the-art, sometimes using a fraction of the time. We are currently addressing three 
 issues, which we haven't managed to get in time for this submission. First, we want to extend the 
 evaluation to all the games featured in \cite{bellemare:jair}, and to add more runs per  game. 
 Second, we want to evaluate the various algorithms for different fixed time windows for decisions.
-In the table above, for example, UCT is often taking an order-of-magnitude more time per decision 
-than  2BFS. Third, we need to revise the way duplicate states are handled in IW and 2BFS to ensure
+In the table above, for example, \UCT\ is often taking an order-of-magnitude more time per decision 
+than  \BFS. Third, we need to revise the way duplicate states are handled in \IW\ and \BFS\ to ensure
 that the best paths among the states that have been expanded are returned. Finally, 
 for the future, we also want to explore whether this type of algorithms
 can give meaningful results as well  when used on the screen state, as opposed 
