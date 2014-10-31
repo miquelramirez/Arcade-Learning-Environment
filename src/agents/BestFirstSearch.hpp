@@ -32,7 +32,7 @@ public:
 	{
 	    if ( b->fn < a->fn ) return true;
 	    //else if( b->fn == a->fn && b->m_depth < a->m_depth ) return true;
-	    else if( b->fn == a->fn && b->novelty > a->novelty ) return true;
+	    else if( b->fn == a->fn && b->novelty < a->novelty ) return true;
 	    return false;
 	}
     };

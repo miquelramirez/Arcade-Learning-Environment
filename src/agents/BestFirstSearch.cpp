@@ -245,11 +245,11 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     
     if(!start_node->v_children.empty()) {
 	    start_node->updateTreeNode();
-	    //num_simulated_steps += reuse_branch( start_node );
-	    //std::cout  << "Num_reused_steps: "<< num_simulated_steps << std::endl;
+	    num_simulated_steps += reuse_branch( start_node );
+	    std::cout  << "Num_reused_steps: "<< num_simulated_steps << std::endl;
 	    //COMMENT LINES BELOW, AND UNCOMMENT ABOVE TO WORKSHOP STYLE. ALSO CHANGE FN NOVEL 2ND QUEUE
-	     reset_branch( start_node );
-	     q_exploration->push(start_node);        
+	    //reset_branch( start_node );
+	    //q_exploration->push(start_node);        
 	     update_novelty_table( start_node->state.getRAM() );
     }
     else
