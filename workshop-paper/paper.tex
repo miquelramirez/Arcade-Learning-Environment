@@ -374,8 +374,7 @@ are not yet implemented in the code that is evaluated below.
 
 \section{Width-Based Algorithms for the Atari Games}
 
-Explain: IW(1), 2BFS, and possible IW11. Also, Dijkstra postprocessing over IW(1) graph
-if ran.
+%%Explain: IW(1), 2BFS, and possible IW11. Also, Dijkstra postprocessing over IW(1) graph if ran.
 
 
 The number of nodes \emph{generated} by IW(1) is $n \times D \times b$ in the worst case, 
@@ -390,7 +389,7 @@ IW(1) to IW(2) is not that large, as the variables are boolean. Indeed, we could
 taken the state vector for the Atari games as a vector of 1024 boolean variables, 
 and apply these algorithms to that representation. The results would be different.
 In such a case, IW(1) would generate $n' \times D' \times b$ states, and 
-IW(2), $(n' \times D') \times b$ states, which for $n'=1024$ and $D=2$
+IW(2), $(n' \times D')^2 \times b$ states, which for $n'=1024$ and $D=2$
 represent  $36,864$ and $7,5497,472$ states respectively.
 These are both feasible numbers, but we haven't tried yet this representation,
 under the assumption that the correlations among the bits in each one of 
@@ -412,14 +411,27 @@ planner Fast Downward \cite{malte:fd,malte:alternating}. In addition, we break t
 in the first queue favoring states with largest accumulated reward, and 
 in the second queue, favoring states with smallest novelty measure. Last, when
 a node is expanded, it is removed from the queue, and its children are placed on 
-both queues. The exception are the nodes with novelty 1 measure that are only
-placed in first queue (** check and revise; but keep accurate and simple **).
+both queues. The exception are the nodes with accumulated reward 0 that are only
+placed in the first queue.
 We refer to this best-first algorithm below, as 2BFS.
 
-IW11? 
+In the experiments below, we use IW(1) with two simple variations.
+First, in the breadth-first search, we generate the children in 
+random order. This makes the execution that results from the
+IW(1) lookahead less susceptible to fall into loops; a potential
+problem in local search algorithms with no memory or learning.
+Second, a discount factor $\gamma=0.995$ is added
+for discounting future rewards like in UCT. For this,
+each state $s$ keeps its depth d(s) in the IW(1) tree,
+and if state s' is the child of state s and action a, 
+$R(s')$ is set to $R(s) + \gamma^d(s´) r(a,s)$.
+A discount factor less than 1 results in a slight
+preference for rewards that can be reached earlier, 
+which is reasonable  in the on-line setting.
+
+%% NIR: IW11 Don't need to be explained. Maybe in Future Work?
 
 
-Randomization? Discount?
 
 \section{Experimental Results in the Atari Games}
 

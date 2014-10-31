@@ -43,7 +43,7 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;
 		if(m_randomize_successor)
-			std::random_shuffle ( curr_node->available_actions.begin()+1, curr_node->available_actions.end() );
+			std::random_shuffle ( curr_node->available_actions.begin(), curr_node->available_actions.end() );
 
 	
 	}
@@ -128,13 +128,14 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
  ******************************************************************* */
 void BestFirstSearch::reset_branch(TreeNode* node) {
 	if (!node->v_children.empty()) {
-		for(size_t c = 0; c < node->v_children.size(); c++) {			
-			reset_branch(node->v_children[c]);
+		for(size_t c = 0; c < node->v_children.size(); c++) {	
+		    //node->v_children[c]->updateTreeNode();		
+		    reset_branch(node->v_children[c]);
 			
 		}
 	}
-	node->novelty = 0;
-	node->fn = 0;	
+	//node->novelty = 0;
+	//node->fn = 0;	
 	node->already_expanded = false;
 }
 
@@ -244,11 +245,12 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     
     if(!start_node->v_children.empty()) {
 	    start_node->updateTreeNode();
-	    num_simulated_steps += reuse_branch( start_node );
-	    std::cout  << "Num_reused_steps: "<< num_simulated_steps << std::endl;
-	    // reset_branch( start_node );
-	    // q_exploration->push(start_node);        
-	    // update_novelty_table( start_node->state.getRAM() );
+	    //num_simulated_steps += reuse_branch( start_node );
+	    //std::cout  << "Num_reused_steps: "<< num_simulated_steps << std::endl;
+	    //COMMENT LINES BELOW, AND UNCOMMENT ABOVE TO WORKSHOP STYLE. ALSO CHANGE FN NOVEL 2ND QUEUE
+	     reset_branch( start_node );
+	     q_exploration->push(start_node);        
+	     update_novelty_table( start_node->state.getRAM() );
     }
     else
 	    {
@@ -268,9 +270,15 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     while( ! (q_exploration->empty() && q_exploitation->empty()) ) {
 	// Pop a node to expand
 	TreeNode* curr_node;
+	if( q_exploration->empty() &&  q_exploitation->empty())
+	    break;
+
 	if( explore ){	    
-		if( q_exploration->empty() )
-			break;
+
+		if( q_exploration->empty() ){
+			explore = false;
+			continue;
+		}
 		curr_node = q_exploration->top();
 		q_exploration->pop();
 		explore = false;
