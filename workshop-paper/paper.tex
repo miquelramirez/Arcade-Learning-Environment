@@ -303,7 +303,7 @@ The action selected to be done next is then the first action along such a path  
 by splitting benchmarks  with $N$ atomic goals into $N$ problems with atomic goals.
 \emph{Bottom:} Number of instances solved by \IW\ in comparison with  Iterative Deepening (\ID),  
 Breadth-First Search (\BRFS),   and Greedy Best First Search (\textit{GBFS}) guided by  additive heuristic.
-Time and  memory outs  after 30 minutes and 2 GB resp. From \cite{nir:ecai2102}.
+Time and  memory outs  after 30 minutes and 2 GB resp. From \cite{nir:ecai2012}.
 }
 \label{table1}
 \end{table}
@@ -395,7 +395,7 @@ and a second queue ordered by accumulated reward. In one iteration, the best fir
 search picks up the best node from one queue, and in the second iteration it picks
 up the best node from the other queue. This way for combining multiple heuristics
 is used in the LAMA planner \cite{richter:lama}, and was introduced in the
-planner Fast Downward \cite{malte:fd,malte:alternating}. In addition, we break ties
+planner Fast Downward \cite{helmert:fd,malte:alternating}. In addition, we break ties
 in the first queue favoring states with largest accumulated reward, and 
 in the second queue, favoring states with smallest novelty measure. Last, when
 a node is expanded, it is removed from the queue, and its children are placed on 
@@ -432,7 +432,7 @@ which is reasonable  in the on-line setting.
 The notion of width underlying the iterated width algorithm was developed in the context
 of classical planning in order to understand why most of the hundreds of existing benchmarks
 resulting from planning competitions appear to be relatively simple for current planners, even
-though classical planning is PSPACE-complete \cite{bylander}. The partial answer is that 
+though classical planning is PSPACE-complete \cite{bylander:complexity}. The partial answer is that 
 most of these domains have a low width, and hence, can be solved in low polynomial time (by IW),
 when goals contain a single atom. At the same time, most problems with multiple atomic goals are 
 also easy too, as the goals can often be achieved one at a time \cite{nir:ecai2012}.
@@ -497,7 +497,7 @@ that originate in work in classical planning, can be used in the Atari games
 with a performance that approaches the state-of-the-art as captured by UCT 
 planning, sometimes using a fraction of the time. We are currently addressing three issues, 
 which we haven't managed to get in time for this submission. First, we want to extend the evaluation to 
-all the games featured in \cite{bellemare:jair}, and to add more runs per  game. 
+all the games featured in \cite{bellemare:jair2013}, and to add more runs per  game. 
 Second, we want to evaluate the algorithm for different fixed time windows. In the table above, for example, UCT
 is often taking an order-of-magnitude more time per decision as 2BFS, so the 
 comparison in not fair. Third, we need to revise the way duplicate states are handled 
