@@ -1,0 +1,54 @@
+The algorithms IW1 and BFS are tested over 9 games selected from those
+considered in the training set in \cite{bellemare:jair}, and those
+considered in \cite{deep-mind-atari}. Each game has 5 runs, each with
+a different random seed $0,\ldots,4$.  We compare the performance of
+IW1 and BFS with UCT and BRFS. We also include results for a baseline random
+agent. We use the same parameters in the literature, all algorithms use a discount factor of 0.999, and each action
+simulates 5 frames. Each algorithm has a budget on the number of nodes
+it can generate per lookahead. BRFS, IW1 and BFS have a maximum budget
+of 100k. For UCT we use the same parameters as in
+\cite{bellemare:jair}, 0.1 exploration rate, and 500 rollouts of a maximum depth of 300 steps,
+which gives a maximum budget of 150k nodes. We tested UCT with a fix
+budget of 100k and max depth 300, but resulted in practically the same
+results. All algorithms reuse the tree built between lookaheads by
+setting the new root of the tree to the node of the selected action,
+and deleting the other branches. Note that this may have a different
+effect on algorithms were all branches have the same number of
+generated nodes, ex. BRFS, than those that may focus on different
+areas of the tree, ex. IW1, BFS, UCT.
+
+On Table~\ref{performance}, we can observe the performance of each
+algorithm on terms of average score with standard deviation, and
+average time per lookahead in seconds. The Random agent don't include
+average time as it just chooses an action randomly. BRFS outperform
+the Random agent in 7 out of 9 domains. BRFS rarely finds any reward,
+turning itself mostly into a random agent, but exploring 100k nodes up
+to an average depth of 4. When BRFS is turned int IW1 using novelty to
+explore the search space, the jump on performance is important. IW1 in
+most of the cases does not completely use its budget, and is able to
+achieve depths of 70 to 260 depending on the game, which first
+explains how IW1 is able to achieve a performance that is closer to
+UCT than to BRFS. In 4 out of 9 tested games it is the best
+performer. Remarkably, is the first domain independent solver that
+shows good performance on Freeway, where rewards are very sparse and
+deep in the search tree. BFS outperforms IW1 and UCT in 4 and 2
+domains respectively.  Both IW1 and BFS performance in terms of score
+is close to UCT, but they are some times one order of magnitud
+faster. The speedup is due to the bounded space in IW1, and to the
+fact that in some games, both IW1 and BFS are able to reuse an
+important part of their trees between lookaheads.
+
+The novelty of states in IW1 and BFS may depend on the order that
+nodes are generated. Therefore, every time a node is expanded, we
+randomized the order in which nodes get genreated. Randomizing the
+order of expansion is also applied to BRFS, but has no impact on its
+performance.
+
+IW2 is not included in the table due to its low performance, which is
+closer to BRFS than to the other algorithms. This is mainly due to the
+huge number of states that are novel in this algorith, thus,
+achieveing insufficient depths to gather some reward.
+
+
+ ** mention also ideas that have been tried and didn't work (IW2?,
+ discount, randomization, ..)
