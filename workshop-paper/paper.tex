@@ -520,9 +520,10 @@ in many cases, as when  the set of unpruned states becomes  particularly small.
 
 $\IW(1)$ outperforms \UCT\ in $4$ out of $9$ games, 
 both in terms of  average scores and average times per call. \BFS\ 
-is generally faster than $\IW(1)$ but only outperforms \UCT\ in $2$ of the games (\Freeway and
-\Seaquest). Compared with the UCT results from  \cite{bellemare:jair2013}, shown in parenthesis, 
-$\IW(1)$ still outperforms \UCT\ in $3$  of the  $9$ games (\Breakout, \Enduro~and \Freeway). 
+is generally faster than $\IW(1)$ but only outperforms \UCT\ in $2$ of the games (\Freeway\ and
+\Seaquest). Compared with the \UCT\ results from  \cite{bellemare:jair2013}, shown in parenthesis, 
+both $\IW(1)$ and \BFS\ still outperform \UCT\ in $3$  of the  $9$ games (\Breakout, \Enduro\ and \Freeway),
+with \BFS\ and \UCT\ tied in another game, \Pong. 
 As mentioned in the previous section, the order in which $\IW(1)$ and \BFS\ generate the children
 of an expanded node are randomized, something which has a potential effect on the  novelty measures
 of nodes, and hence in the search graph. We found that this randomization helps, in particular 
