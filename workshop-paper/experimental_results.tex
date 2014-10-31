@@ -8,16 +8,15 @@ of the score obtained and time (in seconds) per lookahead, is compared with that
 setup  follows that of \cite{bellemare:jair2013}, with two exceptions. First, rather than
 considering $10$ episodes of each game, we have considered just $5$
 due to time constraints, as each game can take as much as $40$ hours of 
-CPU time. Second, for \UCT, rather than limiting the number of
-base policy rollouts to $500$, we have rather limited the number of frames
-to be simulated during each lookahead to $100,000$ as \cite{bellemare:jair2013} 
-does for \BRFS~and we do for both $\IW(1)$ and \BFS. Other \UCT~parameters such as the exploration constant $C$ and
-the planning horizon $m$ have not been modified ($C=0.1$, $m=1500$). We include
+CPU time. Second, while \UCT~is limited to perform up to $500$ base policy rollouts ($150,000$ frames
+are to be simulated while performing the lookahead), both $\IW(1)$ and \BFS are limited to
+simulate $100,000$ frames. \UCT~parameters such as the exploration constant $C$ and
+the planning horizon $m$ have not been modified ($C=0.1$, $m=300$), the latter being also
+used by both $\IW(1)$ and \BFS~to limit the depth of the lookahead. We include
 the average score reported for \UCT~by \cite{bellemare:jair2013} in Table~\ref{performance}
 bracketed with parenthesis for reference. Also unchanged is the discount factor
 used by all the algorithms ($\gamma=0.995$) and the rate at which an algorithm is
-invoked to select an action (every $5$ frames~\footnote{We note that with this setup, the maximum depth $d$
-of the lookahead will be $m/5$, or $300$ nodes.}). All algorithms reuse the tree built between each 
+invoked to select an action (every $5$ frames). All algorithms reuse the tree built between each 
 lookahead by setting the root of the tree to the best child of the root in the previous one,
 and deleting its siblings and their descendants, as \cite{bellemare:jair2013} does for \UCT. We note that 
 this may have a different effect on algorithms where all branches have the same number of
@@ -45,10 +44,10 @@ to be simulated in each lookahead, $\IW(1)$ still outperforms \UCT~in $3$ out of
 (\Breakout, \Enduro and \Freeway). As introduced in the previous Section, the order in which
 $\IW(1)$ and \BFS~consider actions is randomized, since the novelty of a given state may
 change depending on the order in which states are considered. We found this randomization to
-have a significant effect in (\textbf{TODO}: What game? \Qbert?) where (\textbf{TODO}: What was
-going on?). Last, we note that $\IW(1)$ and \BFS~attain similar performance as the baseline
-semi-random algorithm \emph{Perturb} from \cite{bellemare:jair2013}, which beated both \UCT~
-and the reinforcement learning algorithms reported.
+have a significant effect in \Qbert where not randomizing the order in which actions are considered
+resulted in $\IW(1)$ being trapped in a loop. Last, we note that both $\IW(1)$ and \BFS~attain similar 
+performance on \Freeway as the baseline semi-random algorithm \emph{Perturb} 
+from \cite{bellemare:jair2013}, which beated both \UCT~and the reinforcement learning algorithms reported.
 
 We finish the discussion of the results presented in Table~\ref{performance} by observing
 that $\IW(1)$ outperforms the average scores reported for the best algorithm reported in
