@@ -83,7 +83,7 @@
 The Atari  2600 games supported in  the Arcade Learning Environment (Bellemare et. al. 2013) 
 all feature a known initial (RAM) state and actions that have deterministic effects. Classical planners, however, 
 cannot be used  for selecting actions  for  two reasons: first,  no  compact PDDL-model of  the games is given, 
-and  more importantly,  the action effects and goals are  not known a priori. Moreover, in these games there is usually  
+and  more importantly,  the action effects and goals are  not known \emph{a priori}. Moreover, in these games there is usually  
 no set of goals to be achieved but rewards to be collected. These features do not preclude the use of   classical  algorithms like
 breadth-first search or Dijkstra's algorithm,  but    these methods are not effective over  large state spaces. We thus turn to a
 different class of classical planning algorithms  introduced recently  that perform a \emph{structured exploration} of the state space; namely,  
@@ -112,7 +112,7 @@ performance of  human players across a broad range of games.
 
 While all  these games feature a known initial (RAM) state and actions that
 have deterministic effects on the state, the problem of selecting the next action
-to be done cannot be addressed with state-of-the-art classical planners \cite{geffner:2013book}.
+to be done cannot be addressed with state-of-the-art classical planners \cite{geffner:book}.
 This is because there is  no compact PDDL-like encoding of the domain, and more 
 importantly,  the goal to be achieved in each game  is not given. Indeed, there are 
 often no goals  but rewards $r(a,s)$ that  depend on the action $a$ and 
@@ -124,7 +124,7 @@ standard heuristic search and classical planning methods can't be used.
 
 The action selection problem in the Atari games can be seen as a \emph{reinforcement learning} problem 
 \cite{sutton:book} over a deterministic MDP where the state transitions and rewards are not known, or alternatively,
-as a  \emph{net-benefit planning problem} \cite{ref-net-benefit-planning,keyder} with unknown state transitions  and  rewards. Namely, 
+as a  \emph{net-benefit planning problem} \cite{coles2012survey,keyder:jair09} with unknown state transitions  and  rewards. Namely, 
 we seek  an action sequence $a_0, a_1, \ldots, a_m$ from the given current  state $s_0$ that generates 
 a state sequence $s_0, s_1, \ldots, s_{m+1}$ with  maximum  total reward $\sum_{i=0}^{m} r(a_i,s_i)$,  
 where $m$ is a sufficiently large planning horizon, and the rewards $r(a_i,s_i)$ and the  state-transitions $s_{i+1}=f(a_i,s_i)$ 
@@ -132,7 +132,7 @@ are known only after  action $a_i$ is applied in the state $s_i$.
 
 The presence of unknown transition and  rewards in  the Atari games does not preclude the use of blind-search
 methods like breadth-first search, Dijkstra's algorithm \cite{dijkstra},  or learning methods  such as 
-LRTA* \cite{korf:lrta}, \UCT\ \cite{uct}, and Q-learning  \cite{sutton:rl,bertsekas:neuro}. Indeed, 
+LRTA* \cite{korf:lrta}, \UCT\ \cite{uct}, and Q-learning  \cite{sutton:book,bertsekas:neuro}. Indeed, 
 the net-benefit planning problem with unknown state transitions and rewards over a given planning
 horizon, can be mapped into a standard \emph{shortest-path problem} which can be solved optimally by Dijkstra's algorithm.
 For this, we just need to  map the unknown rewards $r(a,s)$ into positive (unknown) action costs $c(a,s) = C - r(a,s)$
@@ -177,16 +177,16 @@ additive reward measure  to be optimized, like in the Atari games, is direct.
 %% generated but  not pruned, as $R(s) = R(s')+ r(a,s')$ where $s'$ and $a$ are  the single parent state
 %% and action $a$ that led to $s$ in IW(k) with $R(s)=0$ for the current state $s$. The best reward 
 
-\Omit{
-The sequence of calls IW(1), IW(2), \ldots, IW(k) manages to combine the scope of ``blind'' search algorithms with the performance of 
-heuristic-search algorithms by exploring states  in an  order dictated by the ``width''  parameter $k$; 
-states that have width 1 are explored first in linear time, then states that have  width two are explored in quadratic time, and so on. 
-In classical planning problems, if the goal has a small width (something common in the classical planning domains when the  goal is a single atom, as
-we have seen above), IW will find goal states  in low polynomial time. Similarly, in the reward-based setting, if  there are states of high reward 
-that have small width, IW will find such states in low polynomial time, even if the state space is exponential in the number of variables. 
-In this paper, we aim to test whether these ideas work for the Atari games too  when  the RAM state of the emulator
-is used  as the system state. 
-}
+% \Omit{
+% The sequence of calls IW(1), IW(2), \ldots, IW(k) manages to combine the scope of ``blind'' search algorithms with the performance of 
+% heuristic-search algorithms by exploring states  in an  order dictated by the ``width''  parameter $k$; 
+% states that have width 1 are explored first in linear time, then states that have  width two are explored in quadratic time, and so on. 
+% In classical planning problems, if the goal has a small width (something common in the classical planning domains when the  goal is a single atom, as
+% we have seen above), IW will find goal states  in low polynomial time. Similarly, in the reward-based setting, if  there are states of high reward 
+% that have small width, IW will find such states in low polynomial time, even if the state space is exponential in the number of variables. 
+% In this paper, we aim to test whether these ideas work for the Atari games too  when  the RAM state of the emulator
+% is used  as the system state. 
+% }
 
 The paper is organized as follows. We review the iterated width  algorithm and where it comes from, 
 look at  simple   variations of the algorithm that appear to be convenient  for the Atari
@@ -208,7 +208,7 @@ a set of actions applicable in each state, a
 transition function $f$ such that  $s' = f(a,s)$ is 
 the state that results from applying action $a \in A(s)$ to the state $s$, 
 and rewards $r(a,s)$ represented by real numbers that result from  applying action $a$ in state $s$.
-The transition and reward functions do not  need to be known a priori, yet in that case, the  
+The transition and reward functions do not need to be known a priori, yet in that case, the  
 state and  reward that results from the application of an action in a state needs to be \emph{observable}.
 The task is to compute an action sequence $a_0, \ldots, a_m$ for a large horizon $m$
 that generates a state sequence $s_0, \ldots, s_{m+1}$ that  maximizes the accumulated 
@@ -238,7 +238,7 @@ returning then the best path found.
 For classical planning, the termination condition is the achievement of the goal. In the on-line setting, 
 as in the Atari games, the termination condition is given by a time window or a maximum number of generated nodes.
 The  best path found by \IW is the path  that has a  maximum accumulated reward. 
-The accummulated reward $R(s)$  of a state $s$ reached in an iteration of \IW is determined by the  unique parent state $s'$ 
+The accumulated reward $R(s)$  of a state $s$ reached in an iteration of \IW is determined by the  unique parent state $s'$ 
 and action $a$ leading to $s$ from $s'$ as $R(s) = R(s') + r(a,s')$. The best state is the state $s$ with maximum reward
 $R(s)$ generated but not pruned by \IW, and the best path is the one that leads to the state $s$ from the current state.
 The action selected to be done next is then the first action along such a path.
@@ -326,7 +326,7 @@ The action selected to be done next is then the first action along such a path.
 by splitting benchmarks  with $N$ atomic goals into $N$ problems with atomic goals.
 \emph{Bottom:} Number of instances solved by \IW\ in comparison with  Iterative Deepening (\ID),  
 Breadth-First Search (\BRFS),   and Greedy Best First Search (\textit{GBFS}) guided by  additive heuristic.
-Time and  memory outs  after 30 minutes and 2 GB resp. From \cite{nir:ecai2102}.
+Time and  memory outs  after 30 minutes and 2 GB resp. From \cite{nir:ecai2012}.
 }
 \label{table1}
 \end{table}
@@ -347,14 +347,14 @@ the percentage of instances that are  solved by  the first iteration of \IW, i.e
 $\IW(2)$, and by neither one.  These are instances that  have been obtained from the existing benchmarks
 by splitting problems with $N$ atomic goals, into $N$ problems with one atomic goal each. As the table shows, 
 $37\%$ of the 37921 instances are solved by $\IW(1)$ while $51.3\%$ are  solved by $\IW(2)$. Since $\IW(k)$
-runs in time that is exponential in $k$, this mean that almost $90\%$ of the 37921 instances are  solved in time that
-is either linear or quadratic in the number of problem variables, which in these encodings are all \emph{boolean}.  
+runs in time that is exponential in $k$, this mean that almost $90\%$ of the 37,921 instances are  solved in time that
+is either linear or quadratic in the number of problem variables, which in these encoding are all \emph{boolean}.  
 Furthermore, when the performance of \IW\   is compared with  breadth-first search and iterative deepening, 
 on the one hand,  and  with a  Greedy Best First Search guided by the additive heuristic $h_{add}$ 
-\cite{bonet:hsp-aij} on the other (this algorithm is similar 
+\cite{bonet:aij-hsp} on the other (this algorithm is similar 
 to one used by  the FF planner when hill climbing search fails \cite{hoffmann:ff}), 
-it turns out that ``blind'' \IW\ solves as many problems as the informed search, 34627 vs. 34849, far ahead
-of the other blind algorithms BrFS and ID  that solve 9010 and 8762 problems each. This is shown in the bottom
+it turns out that ``blind'' \IW\ solves as many problems as the informed search, 34,627 vs. 34,849, far ahead
+of the other blind algorithms \BRFS\ and \ID\  that solve 9,010 and 8,762 problems each. This is shown in the bottom
 part of the Table~\ref{table1}. Moreover, \IW\ is  faster and results in shorter plans than the heuristic search  
 \cite{nir:ecai2012}.
 
@@ -420,7 +420,7 @@ and a second queue ordered by accumulated reward. In one iteration, the best fir
 search picks up the best node from one queue, and in the second iteration it picks
 up the best node from the other queue. This way for combining multiple heuristics
 is used in the LAMA planner \cite{richter:lama}, and was introduced in the
-planner Fast Downward \cite{helmert:fd,malte:alternating}. In addition, we break ties
+planner Fast Downward \cite{helmert:fd}. In addition, we break ties
 in the first queue favoring states with largest accumulated reward, and 
 in the second queue, favoring states with smallest novelty measure. Last, when
 a node is expanded, it is removed from the queue, and its children are placed on 
@@ -479,8 +479,7 @@ based on lookahead searches.
    frames. For every algorithm, minus the trivial random baseline algorithm, we report the average CPU time per call 
    to each action selection algorithm, along with the average score achieved. \UCT~performance
    reported in \cite{bellemare:jair2013} is shown in parenthesis. Numbers
-   in bold show best performer in terms of average score. Average score reported in 
-   \cite{deep-mind-atari} is reported for reference under the column \Deepmind.
+   in bold show best performer in terms of average score.
    }
 \label{performance}
 
@@ -548,7 +547,7 @@ planning algorithms.
 The notion of width underlying the iterated width algorithm was developed in the context
 of classical planning in order to understand why most of the hundreds of existing benchmarks
 appear to be relatively simple for current planners, even
-though classical planning is PSPACE-complete \cite{bylander}. A  partial answer is that 
+though classical planning is PSPACE-complete \cite{bylander:complexity}. A  partial answer is that 
 most of these domains have a low width, and hence, can be solved in low polynomial time (by \IW)
 when goals contain a single atom.  Benchmark problems with multiple atomic goals tend to be 
 easy too, as the goals can often be achieved one at a time \cite{nir:ecai2012}.
@@ -563,7 +562,7 @@ The use of ``novelty measures'' for guiding an optimization search while ignorin
 optimized, appears to be  common to novelty-based search methods developed independently 
 in the context of genetic algorithms \cite{lehman:novelty}. %%% bibtex for this below
 In these methods individuals in the population are not ranked according to the  optimization function
-but in terms of how ``novel'' thay are in relation to the rest of the population, thus encouraging diversity
+but in terms of how ``novel'' they are in relation to the rest of the population, thus encouraging diversity
 and exploration rather than (greedy) exploitation. The actual definition of novelty
 in such a case is domain-dependent; for example, in the evolution of a controller
 for guiding a robot in a maze, an individual controller  will not be ranked by how
@@ -590,7 +589,7 @@ that alternate, one guided by the novelty measures  and the other by the accumul
 provides a different scheme. The first converges to the optimal behavior asymptotically; the 
 second in a bounded number of steps. Alternatively, novelty-guided probes, possibly with 
 some noise added, could potentially pay off as  a  base policy for \UCT\ in replacement 
-of random rollouts, as they apparently manage to exploit the structure of many problems.
+of random roll outs, as they apparently manage to exploit the structure of many problems.
 
 \section{Summary and Future Work}
 
@@ -598,7 +597,7 @@ We have shown experimentally that width-based algorithms like $\IW(1)$ and \BFS\
 that originate in work in classical planning, can be used in the Atari games
 with a performance that approaches the state-of-the-art, sometimes using a fraction of the time. We are currently addressing three 
 issues, which we haven't managed to get in time for this submission. First, we want to extend the 
-evaluation to all the games featured in \cite{bellemare:jair}, and to add more runs per  game. 
+evaluation to all the games featured in \cite{bellemare:jair2013}, and to add more runs per  game. 
 Second, we want to evaluate the various algorithms for different fixed time windows for decisions.
 In the table above, for example, \UCT\ is often taking an order-of-magnitude more time per decision 
 than  \BFS. Third, we need to revise the way duplicate states are handled in \IW\ and \BFS\ to ensure
