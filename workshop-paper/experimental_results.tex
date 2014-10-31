@@ -5,18 +5,18 @@ In Table~\ref{performance} the performance of both $\IW(1)$
 and \BFS, characterized by the average score obtained over all episodes, the standard deviation
 of the score obtained and time (in seconds) per lookahead, is compared with that of \UCT, 
 \BRFS~and the baseline random action selection. Our experimental 
-setup  follows that of \cite{bellemare:jair2013}, with two exceptions. First, rather than
+setup  follows that of \cite{bellemare:jair2013}, with three exceptions. First, rather than
 considering $10$ episodes of each game, we have considered just $5$
 due to time constraints, as each game can take as much as $40$ hours of 
 CPU time. Second, while \UCT~is limited to perform up to $500$ base policy rollouts ($150,000$ frames
 are to be simulated while performing the lookahead), both $\IW(1)$ and \BFS are limited to
-simulate $100,000$ frames. \UCT~parameters such as the exploration constant $C$ and
-the planning horizon $m$ have not been modified ($C=0.1$, $m=300$), the latter being also
-used by both $\IW(1)$ and \BFS~to limit the depth of the lookahead. We include
-the average score reported for \UCT~by \cite{bellemare:jair2013} in Table~\ref{performance}
-bracketed with parenthesis for reference. Also unchanged is the discount factor
-used by all the algorithms ($\gamma=0.995$) and the rate at which an algorithm is
-invoked to select an action (every $5$ frames). All algorithms reuse the tree built between each 
+simulate $100,000$ frames. Other \UCT~parameters such as the exploration constant $C$ and
+the planning horizon $m$ have not been modified ($C=0.1$, $m=300$). Thirdly and last, both $\IW(1)$ 
+and \BFS~are limited to a planning horizon $m=1500$, where one only an action is evaluated every $5$ frames, matching
+the setup used during actual gameplay (an action is selected every $5$ frames, using a no-op
+for the remaining $4$). We include the average score reported for \UCT~by \cite{bellemare:jair2013} 
+in Table~\ref{performance} bracketed with parenthesis for reference. Also unchanged is the discount factor
+used by all the algorithms ($\gamma=0.995$). All algorithms reuse the tree built between each 
 lookahead by setting the root of the tree to the best child of the root in the previous one,
 and deleting its siblings and their descendants, as \cite{bellemare:jair2013} does for \UCT. We note that 
 this may have a different effect on algorithms where all branches have the same number of
@@ -41,12 +41,12 @@ generally faster than $\IW(1)$, but only outperforms \UCT~in $2$ out of $9$ game
 \Seaquest) and $\IW(1)$ in $4$ out of $9$ games. Compared with the \UCT~results reported
 in \cite{bellemare:jair2013}, that by limiting the number of rollouts allow a $50$\% more frames
 to be simulated in each lookahead, $\IW(1)$ still outperforms \UCT~in $3$ out of $9$ games
-(\Breakout, \Enduro and \Freeway). As introduced in the previous Section, the order in which
+(\Breakout, \Enduro~and \Freeway). As introduced in the previous Section, the order in which
 $\IW(1)$ and \BFS~consider actions is randomized, since the novelty of a given state may
 change depending on the order in which states are considered. We found this randomization to
-have a significant effect in \Qbert where not randomizing the order in which actions are considered
+have a significant effect in \Qbert~where not randomizing the order in which actions are considered
 resulted in $\IW(1)$ being trapped in a loop. Last, we note that both $\IW(1)$ and \BFS~attain similar 
-performance on \Freeway as the baseline semi-random algorithm \emph{Perturb} 
+performance on \Freeway~as the baseline semi-random algorithm \emph{Perturb} 
 from \cite{bellemare:jair2013}, which beated both \UCT~and the reinforcement learning algorithms reported.
 
 We finish the discussion of the results presented in Table~\ref{performance} by observing
@@ -56,7 +56,7 @@ games.
 
 We do not report $IW(2)$ in Table~\ref{performance} since we found its performance to
 be very similar to that of \BRFS~in some preliminary tests. When considering $2$--tuples
-of state variables to evaluate the novelty of states, it tended to result in lookaheads
+of state variables to evaluate the novelty of states, it tended to result in a lookahead
 $5$ times deeper than those resulting from applying \BRFS~, but still far too shallow so
 as to compete with the other planning algorithms considered.
 
