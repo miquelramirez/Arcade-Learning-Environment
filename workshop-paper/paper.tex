@@ -408,44 +408,62 @@ Randomization? Discount?
 
 \section{Experimental Results in the Atari Games}
 
-\begin{table*}
-%% \addtolength{\tabcolsep}{-2pt}
-{\scriptsize
-\begin{tabular}{@{}l|rr|rrr|rrr|rrr|rrr@{}}
-%% table header
-\hline\\[-3ex]
-\multicolumn{1}{c|}{} & \multicolumn{2}{c|}{Random} & \multicolumn{3}{c|}{BrFS}& \multicolumn{3}{c|}{IW1}& \multicolumn{3}{c|}{BFS}& \multicolumn{3}{c}{UCT} \\[.2ex]
-\hline\\[-3ex]
-%% table body
-\multicolumn{1}{c}{Game}  & \multicolumn{1}{c}{S} & \multicolumn{1}{c|}{Dev}  & \multicolumn{1}{c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev}  & \multicolumn{1}{|c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev}  & \multicolumn{1}{|c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev}  & \multicolumn{1}{|c}{T} & \multicolumn{1}{c}{S} & \multicolumn{1}{c}{Dev} \\[.2ex]
-\hline\\[-3ex]
-asterix         & 210   & 54.77     & 32.24 & 3900  & 5538.95   & 17.08 & 119000        & 4987.48   & 0.95  & 56320       & 4757.84   & 10.82 & \textbf{296300} & 6657.7    \\
-beam\_rider     & 448.8 & 84.64     & 43.48 & 519.2 & 179.81    & 6.02  & 3000          & 1150.22   & 0.92  & 3804        & 446.18    & 42.91 & \textbf{4320}   & 2175.26   \\
-breakout        & 1     & 0.71      & 51.56 & 2     & 1.41      & 1.37  & 383.6         & 9.84      & 3.95  & 421.2       & 13.66     & 26.03 & \textbf{512.4}  & 193.97    \\
-enduro          & 0     & 0         & 40.92 & 0.4   & 0.89      & 38.13 & \textbf{500}  & 0         & 13.12 & 292.8       & 6.18      & 32.14 & 306.8           & 8.14      \\
-freeway         & 0     & 0         & 71.84 & 0     & 0         & 15.19 & \textbf{29.4} & 0.89      & 4.44  & 19.6        & 3.29      & 90.64 & 1               & 1.41      \\
-pong            & -20.4 & 0.55      & 41.51 & -20.2 & 0.84      & 18.45 & 16.4          & 1.67      & 39.69 & \textbf{21} & 0         & 38.37 & \textbf{21}     & 0         \\
-qbert           & 185   & 345.33    & 42.83 & 160   & 85.88     & 1.82  & 1545          & 1666.06   & 1.76  & 14725       & 7872.1    & 28.61 & \textbf{18730}  & 1127.69   \\
-seaquest        & 192   & 38.99     & 40.01 & 200   & 14.14     & 14.72 & \textbf{4274} & 4206.81   & 1.59  & 4070        & 1939.55   & 26.16 & 3406            & 2402.47   \\
-space\_invaders & 187   & 120.86    & 46.11 & 115   & 61.44     & 12.1  & \textbf{2670} & 637.3     & 2.25  & 1327        & 598.04    & 19.66 & 2634            & 375.66   
-\end{tabular}
-}
+\input{performance_table}
 
- \caption{\small
-   Random, BrFS, IW1, BFS, UCT performance over 5 runs, with
-   seeds 0 to 4.  \textit{T} is the action selection average
-   computation time, \textit{S} is the average score, and
-   \textit{Dev} is the standard deviation.  Numbers in bold show best performer in terms of average score.}
-\label{performance}
+The algorithms IW1 and BFS are tested over 9 games selected from those
+considered in the training set in \cite{bellemare:jair}, and those
+considered in \cite{deep-mind-atari}. Each game has 5 runs, each with
+a different random seed $0,\ldots,4$.  We compare the performance of
+IW1 and BFS with UCT and BRFS. We also include results for a baseline random
+agent. We use the same parameters in the literature, all algorithms use a discount factor of 0.999, and each action
+simulates 5 frames. Each algorithm has a budget on the number of nodes
+it can generate per lookahead. BRFS, IW1 and BFS have a maximum budget
+of 100k. For UCT we use the same parameters as in
+\cite{bellemare:jair}, 0.1 exploration rate, and 500 rollouts of a maximum depth of 300 steps,
+which gives a maximum budget of 150k nodes. We tested UCT with a fix
+budget of 100k and max depth 300, but resulted in practically the same
+results. All algorithms reuse the tree built between lookaheads by
+setting the new root of the tree to the node of the selected action,
+and deleting the other branches. Note that this may have a different
+effect on algorithms were all branches have the same number of
+generated nodes, ex. BRFS, than those that may focus on different
+areas of the tree, ex. IW1, BFS, UCT.
 
-\end{table*}
+On Table~\ref{performance}, we can observe the performance of each
+algorithm on terms of average score with standard deviation, and
+average time per lookahead in seconds. The Random agent don't include
+average time as it just chooses an action randomly. BRFS outperform
+the Random agent in 7 out of 9 domains. BRFS rarely finds any reward,
+turning itself mostly into a random agent, but exploring 100k nodes up
+to an average depth of 4. When BRFS is turned int IW1 using novelty to
+explore the search space, the jump on performance is important. IW1 in
+most of the cases does not completely use its budget, and is able to
+achieve depths of 70 to 260 depending on the game, which first
+explains how IW1 is able to achieve a performance that is closer to
+UCT than to BRFS. In 4 out of 9 tested games it is the best
+performer. Remarkably, is the first domain independent solver that
+shows good performance on Freeway, where rewards are very sparse and
+deep in the search tree. BFS outperforms IW1 and UCT in 4 and 2
+domains respectively.  Both IW1 and BFS performance in terms of score
+is close to UCT, but they are some times one order of magnitud
+faster. The speedup is due to the bounded space in IW1, and to the
+fact that in some games, both IW1 and BFS are able to reuse an
+important part of their trees between lookaheads.
+
+The novelty of states in IW1 and BFS may depend on the order that
+nodes are generated. Therefore, every time a node is expanded, we
+randomized the order in which nodes get genreated. Randomizing the
+order of expansion is also applied to BRFS, but has no impact on its
+performance.
+
+IW2 is not included in the table due to its low performance, which is
+closer to BRFS than to the other algorithms. This is mainly due to the
+huge number of states that are novel in this algorith, thus,
+achieveing insufficient depths to gather some reward.
 
 
-
-** Results, cold and detached, same format as those reported in jair paper, possibly with
-std deviations and times. 
-
-** mention also ideas that have been tried and didn't work (IW2?, discount, randomization, ..)
+ ** mention also ideas that have been tried and didn't work (IW2?,
+ discount, randomization, ..)
 
  
 \section{Exploration and Exploitation: Discussion}
@@ -528,6 +546,7 @@ what it's practical impact will be.
 
 %%% - Learning in same instance, across diff instances of same game, etc.
 %%%% - Learning controllers vs. on-line planning, etc
+
 
 
 \end{document}
