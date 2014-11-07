@@ -145,12 +145,13 @@ Action SearchAgent::act() {
 		return m_curr_action;
 	
 	std::cout << "Search Agent action selection: frame=" << frame_number << std::endl;
+	std::cout << "Is Terminal Before Lookahead? " << m_rom_settings->isTerminal() << std::endl;
 	std::cout << "Evaluating actions: " << std::endl;
 
 	float t0 = aptk::time_used();
 
 	state = m_env->cloneState();
-
+	
 	if (search_tree->is_built ) {
 		// Re-use the old tree
 		search_tree->move_to_best_sub_branch();
@@ -178,6 +179,7 @@ Action SearchAgent::act() {
 
 	m_env->restoreState( state );
 	
+	std::cout << "Is Terminal After Lookahead? " << m_rom_settings->isTerminal() << std::endl;
 
 	float tf = aptk::time_used();
 

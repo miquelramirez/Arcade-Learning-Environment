@@ -96,6 +96,7 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 	int num_simulated_steps =0;
 	int num_actions = available_actions.size();
 	bool leaf_node = (curr_node->v_children.empty());
+	static     int max_nodes_per_frame = max_sim_steps_per_frame / sim_steps_per_node;
 	m_expanded_nodes++;
 	// Expand all of its children (simulates the result)
 	if(leaf_node){
@@ -127,7 +128,7 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 				curr_node->v_children[a] = child;
 				child->is_terminal = true;
 				m_pruned_nodes++;
-				continue;				
+				//continue;				
 			}
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 			num_simulated_steps += child->num_simulated_steps;
@@ -140,27 +141,33 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 			// This recreates the novelty table (which gets resetted every time
 			// we change the root of the search tree)
 			if ( m_novelty_pruning )
+			{
+			    if( child->is_terminal )
+			    {
 				if ( check_novelty_1( child->state.getRAM() ) ){
-					update_novelty_table( child->state.getRAM() );
-					child->is_terminal = false;
+				    update_novelty_table( child->state.getRAM() );
+				    child->is_terminal = false;
 				}
 				else{
-					child->is_terminal = true;
-					m_pruned_nodes++;
+				    child->is_terminal = true;
+				    m_pruned_nodes++;
 				}
-			
+			    }
+			}
 			child->updateTreeNode();
 
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 
-			if ( !child->is_terminal )
-				num_simulated_steps += child->num_simulated_steps;
+			// DONT COUNT REUSED NODES
+			//if ( !child->is_terminal )
+			//	num_simulated_steps += child->num_simulated_steps;
 
 		}
 	
 		// Don't expand duplicate nodes, or terminal nodes
 		if (!child->is_terminal) {
 			if (! (ignore_duplicates && test_duplicate(child)) )
+			    if( child->num_nodes_reusable < max_nodes_per_frame )
 				q.push(child);
 		}
 	}
@@ -180,7 +187,15 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 		return;
 	}
 
-	if(!start_node->v_children.empty()) start_node->updateTreeNode();
+	if(!start_node->v_children.empty()){
+	    start_node->updateTreeNode();
+	    for (int a = 0; a < available_actions.size(); a++) {
+		TreeNode* child = start_node->v_children[a];
+		if( !child->is_terminal ){
+		        child->num_nodes_reusable = child->num_nodes();
+		}
+	    }
+	}
 
 	queue<TreeNode*> q;
 	std::list< TreeNode* > pivots;

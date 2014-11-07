@@ -39,7 +39,9 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   discounted_accumulated_reward(0),
   discount(1.0),
   act(Action::PLAYER_A_NOOP),
-  already_expanded(false)
+  already_expanded(false),
+  num_nodes_reusable(0)
+
 {
 }
 
@@ -62,7 +64,8 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
 	discount(disc),
 	original_discount(disc),
 	act(a),
-	already_expanded(false)
+	already_expanded(false),
+	num_nodes_reusable(0)
 {
 	if(parent == NULL){
 		m_depth = 0;

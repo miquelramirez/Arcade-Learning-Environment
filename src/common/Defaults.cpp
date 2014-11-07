@@ -31,7 +31,7 @@ void setDefaultSettings(Settings &settings) {
     settings.setBool("run_length_encoding", true);
 
     // Environment customization settings
-    settings.setBool("record_trajectory", true);
+    settings.setBool("record_trajectory", false);
     //settings.setBool("restricted_action_set", false);
     settings.setBool("restricted_action_set", false);
     settings.setBool("use_starting_actions", true);
@@ -66,7 +66,7 @@ void setDefaultSettings(Settings &settings) {
 	//settings.setBool("iw1_stop_on_first_reward", true);
 	//settings.setInt("iw1_reward_horizon", 50 );
 	settings.setBool("iw1_stop_on_first_reward", false);
-	settings.setInt("iw1_reward_horizon", 60 );	
+	settings.setInt("iw1_reward_horizon", 300 );	
 	settings.setBool("randomize_successor_novelty", true );
 
 }

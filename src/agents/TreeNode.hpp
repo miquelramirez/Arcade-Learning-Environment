@@ -96,6 +96,8 @@ class TreeNode {
 	Action                  act;
 	ActionVect              available_actions;
 	bool                    already_expanded;
+    
+        unsigned                num_nodes_reusable;
 };
 
 

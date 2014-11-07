@@ -47,7 +47,7 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 
 	
 	}
-
+	
 	for (int a = 0; a < num_actions; a++) {
 		Action act = curr_node->available_actions[a];
 		
@@ -72,6 +72,8 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 			    m_gen_count_novelty2++;
 			}
 			child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
+
+			child->num_nodes_reusable = curr_node->num_nodes_reusable + num_actions;
 
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 			num_simulated_steps += child->num_simulated_steps;
@@ -156,7 +158,7 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 		if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
 		if (!node->v_children.empty()) {
 			for(size_t c = 0; c < node->v_children.size(); c++) {			
-				TreeNode* child = curr_node->v_children[c];
+				TreeNode* child = curr_node->v_children[c];				
 				
 				// This recreates the novelty table (which gets resetted every time
 				// we change the root of the search tree)
@@ -177,6 +179,11 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 				child->updateTreeNode();
 				child->fn += ( m_max_reward - child->discounted_accumulated_reward ); // Miquel: add this to obtain Hector's BFS + m_max_reward * (720 - child->depth()) ;
 				
+				//First applicable action
+				if(child->depth() == 1)
+				    child->num_nodes_reusable = child->num_nodes();
+				else
+				    child->num_nodes_reusable = curr_node->num_nodes_reusable;
 				if (child->depth() > m_max_depth ) m_max_depth = child->depth();
 				
 				
@@ -199,10 +206,10 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 				
 			}
 		}
-		// Stop once we have simulated a maximum number of steps
-		if (num_simulated_steps >= max_sim_steps_per_frame) {
-			break;
-		}
+		// // Stop once we have simulated a maximum number of steps
+		// if (num_simulated_steps >= max_sim_steps_per_frame) {
+		// 	break;
+		// }
 		
 	}
 	
@@ -240,13 +247,14 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
     int num_simulated_steps = 0;
     bool explore = true;
     
-
+    int max_nodes_per_frame = max_sim_steps_per_frame / sim_steps_per_node;
     clear_queues();
     
     if(!start_node->v_children.empty()) {
 	    start_node->updateTreeNode();
 	    num_simulated_steps += reuse_branch( start_node );
 	    std::cout  << "Num_reused_steps: "<< num_simulated_steps << std::endl;
+	    num_simulated_steps = 0;
 	    //COMMENT LINES BELOW, AND UNCOMMENT ABOVE TO WORKSHOP STYLE. ALSO CHANGE FN NOVEL 2ND QUEUE
 	    //reset_branch( start_node );
 	    //q_exploration->push(start_node);        
@@ -304,6 +312,13 @@ void BestFirstSearch::expand_tree(TreeNode* start_node) {
 	 */
 	 if(  curr_node->already_expanded ) 
 	 	continue;
+	 
+	 /**
+	 * check if subtree is bigger than max_budget of nodes
+	 */
+	 if(  curr_node->num_nodes_reusable > max_nodes_per_frame  ) {
+	 	continue;
+	 }
 	
 		
 
