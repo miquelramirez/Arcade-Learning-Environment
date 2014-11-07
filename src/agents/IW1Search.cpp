@@ -103,7 +103,7 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;
 		if(m_randomize_successor)
-		    std::random_shuffle ( curr_node->available_actions.begin()+1, curr_node->available_actions.end() );
+		    std::random_shuffle ( curr_node->available_actions.begin(), curr_node->available_actions.end() );
 	
 	}
 	for (int a = 0; a < num_actions; a++) {
