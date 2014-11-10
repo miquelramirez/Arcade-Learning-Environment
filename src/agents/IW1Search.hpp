@@ -4,6 +4,7 @@
 #include "SearchTree.hpp"
 #include "bit_matrix.hxx"
 #include "../environment/ale_ram.hpp"
+#include "closed_list.hxx"
 
 #include <queue>
 
@@ -45,12 +46,14 @@ protected:
 	virtual void	clear();
 	virtual void	move_to_best_sub_branch();
 	
-	ALERAM 			m_ram;
-	aptk::Bit_Matrix*	m_ram_novelty_table;
-	unsigned		m_pruned_nodes;
-	bool			m_stop_on_first_reward;
-	unsigned		m_reward_horizon;	
-
+	ALERAM 				m_ram;
+	aptk::Bit_Matrix*		m_ram_novelty_table;
+	unsigned			m_pruned_nodes;
+	unsigned			m_dup_nodes;
+	unsigned			m_dup_nodes_better_reward;
+	bool				m_stop_on_first_reward;
+	unsigned			m_reward_horizon;	
+	aptk::Closed_List< TreeNode >	m_closed;		
 
 };
 

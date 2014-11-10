@@ -40,7 +40,8 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState):
   discount(1.0),
   act(Action::PLAYER_A_NOOP),
   already_expanded(false),
-  num_nodes_reusable(0)
+  num_nodes_reusable(0),
+  m_dijkstra_depth(0)
 
 {
 }
@@ -65,7 +66,9 @@ TreeNode::TreeNode(	TreeNode* parent, ALEState &parentState,
 	original_discount(disc),
 	act(a),
 	already_expanded(false),
-	num_nodes_reusable(0)
+	num_nodes_reusable(0),
+  m_dijkstra_depth(0)
+
 {
 	if(parent == NULL){
 		m_depth = 0;

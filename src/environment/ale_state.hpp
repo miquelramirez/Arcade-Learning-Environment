@@ -24,6 +24,7 @@
 #include "../games/RomSettings.hpp"
 #include "ale_ram.hpp"
 #include "ale_screen.hpp"
+#include "jenkins_12bit.hxx"
 
 #define PADDLE_DELTA 23000
 // MGB Values taken from Paddles.cxx (Stella 3.3) - 1400000 * [5,235] / 255
@@ -50,8 +51,14 @@ class ALEState {
     void reset(int numResetSteps = 1);
 
     /** Returns true if the two states contain the same saved information */
-    bool equals(ALEState &state);
+    bool equals(const ALEState &state) const;
 
+	bool operator==( const ALEState& s ) const {
+		return equals( s );
+	} 
+	
+	size_t	hash();
+	
     void resetPaddles(Event*);
 
     /** Applies paddle actions. This actually modifies the game state by updating the paddle
@@ -109,8 +116,9 @@ class ALEState {
     string m_serialized_state; // The stored environment state, if this is a saved state
 
     ALERAM m_ram; // The current ALE RAM
-	ALEScreen* m_screen;
-
+	ALEScreen* 	m_screen;
+	size_t		m_hash;
+	bool		m_hash_ready;
 };
 
 #endif // __ALE_STATE_HPP__

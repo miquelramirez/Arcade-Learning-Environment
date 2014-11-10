@@ -16,20 +16,24 @@
 
 /** Default constructor - loads settings from system */ 
 ALEState::ALEState():
-  m_left_paddle(PADDLE_DEFAULT_VALUE),
-  m_right_paddle(PADDLE_DEFAULT_VALUE),
-  m_frame_number(0),
-  m_episode_frame_number(0),
-  m_screen(NULL){
+  	m_left_paddle(PADDLE_DEFAULT_VALUE),
+  	m_right_paddle(PADDLE_DEFAULT_VALUE),
+  	m_frame_number(0),
+  	m_episode_frame_number(0),
+  	m_screen(NULL),
+	m_hash(0),
+	m_hash_ready(false){
 }
 
 ALEState::ALEState(const ALEState &rhs, std::string serialized):
-  m_left_paddle(rhs.m_left_paddle),
-  m_right_paddle(rhs.m_right_paddle),
-  m_frame_number(rhs.m_frame_number),
-  m_episode_frame_number(rhs.m_episode_frame_number),
-  m_serialized_state(serialized),
-  m_screen(NULL) {
+  	m_left_paddle(rhs.m_left_paddle),
+  	m_right_paddle(rhs.m_right_paddle),
+  	m_frame_number(rhs.m_frame_number),
+ 	m_episode_frame_number(rhs.m_episode_frame_number),
+  	m_serialized_state(serialized),
+  	m_screen(NULL),
+	m_hash( 0 ),
+	m_hash_ready(false) {
 }
 
 ALEState::ALEState(ALEState &rhs, std::string serialized):
@@ -38,7 +42,9 @@ ALEState::ALEState(ALEState &rhs, std::string serialized):
   m_frame_number(rhs.m_frame_number),
   m_episode_frame_number(rhs.m_episode_frame_number),
   m_serialized_state(serialized),
-  m_screen(NULL){
+  m_screen(NULL),
+	m_hash( 0 ),
+	m_hash_ready(false) {
 }
 
 ALEState::ALEState( const ALEState& other )
@@ -55,6 +61,8 @@ ALEState::ALEState( const ALEState& other )
 		m_screen = new ALEScreen( *(other.m_screen) );
 	}
 	m_ram = other.m_ram;
+	m_hash = other.m_hash;
+	m_hash_ready = other.m_hash_ready;
 }
 
 const ALEState&	ALEState::operator=( const ALEState& other )
@@ -71,25 +79,28 @@ const ALEState&	ALEState::operator=( const ALEState& other )
 	// 	m_screen = new ALEScreen( *(other.m_screen) );
 	// }
 	m_ram = other.m_ram;
+	m_hash = other.m_hash;
+	m_hash_ready = other.m_hash_ready;
 
 	return *this;
 }
 
 /** Restores ALE to the given previously saved state. */ 
 void ALEState::load(OSystem* osystem, RomSettings* settings, std::string md5, const ALEState &rhs) {
-  assert(rhs.m_serialized_state.length() > 0);
+	assert(rhs.m_serialized_state.length() > 0);
   
-  // Deserialize the stored string into the emulator state
-  Deserializer deser(rhs.m_serialized_state);
+	// Deserialize the stored string into the emulator state
+	Deserializer deser(rhs.m_serialized_state);
   
-  osystem->console().system().loadState(md5, deser);
-  settings->loadState(deser);
+	osystem->console().system().loadState(md5, deser);
+	settings->loadState(deser);
  
-  // Copy over other member variables
-  m_left_paddle = rhs.m_left_paddle; 
-  m_right_paddle = rhs.m_right_paddle; 
-  m_episode_frame_number = rhs.m_episode_frame_number;
-  m_frame_number = rhs.m_frame_number; 
+	// Copy over other member variables
+	m_left_paddle = rhs.m_left_paddle; 
+	m_right_paddle = rhs.m_right_paddle; 
+	m_episode_frame_number = rhs.m_episode_frame_number;
+	m_frame_number = rhs.m_frame_number; 
+	m_hash_ready = false;
 }
 
 ALEState ALEState::save(OSystem* osystem, RomSettings* settings, std::string md5) {
@@ -123,13 +134,16 @@ ALEState ALEState::save(OSystem* osystem, RomSettings* settings, std::string md5
 }
 
 void ALEState::incrementFrame(int steps /* = 1 */) {
-    m_frame_number+=steps;
-    m_episode_frame_number+=steps;
+    	m_frame_number+=steps;
+    	m_episode_frame_number+=steps;
+	m_hash_ready = false;
+
 }
 
 void ALEState::resetEpisodeFrameNumber(){
         m_episode_frame_number = 0;
-    }
+	m_hash_ready = false;
+}
 
 
 
@@ -141,20 +155,22 @@ int ALEState::calcPaddleResistance(int x_val) {
 }
 
 void ALEState::resetPaddles(Event * event) {
-  setPaddles(event, PADDLE_DEFAULT_VALUE, PADDLE_DEFAULT_VALUE);
+	setPaddles(event, PADDLE_DEFAULT_VALUE, PADDLE_DEFAULT_VALUE);
+	m_hash_ready = false;
 }
 
 void ALEState::setPaddles(Event * event, int left, int right) {
-  m_left_paddle = left; 
-  m_right_paddle = right;
+	m_left_paddle = left; 
+	m_right_paddle = right;
 
-  // Compute the "resistance" (this is for vestigal clarity) 
-  int left_resistance = calcPaddleResistance(m_left_paddle);
-  int right_resistance = calcPaddleResistance(m_right_paddle);
+	// Compute the "resistance" (this is for vestigal clarity) 
+	int left_resistance = calcPaddleResistance(m_left_paddle);
+	int right_resistance = calcPaddleResistance(m_right_paddle);
   
-  // Update the events with the new resistances
-  event->set(Event::PaddleZeroResistance, left_resistance);
-  event->set(Event::PaddleOneResistance, right_resistance);
+	// Update the events with the new resistances
+	event->set(Event::PaddleZeroResistance, left_resistance);
+	event->set(Event::PaddleOneResistance, right_resistance);
+	m_hash_ready = false;
 }
 
 /* *********************************************************************
@@ -478,6 +494,7 @@ void ALEState::setActionJoysticks(Event* event, int player_a_action, int player_
           cerr << "Invalid Player B Action: " << player_b_action << endl;
           exit(-1); 
   }
+	m_hash_ready = false;
 }
 
 /* ***************************************************************************
@@ -502,10 +519,22 @@ void ALEState::resetKeys(Event* event) {
     event->set(Event::PaddleOneFire, 0);
 }
 
-bool ALEState::equals(ALEState &rhs) {
-    return (rhs.m_serialized_state == this->m_serialized_state &&
-	  rhs.m_left_paddle == this->m_left_paddle &&
-    rhs.m_right_paddle == this->m_right_paddle &&
-    rhs.m_frame_number == this->m_frame_number) &&
-  rhs.m_episode_frame_number == this->m_episode_frame_number;
+bool ALEState::equals(const ALEState &rhs) const {
+    return (	rhs.m_serialized_state == this->m_serialized_state &&
+	  	rhs.m_left_paddle == this->m_left_paddle &&
+    		rhs.m_right_paddle == this->m_right_paddle &&
+    		rhs.m_frame_number == this->m_frame_number) &&
+  		rhs.m_episode_frame_number == this->m_episode_frame_number;
+}
+
+size_t ALEState::hash()  {
+	if ( m_hash_ready ) return m_hash;
+	m_hash = 32991;
+	m_hash = jenkins_hash( (ub1*)(&(m_serialized_state[0])), m_serialized_state.size(), m_hash );
+	m_hash = jenkins_hash( (ub1*)(&m_left_paddle), sizeof(int), m_hash );
+	m_hash = jenkins_hash( (ub1*)(&m_right_paddle), sizeof(int), m_hash );
+	m_hash = jenkins_hash( (ub1*)(&m_frame_number), sizeof(int), m_hash );
+	m_hash = jenkins_hash( (ub1*)(&m_episode_frame_number), sizeof(int), m_hash );
+	m_hash_ready = true;
+	return m_hash;
 }

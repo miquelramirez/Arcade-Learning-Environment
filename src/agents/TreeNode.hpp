@@ -86,6 +86,7 @@ class TreeNode {
     	// Whether this node was flagged as a duplicate
     	bool duplicate;
         unsigned m_depth;
+	unsigned m_dijkstra_depth;
 
 	unsigned long long	fn; // evaluation function
         unsigned                novelty;

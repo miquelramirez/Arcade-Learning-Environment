@@ -174,6 +174,21 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 	return num_simulated_steps;
 }
 
+
+class TreeNodeComparerExploitation
+{
+public:
+	
+	bool operator()( TreeNode* a, TreeNode* b ) const 
+	{
+		if ( b->fn < a->fn ) return true;
+		return false;
+	}
+};
+
+typedef std::priority_queue<TreeNode*, std::vector<TreeNode*>, TreeNodeComparerExploitation >
+	Dijkstra_Queue;
+
 /* *********************************************************************
    Expands the tree from the given node until i_max_sim_steps_per_frame
    is reached
@@ -196,69 +211,117 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 		}
 	    }
 	}
-
 	queue<TreeNode*> q;
-	std::list< TreeNode* > pivots;
-	
-	//q.push(start_node);
-	pivots.push_back( start_node );
-
+	q.push(start_node);
+	reward_t R_max = 0;
 	update_novelty_table( start_node->state.getRAM() );
 	int num_simulated_steps = 0;
 
 	m_expanded_nodes = 0;
 	m_generated_nodes = 0;
-
+	m_dup_nodes = 0;
+	m_dup_nodes_better_reward = 0;
 	m_pruned_nodes = 0;
 
-	do {
-		
-		std::cout << "# Pivots: " << pivots.size() << std::endl;
-		std::cout << "First pivot reward: " << pivots.front()->node_reward << std::endl;
-		pivots.front()->m_depth = 0;
-		int steps = expand_node( pivots.front(), q );
+	while(!q.empty()) {
+		// Pop a node to expand
+		TreeNode* curr_node = q.front();
+		q.pop();
+		TreeNode* other = m_closed.retrieve(curr_node);
+		if ( other != nullptr ) {
+			// We got a duplicated node!
+			m_dup_nodes++;
+			if ( curr_node->accumulated_reward > other->accumulated_reward ) {
+				// Replace node in parent children array
+				for (int a = 0; a < available_actions.size(); a++) {
+					TreeNode* child = other->p_parent->v_children[a];
+					if ( child == other ) {
+						other->p_parent->v_children[a] = curr_node;
+						break;
+					}
+				}
+				// Copy children into new node, and connect children to parent
+				for (int a = 0; a < available_actions.size(); a++) {
+					TreeNode* child = other->v_children[a];
+					curr_node->v_children.push_back( child );
+					child->p_parent = curr_node;
+				}
+				m_dup_nodes_better_reward++; 
+				m_closed.remove(other);
+				m_closed.put(curr_node);
+				delete other; // !! This should be safe
+			}
+			else {
+				// Replace node in current's parent children array
+				for (int a = 0; a < available_actions.size(); a++) {
+					TreeNode* child = curr_node->p_parent->v_children[a];
+					if ( child == curr_node ) {
+						curr_node->p_parent->v_children[a] = other;
+						break;
+					}
+				}
+			}
+			continue;
+		}
+		m_closed.put(curr_node);
+		if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
+		if ( curr_node->node_reward > R_max ) R_max = curr_node->node_reward;
+		int steps = expand_node( curr_node, q );	
 		num_simulated_steps += steps;
-
-		if (num_simulated_steps >= max_sim_steps_per_frame) {
-			break;
-		}
-
-		pivots.pop_front();
-
-		while(!q.empty()) {
-			// Pop a node to expand
-			TreeNode* curr_node = q.front();
-			q.pop();
-	
-			if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
-			if ( m_stop_on_first_reward && curr_node->node_reward != 0 ) 
-			{
-				pivots.push_back( curr_node );
-				continue;
-			}
-			steps = expand_node( curr_node, q );	
-			num_simulated_steps += steps;
-			// Stop once we have simulated a maximum number of steps
-			if (num_simulated_steps >= max_sim_steps_per_frame) {
-				break;
-			}
-		
-		}
-		std::cout << "\tExpanded so far: " << m_expanded_nodes << std::endl;	
-		std::cout << "\tPruned so far: " << m_pruned_nodes << std::endl;	
-		std::cout << "\tGenerated so far: " << m_generated_nodes << std::endl;	
-
-		if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
 		// Stop once we have simulated a maximum number of steps
 		if (num_simulated_steps >= max_sim_steps_per_frame) {
 			break;
 		}
-
-	} while ( !pivots.empty() );
-    
-
 	
-	update_branch_return(start_node);
+	}
+	std::cout << "\tExpanded so far: " << m_expanded_nodes << std::endl;	
+	std::cout << "\tPruned so far: " << m_pruned_nodes << std::endl;	
+	std::cout << "\tGenerated so far: " << m_generated_nodes << std::endl;
+	std::cout << "\tDuplicates: " << m_dup_nodes << " Duplicates with better reward: " << m_dup_nodes_better_reward << std::endl;	
+	std::cout << "\tR_{max}: " << R_max << std::endl;
+
+	// Dijkstra post-processing
+	aptk::Closed_List< TreeNode >	m_exp_visited;
+	Dijkstra_Queue	Q_exp;
+	start_node->m_dijkstra_depth = 0;
+	start_node->fn = R_max + 1 - start_node->node_reward;
+	Q_exp.push( start_node );
+	m_exp_visited.put( start_node );	
+	TreeNode* best = nullptr;
+   	while (!Q_exp.empty()) {
+		TreeNode* current = Q_exp.top();
+		Q_exp.pop();
+		if ( current->is_terminal ) {
+			m_exp_visited.put(current);
+			continue;
+		}	
+		if ( current->m_dijkstra_depth == m_max_depth ) {
+			if ( best == nullptr || current->fn < best->fn )
+				best = current;
+			m_exp_visited.put(current);
+			continue;
+		}
+		for ( TreeNode* child : current->v_children ) {
+			if ( m_exp_visited.retrieve(child) != nullptr ) continue;
+			child->m_dijkstra_depth = current->m_dijkstra_depth+1;
+			child->fn = current->fn + ( R_max + 1 - child->node_reward );
+			Q_exp.push(child);
+		}
+		m_exp_visited.put(current);
+	}
+
+	TreeNode* n = best;
+	n->branch_return = n->node_reward;
+	while ( n->p_parent != nullptr ) {
+		for ( unsigned k = 0; k < n->p_parent->v_children.size(); k++ )
+			if ( n->p_parent->v_children[k] == n ) 
+				n->p_parent->best_branch = k;
+		n = n->p_parent;	
+		n->branch_return = n->node_reward + n->v_children[n->best_branch]->branch_return;
+	} 
+
+
+	m_closed.clear();
 }
 
 void IW1Search::clear()
@@ -286,16 +349,17 @@ void IW1Search::update_branch_return(TreeNode* node) {
 		node->branch_depth = node->m_depth;
 		return;
 	}
-
+	node->already_expanded = true;
 	// First, we have to make sure that all the children are updated
 	for (unsigned int c = 0; c < node->v_children.size(); c++) {
 		TreeNode* curr_child = node->v_children[c];
 			
 		if (ignore_duplicates && curr_child->is_duplicate()) continue;
-    
+   		if ( curr_child->already_expanded ) continue; 
 		update_branch_return(curr_child);
 	}
 	
+	node->already_expanded = false;
 	// Now that all the children are updated, we can update the branch-reward
 	float best_return = -1;
 	int best_branch = -1;
