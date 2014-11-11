@@ -50,7 +50,7 @@ protected:
 	aptk::Bit_Matrix*		m_ram_novelty_table;
 	unsigned			m_pruned_nodes;
 	unsigned			m_dup_nodes;
-	unsigned			m_dup_nodes_better_reward;
+	unsigned			m_dup_nodes_unpruned;
 	bool				m_stop_on_first_reward;
 	unsigned			m_reward_horizon;	
 	aptk::Closed_List< TreeNode >	m_closed;		

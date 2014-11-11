@@ -220,8 +220,10 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 	m_expanded_nodes = 0;
 	m_generated_nodes = 0;
 	m_dup_nodes = 0;
-	m_dup_nodes_better_reward = 0;
+	m_dup_nodes_unpruned = 0;
 	m_pruned_nodes = 0;
+	unsigned unpruned_better_reward = 0;
+	unsigned max_exp_depth = 0;
 
 	while(!q.empty()) {
 		// Pop a node to expand
@@ -231,41 +233,27 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 		if ( other != nullptr ) {
 			// We got a duplicated node!
 			m_dup_nodes++;
+			if ( other->is_terminal ) {// was pruned {
+				curr_node->duplicate = true;
+				curr_node->is_terminal = true;
+				continue;
+			}
+			m_dup_nodes_unpruned++;
 			if ( curr_node->accumulated_reward > other->accumulated_reward ) {
-				// Replace node in parent children array
-				for (int a = 0; a < available_actions.size(); a++) {
-					TreeNode* child = other->p_parent->v_children[a];
-					if ( child == other ) {
-						other->p_parent->v_children[a] = curr_node;
-						break;
-					}
-				}
-				// Copy children into new node, and connect children to parent
-				for (int a = 0; a < available_actions.size(); a++) {
-					TreeNode* child = other->v_children[a];
-					curr_node->v_children.push_back( child );
-					child->p_parent = curr_node;
-				}
-				m_dup_nodes_better_reward++; 
-				m_closed.remove(other);
-				m_closed.put(curr_node);
-				delete other; // !! This should be safe
-			}
-			else {
-				// Replace node in current's parent children array
-				for (int a = 0; a < available_actions.size(); a++) {
-					TreeNode* child = curr_node->p_parent->v_children[a];
-					if ( child == curr_node ) {
-						curr_node->p_parent->v_children[a] = other;
-						break;
-					}
+				unpruned_better_reward++; 
+				for (TreeNode* c : other->v_children) {
+					c->p_parent = curr_node;
+					curr_node->v_children.push_back(c);
 				}
 			}
+			curr_node->duplicate = true;
+			curr_node->is_terminal = true;
 			continue;
 		}
 		m_closed.put(curr_node);
 		if ( curr_node->depth() > m_reward_horizon - 1 ) continue;
 		if ( curr_node->node_reward > R_max ) R_max = curr_node->node_reward;
+		if ( curr_node->depth() > max_exp_depth ) max_exp_depth = curr_node->depth();
 		int steps = expand_node( curr_node, q );	
 		num_simulated_steps += steps;
 		// Stop once we have simulated a maximum number of steps
@@ -277,8 +265,11 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 	std::cout << "\tExpanded so far: " << m_expanded_nodes << std::endl;	
 	std::cout << "\tPruned so far: " << m_pruned_nodes << std::endl;	
 	std::cout << "\tGenerated so far: " << m_generated_nodes << std::endl;
-	std::cout << "\tDuplicates: " << m_dup_nodes << " Duplicates with better reward: " << m_dup_nodes_better_reward << std::endl;	
+	std::cout << "\tDuplicates: " << m_dup_nodes << std::endl;
+	std::cout << "\tDuplicates of unpruned nodes: " << m_dup_nodes_unpruned << std::endl;	
+	std::cout << "\tDuplicates of unpruned with better rewards: " << unpruned_better_reward << std::endl;
 	std::cout << "\tR_{max}: " << R_max << std::endl;
+	std::cout << "\tExpansion depth: " << max_exp_depth << std::endl;
 
 	// Dijkstra post-processing
 	aptk::Closed_List< TreeNode >	m_exp_visited;
@@ -286,28 +277,27 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 	start_node->m_dijkstra_depth = 0;
 	start_node->fn = R_max + 1 - start_node->node_reward;
 	Q_exp.push( start_node );
-	m_exp_visited.put( start_node );	
 	TreeNode* best = nullptr;
    	while (!Q_exp.empty()) {
 		TreeNode* current = Q_exp.top();
 		Q_exp.pop();
-		if ( current->is_terminal ) {
-			m_exp_visited.put(current);
-			continue;
-		}	
-		if ( current->m_dijkstra_depth == m_max_depth ) {
-			if ( best == nullptr || current->fn < best->fn )
+		if ( m_exp_visited.retrieve(current) != nullptr ) continue;
+		//std::cout << current->fn << " " << current->m_dijkstra_depth << " " << ( current->is_terminal ? "yes" : "no" ) << std::endl;
+		if ( current->node_reward > 0 ) {
+			if ( best == nullptr || current->accumulated_reward > best->accumulated_reward ) {
 				best = current;
-			m_exp_visited.put(current);
-			continue;
+				std::cout << "Done! Accumulated reward: " << current->accumulated_reward << " d=" << current->depth() << " d_D=" << current->m_dijkstra_depth << std::endl;
+			}
 		}
 		for ( TreeNode* child : current->v_children ) {
+			if ( child->is_terminal ) continue;
 			if ( m_exp_visited.retrieve(child) != nullptr ) continue;
 			child->m_dijkstra_depth = current->m_dijkstra_depth+1;
 			child->fn = current->fn + ( R_max + 1 - child->node_reward );
 			Q_exp.push(child);
 		}
 		m_exp_visited.put(current);
+		//std::cout << "Size of queue: " << Q_exp.size() << std::endl;
 	}
 
 	TreeNode* n = best;
