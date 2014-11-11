@@ -24,6 +24,7 @@
 #include "../environment/stella_environment.hpp"
 #include "Settings.hxx"
 #include <fstream>
+#include <limits>
 
 class SearchAgent;
 

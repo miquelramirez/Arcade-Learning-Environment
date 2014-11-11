@@ -109,15 +109,26 @@ int BestFirstSearch::expand_node( TreeNode* curr_node )
 			num_simulated_steps += child->num_simulated_steps;
 		}
 	
+		// // Don't expand duplicate nodes, or terminal nodes
+		// if (!child->is_terminal) {
+		//     if (! (ignore_duplicates && test_duplicate(child)) ){				
+		// 		if( child->fn !=  m_max_reward )
+		// 			q_exploitation->push(child);
+		// 		else
+		// 			q_exploration->push(child);
+		//     }
+		// }
 		// Don't expand duplicate nodes, or terminal nodes
 		if (!child->is_terminal) {
 		    if (! (ignore_duplicates && test_duplicate(child)) ){				
-				if( child->fn !=  m_max_reward )
-					q_exploitation->push(child);
-				else
+				if( child->novelty ==  1 )
 					q_exploration->push(child);
+				
+				q_exploitation->push(child);
+
 		    }
 		}
+	
 	}
 	
 
@@ -163,16 +174,19 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 				// This recreates the novelty table (which gets resetted every time
 				// we change the root of the search tree)
 				if ( m_novelty_pruning ){
-					if ( check_novelty_1( child->state.getRAM() ) ){
-						update_novelty_table( child->state.getRAM() );
-						if(!child->already_expanded)
-						    child->novelty = 1;
-					}
-					else{
-					    if(!child->already_expanded)
-						child->novelty = 2;
-
-						
+					if( child->is_terminal ){						
+						if ( check_novelty_1( child->state.getRAM() ) ){
+							update_novelty_table( child->state.getRAM() );
+							if(!child->already_expanded){
+								child->novelty = 1;
+							}
+						}
+						else{
+							if(!child->already_expanded)
+								child->novelty = 2;
+							
+							
+						}
 					}
 				}
 				
@@ -193,10 +207,15 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 				if (!child->is_terminal) {
 					if (! (ignore_duplicates && test_duplicate(child)) ){
 						if(!child->already_expanded){
-							if( child->fn !=  m_max_reward )
-								q_exploitation->push(child);
+							// if( child->fn !=  m_max_reward )
+							// 	q_exploitation->push(child);
 
-							q_exploration->push(child);
+							// q_exploration->push(child);
+
+
+							q_exploitation->push(child);
+							if( child->novelty == 1 )
+								q_exploration->push(child);
 						}
 						else
 							q.push(child);
