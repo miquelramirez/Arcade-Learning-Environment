@@ -30,6 +30,7 @@
 #include "BestFirstSearch.hpp"
 #include "Width2BestFirstSearch.hpp"
 #include "UCTSearchTree.hpp"
+#include "BFS_UCB.hpp"
 #include "time.hxx"
 
 SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnvironment* _env, bool player_B) : 
@@ -88,6 +89,13 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 	
 		search_tree->set_novelty_pruning();
 		m_trace.open( "bfs.search-agent.trace" );
+    
+	}else if( search_method == "bfs_ucb"){
+		search_tree = new BFS_UCB(	_settings, _osystem->settings(),
+						available_actions, _env);
+	
+		search_tree->set_novelty_pruning();
+		m_trace.open( "bfs-ucb.search-agent.trace" );
     
 	}else if( search_method == "bfs_w2"){
 		search_tree = new Width2BestFirstSearch(	_settings, _osystem->settings(),
