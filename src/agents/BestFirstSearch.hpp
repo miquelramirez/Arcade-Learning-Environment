@@ -17,8 +17,8 @@ public:
 	bool operator()( TreeNode* a, TreeNode* b ) const 
 	{
 		if ( b->novelty < a->novelty ) return true;
-		//else if( b->novelty == a->novelty && b->fn < a->fn ) return true;
-		else if( b->novelty == a->novelty && b->m_depth < a->m_depth ) return true;
+		else if( b->novelty == a->novelty && b->fn < a->fn ) return true;
+		
 		return false;
 	}
     };
@@ -31,9 +31,7 @@ public:
 	bool operator()( TreeNode* a, TreeNode* b ) const 
 	{
 	    if ( b->fn < a->fn ) return true;
-	    //else if( b->fn == a->fn && b->m_depth < a->m_depth ) return true;
 	    else if( b->fn == a->fn && b->novelty < a->novelty ) return true;
-	    else if( b->novelty == a->novelty && b->m_depth < a->m_depth ) return true;
 	    return false;
 	}
     };
