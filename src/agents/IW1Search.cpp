@@ -277,7 +277,7 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 	start_node->m_dijkstra_depth = 0;
 	start_node->fn = R_max + 1 - start_node->node_reward;
 	Q_exp.push( start_node );
-	TreeNode* best = nullptr;
+	TreeNode* best = p_root;
    	while (!Q_exp.empty()) {
 		TreeNode* current = Q_exp.top();
 		Q_exp.pop();
@@ -302,13 +302,20 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 
 	TreeNode* n = best;
 	n->branch_return = n->node_reward;
-	while ( n->p_parent != nullptr ) {
-		for ( unsigned k = 0; k < n->p_parent->v_children.size(); k++ )
-			if ( n->p_parent->v_children[k] == n ) 
-				n->p_parent->best_branch = k;
-		n = n->p_parent;	
-		n->branch_return = n->node_reward + n->v_children[n->best_branch]->branch_return;
-	} 
+	
+	if ( n == p_root ) {
+		n->best_branch = 0;
+	}
+	else {
+
+		while ( n->p_parent != nullptr ) {
+			for ( unsigned k = 0; k < n->p_parent->v_children.size(); k++ )
+				if ( n->p_parent->v_children[k] == n ) 
+					n->p_parent->best_branch = k;
+			n = n->p_parent;	
+			n->branch_return = n->node_reward + n->v_children[n->best_branch]->branch_return;
+		} 
+	}
 
 
 	m_closed.clear();

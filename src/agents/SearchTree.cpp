@@ -78,7 +78,9 @@ Action SearchTree::get_best_action(void) {
 	assert (p_root != NULL);
 	int best_branch = p_root->best_branch;
 	TreeNode* best_child = p_root->v_children[best_branch];
+	
 	assert(best_branch != -1);
+
 	vector<int> best_branches;
 	best_branches.push_back(best_branch);
 
