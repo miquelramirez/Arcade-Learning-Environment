@@ -65,7 +65,7 @@ def check_trace( score_file, trace_file, game, algorithm  ):
         return e
 def retrieve_episodes( experiments_folder ) :
 	episodes = []
-	for root, dirs, files in os.walk('experiments') :
+	for root, dirs, files in os.walk('experiments_60_reuse') :
 		game = os.path.split( root )[-2]
                 if "/" in game:
                         game = game.split("/")[1]               
@@ -75,6 +75,7 @@ def retrieve_episodes( experiments_folder ) :
 			if "trace" in f : continue
 			if "fulllog" in f:
 				full_path = os.path.join( root, f )
+                                print full_path
 				with open( full_path ) as instream :
 					e = Episode( game, algorithm )
 					expanded = []
@@ -256,7 +257,7 @@ class Algorithm_Performance :
 
 if __name__ == '__main__':
 
-	episodes = retrieve_episodes('experiments')
+	episodes = retrieve_episodes('experiments_60_reuse')
 	print >> sys.stdout, len(episodes), 'episodes retrieved'
 	# the experimental data set is represented as a nested dictionary
 	# { game, { algorithm, instance of Algorithm Performance } }
@@ -282,9 +283,10 @@ if __name__ == '__main__':
 		for _, perf in algs.iteritems() :
 			perf.compute_stats()
 
-	algorithms = [ 'random', 'brfs', 'iw1','iw1-ucs', 'uct', 'bfs', 'ucs' ]
+        #algorithms = [ 'random', 'brfs', 'iw1','iw1-ucs', 'uct', 'bfs', 'ucs' ]
+        algorithms = [  'iw1', 'bfs', 'uct' ]
 	# and finally, we write the table summarizing the results
-	with open( 'results.csv', 'w' ) as outstream :
+ 	with open( 'results_10000.csv', 'w' ) as outstream :
 		writer = csv.writer( outstream, delimiter = ',' )
 		header = [ 'Game' ]
 		for alg_name in algorithms :
@@ -325,6 +327,32 @@ if __name__ == '__main__':
 						row += [ str( perf.std_dev ) ]
                                         for c in compare_to:
                                                 row += [str( int(perf.median > games[ game_name ][ c ].median ) )]
+				except KeyError :
+					row += [ 'n/a' ] * 11
+			writer.writerow( row )
+
+                        
+        with open( 'results_small.csv', 'w' ) as outstream :
+		writer = csv.writer( outstream, delimiter = ',' )
+		header = [ 'Game' ]
+		for alg_name in algorithms :
+			header += [ alg_name ] + [ '' ] * (1 )
+		writer.writerow( header )
+		header = [ '' ]
+		for alg_name in algorithms :
+			header += [  'score', 'time' ]                        
+		writer.writerow( header )
+
+
+		for game_name, algs in games.iteritems() :
+                        if 'bfs' not in algs.keys(): continue
+			row = [ game_name ]
+			for alg_name in algorithms :
+				try :
+
+					perf = algs[ alg_name ]
+					row += [ str( perf.average ) ]
+					row += [ str( round(perf.avg_decision_time,2) ) ]
 				except KeyError :
 					row += [ 'n/a' ] * 11
 			writer.writerow( row )

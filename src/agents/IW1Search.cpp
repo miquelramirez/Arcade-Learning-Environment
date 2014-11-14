@@ -180,12 +180,6 @@ int IW1Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 	
    ******************************************************************* */
 void IW1Search::expand_tree(TreeNode* start_node) {
-	// If the root is terminal, we will not expand any of its children; deal with this
-	//  appropriately
-	if (start_node->is_terminal) {
-		set_terminal_root(start_node);
-		return;
-	}
 
 	if(!start_node->v_children.empty()){
 	    start_node->updateTreeNode();

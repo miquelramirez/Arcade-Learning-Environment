@@ -96,7 +96,8 @@ def run(cmd, timeout, memory, log=None, verbose=True):
     time_passed_before = os.times()[2] + os.times()[3]
     pid = os.fork()
     if not pid:
-        resource.setrlimit(resource.RLIMIT_CPU, (timeout - time_slack, timeout))
+        if timeout != 0:
+            resource.setrlimit(resource.RLIMIT_CPU, (timeout - time_slack, timeout))
         # resource.setrlimit(resource.RLIMIT_DATA, (memory, memory))
         # resource.setrlimit(resource.RLIMIT_RSS, (memory, memory))
         resource.setrlimit(resource.RLIMIT_AS, (memory, memory))
