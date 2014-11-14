@@ -54,7 +54,9 @@ class ALEState {
     bool equals(const ALEState &state) const;
 
 	bool operator==( const ALEState& s ) const {
-		return equals( s );
+		return ( 	m_serialized_state == m_serialized_state &&
+	  			m_left_paddle == m_left_paddle &&
+    				m_right_paddle == m_right_paddle );
 	} 
 	
 	size_t	hash();
