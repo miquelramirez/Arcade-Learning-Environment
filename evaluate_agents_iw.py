@@ -62,8 +62,8 @@ def main() :
 		        #( 'random', '-player_agent random_agent' ),
 			#( 'brfs', '-player_agent search_agent -search_method brfs' ),
 		        ##( 'iw11', '-player_agent search_agent -search_method iw11' )
-			#( 'iw1', '-player_agent search_agent -search_method iw1' ),
-		        ( 'bfs', '-player_agent search_agent -search_method bfs' )
+			( 'iw1', '-player_agent search_agent -search_method iw1' )
+		        #( 'bfs', '-player_agent search_agent -search_method bfs' )
 		        #( 'uct', '-player_agent search_agent -search_method uct' )
 		 ]
 
