@@ -40,7 +40,7 @@ def main() :
 
 	# tuple of all parallel python servers to connect with
 	ppservers = ()#address of server, default=localhost
-	job_server = pp.Server(num_cpus,ppservers=ppservers,socket_timeout=2) 
+	job_server = pp.Server(num_cpus,ppservers=ppservers,socket_timeout=2, secret="password") 
 
 	print "Starting pp with", job_server.get_ncpus(), "workers"
 
