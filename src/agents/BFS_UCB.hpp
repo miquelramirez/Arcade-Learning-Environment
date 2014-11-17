@@ -45,10 +45,11 @@ public:
 	}
 
 	void		select_queue() {
-		m_current_queue = 0;
-		float best_value = V[m_current_queue] + exploration_bonus( m_current_queue );
+		m_current_queue = Q.size();
+		float best_value = -1.0f;
 
-		for ( unsigned k = 1; k < V.size(); k++ ) {
+		for ( unsigned k = 0; k < V.size(); k++ ) {
+			if ( Q[k]->empty() ) continue;
 			float f_k = V[k] + exploration_bonus(k);
 			if ( f_k > best_value ) {
 				m_current_queue = k;

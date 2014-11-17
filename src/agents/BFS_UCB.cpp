@@ -354,7 +354,7 @@ void BFS_UCB::expand_tree(TreeNode* start_node) {
 	
 	if ( queues_empty() ) std::cout << "Search Space Exhausted!" << std::endl;
 	for ( unsigned k = 0; k < Q.size(); k++ ) {
-		std::cout << "Size(Q[" << k << "]) = " << Q[k]->size() << std::endl;
+		std::cout << "Size(Q[" << k << "]) = " << Q[k]->size()  << "V=" << V[k] << "N=" << N[k] << std::endl;
 	}
 		
 	update_branch_return(start_node);
