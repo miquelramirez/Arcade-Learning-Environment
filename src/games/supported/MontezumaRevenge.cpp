@@ -42,6 +42,7 @@ void MontezumaRevengeSettings::step(const System& system) {
     int new_lives = readRam(&system, 0xBA);
     int some_byte = readRam(&system, 0xFE);
     m_terminal = new_lives == 0 && some_byte == 0x60;
+    //m_reward += ( new_lives > 0 ? 1 : 0 );
 }
 
 
