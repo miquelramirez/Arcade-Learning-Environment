@@ -164,7 +164,7 @@ int BestFirstSearch::reuse_branch(TreeNode* node) {
 				
 				// This recreates the novelty table (which gets resetted every time
 				// we change the root of the search tree)
-				if ( m_novelty_pruning ){				
+			        if ( m_novelty_pruning ){				
 
 						if ( check_novelty_1( child->state.getRAM() ) ){
 							update_novelty_table( child->state.getRAM() );

@@ -468,12 +468,11 @@ based on lookahead searches.
 % \addtolength{\tabcolsep}{-2pt}
 % {\scriptsize
 {\small
-\begin{tabular}{@{}l|r|rr|rr|rr|rr@{}}
+\begin{tabular}{@{}l|rr|rr|r|r@{}}
 %% table header
 % \hline\\[-3ex]
 %\hline
-\multicolumn{1}{c|}{} & \multicolumn{1}{c|}{Random} & \multicolumn{2}{c|}{\BRFS}& \multicolumn{2}{c|}{$\IW(1)$}& \multicolumn{2}{c|}{\BFS}&
-   \multicolumn{2}{c}{\UCT}
+\multicolumn{1}{c|}{}& \multicolumn{2}{c|}{$\IW(1)$}& \multicolumn{2}{c|}{\BFS} & \multicolumn{1}{c|}{\BRFS} &  \multicolumn{1}{c}{\UCT}
 % \\[.2ex]
 \\
 % \hline\\\\[-3ex]
@@ -485,33 +484,64 @@ based on lookahead searches.
 % \multicolumn{1}{c}{Avg. Score} & \multicolumn{1}{c|}{Avg. Time}  &
 % \multicolumn{1}{c}{Avg. Score} & \multicolumn{1}{c|}{Avg. Time}  &
 % \multicolumn{1}{c}{Avg. Score} & \multicolumn{1}{c}{Avg. Time}\\[.2ex]
+ \multicolumn{1}{c}{Score} & \multicolumn{1}{c|}{Time}  &
+ \multicolumn{1}{c}{Score} & \multicolumn{1}{c|}{Time}  &
  \multicolumn{1}{c|}{Score} &
- \multicolumn{1}{c}{Score} & \multicolumn{1}{c|}{Time}  &
- \multicolumn{1}{c}{Score} & \multicolumn{1}{c|}{Time}  &
- \multicolumn{1}{c}{Score} & \multicolumn{1}{c|}{Time}  &
- \multicolumn{1}{c}{Score} & \multicolumn{1}{c}{Time}
+ \multicolumn{1}{c}{Score} 
 % \\[.2ex]
 \\[.2ex]
 % \hline\\
 \hline
-\Asterix        & 210    & 3900  & 32.24 & 119000  & 17.08 & 56320  & 0.95  & \textbf{296300} (290700) & 10.82\\
-\BeamRider     & 448.8 & 519.2 & 43.48 & 3000          & 6.02  & 3804        & 0.92  & \textbf{4320} (6624)   & 42.91\\
-\Breakout       & 1    & 2     & 51.56 & 383.6         & 1.37  & 421.2       & 3.95  & \textbf{512.4} (364)   & 26.03\\
-\Enduro          & 0   & 0.4  & 40.92 & \textbf{500}   & 38.13 & 292.8      & 13.12 & 306.8 (286)             & 32.14\\
-\Freeway         & 0   & 0     & 71.84 & \textbf{29.4} & 15.19 & 19.6       & 4.44  & 1 (0)    & 90.64\\
-\Pong           & -20.4 & -20.2 & 41.51 & 16.4         & 18.45 & \textbf{21} & 39.69 & \textbf{21} (21) & 38.37\\
-\Qbert           & 185   & 160  & 42.83 & 1545         & 1.82  & 14725       & 1.76  & \textbf{18730} (17343) & 28.61\\
-\Seaquest       & 192   & 200   & 40.01 & \textbf{4274}& 14.72 & 4070        & 1.59  & 3406 (5132)      & 26.16\\
-\SpaceInvaders & 187    & 115   & 46.11 & \textbf{2670} & 12.1  & 1327       & 2.25  & 2634 (2718)  & 19.66
+
+\propername{Assault} & 806.4 & 18.21 & \textbf{852.6} & 25.11 & 413.7 & 1512.2 \\ \hline
+\propername{Asterix} & 153400 & 24.33 & 77200 & 26.58 & 2135.7 & \textbf{290700} \\ \hline
+\propername{Asteroids} & \textbf{51338} & 65.92 & 22168 & 64.53 & 3127.4 & 4660.6 \\ \hline
+\propername{Atlantis} & 159420 & 12.8 & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & 30460 & \textbf{193858} \\ \hline
+\propername{Bank\_heist} & \textbf{717} & 39.29 & 362 & 63.83 & 21.5 & 497.8 \\ \hline
+\propername{Battle\_zone} & 11600 & 85.96 & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & 6312.5 & \textbf{70333.3} \\ \hline
+\propername{Beam\_rider} & 9108 & 22.53 & \textbf{9297.6} & 29.03 & 693.5 & 6624.6 \\ \hline
+\propername{Berzerk} & \textbf{2096} & 58 & 802 & 73.47 & 195 & 553.5 \\ \hline
+\propername{Bowling} & \textbf{68.6} & 9.84 & 50.4 & 59.52 & 25.5 & 25.1 \\ \hline
+\propername{Boxing} & 100 & 15.2 & 100 & 22.3 & 100 & 100 \\ \hline
+\propername{Breakout} & 384.2 & 4.22 & \textbf{771.6} & 39.47 & 1.1 & 364.4 \\ \hline
+\propername{Centipede} & 99207.2 & 39.14 & 93067 & 65.49 & \textbf{125123} & 110422 \\ \hline
+\propername{Chopper\_command} & 2100 & 41.06 & 3800 & 40.94 & 1827.3 & \textbf{34018.8} \\ \hline
+\propername{Crazy\_climber} & 36160 & 3.61 & 36940 & 58.12 & 37110 & \textbf{98172.2} \\ \hline
+\propername{Enduro} & \textbf{500} & 65.69 & 359.4 & 37.66 & 0.6 & 286.3 \\ \hline
+\propername{Freeway} & \textbf{30.6} & 31.69 & 22.6 & 60.77 & 0 & 0.4 \\ \hline
+\propername{Frostbite} & \textbf{3582} & 12.25 & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & 137.2 & 270.5 \\ \hline
+\propername{Gravitar} & 3920 & 61.85 & \textbf{5980} & 62.45 & 395 & 2850 \\ \hline
+\propername{Hero} & \textbf{12887} & 36.63 & 7096.6 & 51.83 & 1323.8 & 12859.5 \\ \hline
+\propername{Jamesbond} & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & \textbf{8550} & 25.68 & 25 & 330 \\ \hline
+\propername{Kangaroo} & \textbf{5700} & 7.9 & 5320 & 31 & 90 & 1990 \\ \hline
+\propername{Krull} & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & \textbf{5124} & 36.82 & 3089.2 & 5037 \\ \hline
+\propername{Montezuma\_revenge} & 0 & 17.36 & \textbf{80} & 34.72 & 0 & 0 \\ \hline
+\propername{Ms\_pacman} & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & 14781 & 23.97 & 1708.5 & \textbf{22336} \\ \hline
+\propername{Pong} & \textbf{21} & 16.67 & \textbf{21} & 34.92 & -20.7 & \textbf{21} \\ \hline
+\propername{Pooyan} & 11225 & 7.97 & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & 909.7 & \textbf{17763.4} \\ \hline
+\propername{Qbert} & 3705 & 11.07 & 11680 & 34.61 & 132.8 & \textbf{17343.4} \\ \hline
+\propername{Riverraid} & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & \textbf{5062} & 36.53 & 2178.5 & 4449 \\ \hline
+\propername{Seaquest} & \textbf{14272} & 24.91 & 6138 & 33.38 & 288 & 5132.4 \\ \hline
+\propername{Space\_invaders} & 2877 & 21.37 & \textbf{3974} & 34.21 & 112.2 & 2718 \\ \hline
+\propername{Star\_gunner} & 1540 & 18.89 & \textbf{4660} & 17.62 & 1345 & 1207.1 \\ \hline
+\propername{Tennis} & \textbf{23.8} & 21.05 & 23.6 & 36.33 & -23.8 & 2.8 \\ \hline
+\propername{Venture} & 775 & 23.41 & \textbf{1080} & 27.78 & 0 & 0 \\ \hline
+\propername{Video\_pinball} & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & 62074.6 & 43.13 & 55567.3 & \textbf{254748} \\ \hline
+\propername{Zaxxon} & \multicolumn{1}{l}{--} & \multicolumn{1}{l|}{--} & 15680 & 31.01 & 0 & \textbf{22610} \\ \hline
+\multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} & \multicolumn{1}{l}{} \\ \hline
+Times Best (35 games)& \multicolumn{2}{c|}{12} & \multicolumn{2}{c|}{12} & 1 & 11 \\ \hline
+Times Better than UCT (35 games) & \multicolumn{2}{c|}{23} & \multicolumn{2}{c|}{22} & 1  & -- \\ \hline
+
 \end{tabular}
 }
 
- \caption{\small Performance that results from random policy and various  lookahead algorithms in 9 Atari games.
+ \caption{\small Performance that results from random policy and various  lookahead algorithms in 35 Atari games.
 The algorithms  are \BRFS, $\IW(1)$, \BFS, and \UCT. Averages  over 5 runs shown with ``random'' seeds
 $0$ to $4$, and maximum episode duration of $18,000$  frames. Every algorithm limited to a budget of
-100,000 simulated frames, except for UCT limited to 500 rollouts, 300 frames deep instead. Average scores and CPU times per action selection shown.
-Performance of UCT results  reported in \cite{bellemare:jair2013} shown in parenthesis.
-Numbers  in bold show best performer in terms of average score. }
+150,000 simulated frames, except for UCT limited to 500 rollouts, 300 frames deep instead. Average scores and CPU times per action selection shown.
+Performance of UCT taken from \cite{bellemare:jair2013}.
+Numbers  in bold show best performer in terms of average score.
+--Domains containing (--) are still computing,  each run can take 24 hours of computation. All domains from \cite{bellemare:jair2013}  will be ready for the camera ready--. }
 \label{performance}
 
 \end{table*}

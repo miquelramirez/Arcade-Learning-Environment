@@ -72,7 +72,7 @@ def check_trace( score_file, trace_file, game, algorithm  ):
         return e
 def retrieve_episodes( experiments_folder ) :
 	episodes = []
-	for root, dirs, files in os.walk('experiments_branching') :
+	for root, dirs, files in os.walk('experiments_300_reuse') :
 		game = os.path.split( root )[-2]
                 if "/" in game:
                         game = game.split("/")[1]               
@@ -293,7 +293,7 @@ class Algorithm_Performance :
 
 if __name__ == '__main__':
 
-	episodes = retrieve_episodes('experiments_branching')
+	episodes = retrieve_episodes('experiments_300_reuse')
 	print >> sys.stdout, len(episodes), 'episodes retrieved'
 	# the experimental data set is represented as a nested dictionary
 	# { game, { algorithm, instance of Algorithm Performance } }

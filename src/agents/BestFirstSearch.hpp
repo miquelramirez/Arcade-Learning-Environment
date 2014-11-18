@@ -18,7 +18,6 @@ public:
 	{
 		if ( b->novelty < a->novelty ) return true;
 		else if( b->novelty == a->novelty && b->fn < a->fn ) return true;
-		
 		return false;
 	}
     };
