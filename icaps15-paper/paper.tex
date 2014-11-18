@@ -41,6 +41,15 @@
 \newcommand{\Seaquest}{\propername{Seaquest}}
 \newcommand{\SpaceInvaders}{\propername{Space Invaders}}
 \newcommand{\Deepmind}{\propername{Deepmind}}
+\newcommand{\CrazyClimber}{\propername{Crazy\_climber}}
+\newcommand{\Kangaroo}{\propername{Kangaroo}}
+\newcommand{\Pooyan}{\propername{Pooyan}}
+\newcommand{\Berzerk}{\propername{Berzerk}}
+\newcommand{\Bowling}{\propername{Bowling}}
+\newcommand{\Montezuma}{\propername{Montezuma\_revenge}}
+\newcommand{\StarGunner}{\propername{Star\_gunner}}
+\newcommand{\Venture}{\propername{Venture}}
+
 
 % AAAI (comment for ECAI)
 % \newtheorem{theorem}{Theorem}
@@ -545,62 +554,133 @@ Numbers  in bold show best performer in terms of average score.
 \label{performance}
 
 \end{table*}
-
-We tested  $\IW(1)$ and \BFS\  over $9$ games: those considered in the \emph{training} set
-of \cite{bellemare:jair2013}, abbreviated  as BNVB, and those discussed in \cite{deep-mind-atari}.
-In Table~\ref{performance},  the performance of  $\IW(1)$ and \BFS\
+ We tested $\IW(1)$ and \BFS\ over $35$ games: those considered in
+\cite{bellemare:jair2013}, abbreviated as BNVB \footnote{The full set
+  of games is made of 55 games, 5 runs each. As each run takes around
+  24 hours of CPU time, we luck the resources to submit the full table
+  by the submission date, but the full table will be ready for the
+  camera ready version.}. In Table~\ref{performance}, the
+performance of $\IW(1)$ and \BFS\
 % , characterized by the average score obtained over all episodes, the standard deviation
 % of the score obtained and time (in seconds) per lookahead,
-is compared with that of \UCT, breadth-first search (\BRFS), and random action selection.
+is compared with that of \UCT\ and breadth-first search (\BRFS).
 The discount factor used by all the algorithms is $\gamma=0.995$ and the average scores
-reported for \UCT\ in  BNVB  are included in  parenthesis for reference. 
+reported for \BRFS\ and \UCT\ in  BNVB  are included for reference. 
 Our experimental setup  follows the one in BNVB with one exception: a maximum budget of  $150,000$ simulated frames 
-is applied to all the algorithms, including  \UCT\ that is limited to  $500$ base policy rollouts of depth $300$.
+is applied to \textit{all the algorithms}, including  \UCT\ that is limited to  $500$ base policy rollouts of depth $300$.
 % \footnote{In \UCT,  $500$ base policy rollouts
 % of depth $300$ is equivalent to a budget of $150,000$ simulated frames.}.
-The bound on the number of simulated frames is like a bound on lookahead time, 
-as most of the time in the lookahead search is spent in the calls to the emulator
-for computing the next RAM state.  Also in order to save time, as in BNVB,   all of the algorithms 
-reuse the subtree from  the previous lookahead that is rooted in the selected
-child, deleting its siblings and their descendants. More precisely, no calls to the
-emulator are done  for transitions that are cached in that subtree. As a result
-the number of nodes in the lookahead tree may be larger actually than the budget.
-In addition, in  \IW, the states that are ``reused''  from the  previous searches
-are ignored in the computation of the novelty of new states so that more states 
-can  escape pruning. Otherwise, \IW\ often doesn't use the full budget. This is not 
-needed in \BFS\ which does no pruning.  $\IW(1)$ and \BFS\ have been  limited 
-search up to a depth of $m=1500$  frames and up to $m=20,000$ frames per root branch.
-This is to avoid the search for going too deep or being too committed to a single
-root action. (**** Please revise ****).
+The bound on the number of simulated frames is like a bound on
+lookahead time, as most of the time in the lookahead search is spent
+in the calls to the emulator for computing the next RAM state.  Also,
+as in BNVB, all of the algorithms reuse the subtree from the previous
+lookahead that is rooted in the selected child, deleting its siblings
+and their descendants. More precisely, no calls to the emulator are
+done for transitions that are cached in that subtree. As a result the
+number of nodes in the lookahead tree may be larger actually than the
+budget. In addition, in \IW, the states that are ``reused'' from the
+previous searches are ignored in the computation of the novelty of new
+states so that more states can escape pruning. Otherwise, \IW\ often
+doesn't use the full budget. This is not needed in \BFS\ which does no
+pruning.  $\IW(1)$ and \BFS\ have been limited the search to a depth of
+$m=1500$ frames and up to $m=150,000$ frames per root branch. This is
+to avoid the search for going too deep or being too committed to a
+single root action. Similarly UCT defines a limit of $m=300$ frames
+for each rollout. Note that UCT is more likely to have a performance
+loss if the depth is increased, as the number of rollouts would
+decrease in order to maintain the same budget of $150,000$ simulated
+frames. The last difference inherited from BNVB between all algorithms
+and UCT, is that UCT selects an action randomly in the rollout every
+single frame, while the others select an action every 5 frames, and
+the remain ones are $no-op$, as is done in the simulation
+environment. Therefore, a node in all algorithms represent $5$ frames,
+but in UCT represents $1$ frame. As a result, a UCT rollout of depth
+$300$ frames involve the selection of 300 actions, decreasing the
+budget of simulated frames by $300$, while the other algorithms need a
+branch of $1500$ frames to select $300$ actions, decreasing the budget
+by $1500$ frames instead.
 
-Table~\ref{performance} shows that $\IW(1)$ and \BFS\ both outperform \BRFS\  and the random baseline.
-\BRFS\ rarely collects any reward, as the depth of the \BRFS\ search tree
-results in  a lookahead of $0.3$ seconds ($20$  frames or $4$ nodes deep).
-On the other hand, both $\IW(1)$ and \BFS\ reach states that are  up to $350$--$1500$ frames deep
-($70$--$260$ nodes or $6$--$22$ seconds), even if $\IW(1)$ doesn't always use all the simulation frames
-allocated due to its agressive pruning.
-%% case of \BFS, due to having a novelty of $0$ and the planning horizon being limited to $m$
-%%% (*** What is novelty $0$??? Not clear why BFS doesn't take all the budget.
+Table~\ref{performance} shows that $\IW(1)$ and \BFS\ both outperform
+\BRFS, which rarely collects any reward in many domains, as the
+depth of the \BRFS\ search tree results in a lookahead of $0.3$
+seconds ($20$ frames or $4$ nodes deep). On the other hand, both
+$\IW(1)$ and \BFS\ reach states that are up to $350$--$1500$ frames
+deep ($70$--$260$ nodes or $6$--$22$ seconds), even if $\IW(1)$
+doesn't always use all the simulation frames allocated due to its
+agressive pruning. This behaviour can be observed in games such as
+\Breakout, \CrazyClimber, \Kangaroo, and \Pooyan, where the average
+CPU time for each lookahead is up to $10$ times faster than \BFS. Note
+that computation time for \UCT\ and \BRFS\ is similar to \BFS, as the
+most expensive computation is to generate a frame through the
+simulator and all algorithms use always the full budget.
 
-Interestingly, simple $\IW(1)$ outperforms \UCT\ in $4$ out of $9$ games,
-both in terms of  average scores and average times per call. \BFS\ is
-faster than $\IW(1)$ and an order-of-magnitude faster than \UCT\ in general,
-and it  outscores \UCT\ in $2$ of the games (\Freeway\ and
-\Seaquest). Compared with the \UCT\ results in   \cite{bellemare:jair2013}, shown in parenthesis,
-both $\IW(1)$ and \BFS\  outperform \UCT\ in $3$ of the  $9$ games (\Breakout, \Enduro\ and \Freeway),
-with \BFS\ and \UCT\ tied in  \Pong. It'd  be very interesting to see the results of
-\BFS\ when given more time per action, but we don't have those results yet.
-As mentioned in the previous section, the order in which $\IW(1)$ and \BFS\ generate the children
-of an expanded node are randomized, something which has a potential effect on the  novelty measures
-of nodes, and hence in the search graph. We found that this randomization helps, in particular
-in \Qbert, where not randomizing results  in $\IW(1)$ being trapped into  loops sometimes.
 
-We also  note that in \Freeway,  both $\IW(1)$ and \BFS\ attain a score similar to the
-baseline semi-random algorithm \emph{Perturb} in  \cite{bellemare:jair2013},
-which outperforms   both \UCT\ and  the reinforcement learning methods.
-Likewise,  $\IW(1)$ outperforms the best learning algorithm in \cite{deep-mind-atari}
-in $4$ out of the  $7$ games considered, and \BFS\ does so in $5$  of
-the $7$ games.
+Interestingly, in terms of average scores out of $35$ games, simple $\IW(1)$ outperforms
+\BFS\ and \UCT\ in $18$ and $23$ games respectively,
+most often with lower average times per call. \BFS\ outscores \UCT\ in
+$22$ of the games \footnote{Note that both \IW\ and \BFS\ may improve, as 6 and 4 games  respectively are not reported in the table
+  yet.}. As mentioned in the
+previous section, the order in which $\IW(1)$ and \BFS\ generate the
+children of an expanded node is randomized, something which has a
+potential effect on the novelty measures of nodes, and hence in the
+search graph. We found that this randomization helps, in particular in
+\Qbert, where not randomizing results in $\IW(1)$ being trapped into
+loops sometimes.
+
+Likewise, $\IW(1)$ outperforms the best learning algorithm in
+\cite{deep-mind-atari} in $7$ out of the $7$ games considered, and
+\BFS\ does so in $6$ of the $7$ games.
+
+We also note that in \Freeway, \Berzerk, \Bowling, \Montezuma,
+\StarGunner, and \Venture, both $\IW(1)$ and \BFS\ attain a better
+score than the baseline semi-random algorithm \emph{Perturb} in
+\cite{bellemare:jair2013}, which outperforms both \UCT\ and the
+reinforcement learning methods. \emph{Perturb} performance helps
+understanding these domains. \emph{Perturb} selects a fixed action with probability
+0.95 and otherwise acts uniformly randomly, and the best run out of 10
+episodes is reported in BNVB. Note that all the other algorithms
+report average score instead. The behaviour of \emph{Perturb} hinder
+the nature of these domains: rewards are very deep, but tipically
+repeating the same action may lead to some reward. 
+
+Consider \Freeway, where a chicken has to run across a ten lane
+highway filled with traffic. Every time it gets across, we
+receive a point, i.e. a reward of 1. If the chicken is hit by a car,
+the chicken is forced back. 12 out of 18 possible actions have an
+effect: move up ( up-right, up-left, up-fire, up-right-fire,
+up-left-fire, all have same effect as up ) or move down ( down-right,
+down-left, down-fire, down-right-fire, down-left-fire, all have same
+effect as down ), the remaining 6 actions are like no-ops. It's easy
+to understand that \emph{Perturb} would achieve a high score if the
+selected action is move up with 0.95 probability. In the following link
+\url{http://www.youtube.com/playlist?list=PLXpQcXUQ_CwenUazUivhXyYvjuS6KQOI0}
+we can observe videos of \IW\ and \UCT\ playing \Freeway. As reported
+in Table~\ref{performance}, \UCT\ does not manage to take any chicken
+across the highway, while \IW\ is the best performer out of all tested
+algorithms. The main reason why \UCT\ performs so erratically is that
+the rollouts do not manage to collect any reward, as there is a
+$3^{-1}$ probability to choose any move up action, and given that the
+depth of the closest reward is about 200 frames deep, the probability
+of a rollout achieveing any reward is $3^{-200}$, which implies
+choosing 200 move-up actions. On the other hand, \IW\ manages to find
+rewards without exhausting the full budget. The main reason that
+explains this behaviour is that at most only 3 generated states from
+the same parent node will pass the novelty test, as in any expanded
+node there is at most 3 different new possible bytes in the RAM state
+resulting from moving up, down, or do-nothing.
+
+Another challenging game is \Montezuma. In this game rewards are very
+sparse, deep, and most of the actions lead to loosing a life, which
+only becomes effective after hundreds of frames, i.e. up-left may
+enforce jumping and falling until we loose a life. All algorithms achieve 0 score, wheter RL-based or Planning-based. But, as
+shown in Table~\ref{performance}, \BFS\ achieves an average score of
+80, which is still a very low score, as the first possible reward
+increases the score in 100. The best run by \BFS\ achieves a score of
+400, pointing out that \BFS\ still is not able to consistently find rewards. One way to improve the performance of any algorithm in \Montezuma\ is to encode the lost of a life as a negative reward. Capturing the lost of lifes in the reward function is relevant to many games where not loosing a life is important in later stages of the game. Currently,
+rewards are encoded directly as the change of score, which does not distinguish between the benefits of keeping lifes. This
+beahaviour is also observed in other games like \Breakout\ and \SpaceInvaders, where \BFS\
+is the best performer by far, although initially it looses all lifes but 1 and then plays extremely well. Videos on the link above illustrate
+this behaviour.
 
 We do not report the performance of $\IW(2)$ because  in our
 preliminary tests and according to the discussion in the previous section,
