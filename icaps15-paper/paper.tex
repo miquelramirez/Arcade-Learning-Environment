@@ -525,7 +525,7 @@ is compared with that of \UCT, breadth-first search (\BRFS), and random action s
 The discount factor used by all the algorithms is $\gamma=0.995$ and the average scores
 reported for \UCT\ in  BNVB  are included in  parenthesis for reference. 
 Our experimental setup  follows the one in BNVB with one exception: a maximum budget of  $150,000$ simulated frames 
-is applied to all the  algorithms, including  \UCT\ that is limited to  $500$ base policy rollouts of depth $300$.
+is applied to all the algorithms, including  \UCT\ that is limited to  $500$ base policy rollouts of depth $300$.
 % \footnote{In \UCT,  $500$ base policy rollouts
 % of depth $300$ is equivalent to a budget of $150,000$ simulated frames.}.
 The bound on the number of simulated frames is like a bound on lookahead time, 
@@ -647,8 +647,12 @@ $s$ that is a \emph{duplicate} of a state $s'$ that has been previously generate
 $s'$ is replaced by $s$ if $R(s) > R(s')$. Moreover in such a case, the change in reward 
 must be propagated to the descendants of $R(s')$ that are in memory. This is similar to the change required 
 in A* for preserving optimality when moving from consistent to inconsistent heuristics \cite{pearl:heuristics}. 
-The alternative is to ``reopen'' such nodes.  The same change is actually in \BFS\ to ensure that, 
-if given enough time, \BFS\ will actually find the optimal paths. The code used for \IW\ and \BFS\ in the
+The alternative is to ``reopen'' such nodes. 
+%The same change is actually in \BFS\ to ensure that, 
+%if given enough time, \BFS\ will actually find the optimal paths.
+Changing \BFS\ to account for such paths guarantees that, if given enough time, \BFS\ will actually find
+the optimal paths. 
+The code used for \IW\ and \BFS\ in the
 experiments above does not implement this change, however, as the overhead involved in checking for duplicates 
 in some test cases did not appear to pay off. More experimentation is probably needed.
 
