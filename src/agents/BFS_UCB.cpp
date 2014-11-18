@@ -28,6 +28,7 @@ int BFS_UCB::expand_node( TreeNode* curr_node )
 {
 	int num_simulated_steps =0;
 	int num_actions = available_actions.size();
+	static     int max_nodes_per_frame = max_sim_steps_per_frame / sim_steps_per_node;
 	bool leaf_node = (curr_node->v_children.empty());
 	m_expanded_nodes++;
 	if(curr_node->novelty == 1)
@@ -107,8 +108,9 @@ int BFS_UCB::expand_node( TreeNode* curr_node )
 	
 		// Don't expand duplicate nodes, or terminal nodes
 		if (!child->is_terminal) {
-		    if (! (ignore_duplicates && test_duplicate(child)) ){				
-				Q[m_current_queue]->push(child);
+		    if (! (ignore_duplicates && test_duplicate(child)) ){
+				if( child->num_nodes_reusable < max_nodes_per_frame )
+					Q[m_current_queue]->push(child);
 
 		    }
 		}
@@ -284,12 +286,6 @@ void BFS_UCB::expand_tree(TreeNode* start_node) {
 		if ( curr_node->depth() > m_max_depth ) m_max_depth = curr_node->depth();
 
 		/**
-		* check nodes that have been expanded by other queue
-		*/
-		if(  curr_node->already_expanded ) 
-			continue;
-		
-		/**
 		* check if subtree is bigger than max_budget of nodes
 		*/
 		if(  curr_node->num_nodes_reusable > max_nodes_per_frame  ) {
@@ -354,7 +350,7 @@ void BFS_UCB::expand_tree(TreeNode* start_node) {
 	
 	if ( queues_empty() ) std::cout << "Search Space Exhausted!" << std::endl;
 	for ( unsigned k = 0; k < Q.size(); k++ ) {
-		std::cout << "Size(Q[" << k << "]) = " << Q[k]->size()  << "V=" << V[k] << "N=" << N[k] << std::endl;
+		std::cout << "Size(Q[" << k << "]) = " << Q[k]->size()  << " V[" << k << "]=" << V[k] << " N[" << k << "]=" << N[k] << std::endl;
 	}
 		
 	update_branch_return(start_node);
