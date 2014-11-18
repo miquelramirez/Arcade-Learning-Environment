@@ -524,10 +524,8 @@ In Table~\ref{performance},  the performance of  $\IW(1)$ and \BFS\
 is compared with that of \UCT, breadth-first search (\BRFS), and random action selection.
 The discount factor used by all the algorithms is $\gamma=0.995$ and the average scores
 reported for \UCT\ in  BNVB  are included in  parenthesis for reference. 
-Our experimental setup  follows the one in BNVB with two exceptions: rather than
-considering $10$ runs per games, we considered just $5$ due to time constraints (*** ???),
-and  a maximum budget of  $150,000$ simulated frames is applied to all the  algorithms, 
-including  \UCT\ that is limited to  $500$ base policy rollouts of depth $300$.
+Our experimental setup  follows the one in BNVB with one exception: a maximum budget of  $150,000$ simulated frames 
+is applied to all the  algorithms, including  \UCT\ that is limited to  $500$ base policy rollouts of depth $300$.
 % \footnote{In \UCT,  $500$ base policy rollouts
 % of depth $300$ is equivalent to a budget of $150,000$ simulated frames.}.
 The bound on the number of simulated frames is like a bound on lookahead time, 
