@@ -43,24 +43,46 @@
 \newcommand{\BFS}{{\textsc{2BFS}}}
 \newcommand{\UCT}{{\textsc{UCT}}}
 
+\newcommand{\numgames}{$35$}
+
+\newcommand{\Assault}{\propername{Assault}}
 \newcommand{\Asterix}{\propername{Asterix}}
+\newcommand{\Asteroids}{\propername{Asteroids}}
+\newcommand{\Atlantis}{\propername{Atlantis}}
+\newcommand{\BankHeist}{\propername{Bank Heist}}
+\newcommand{\BattleZone}{\propername{Battle Zone}}
 \newcommand{\BeamRider}{\propername{Beam Rider}}
-\newcommand{\Breakout}{\propername{Breakout}}
-\newcommand{\Enduro}{\propername{Enduro}}
-\newcommand{\Freeway}{\propername{Freeway}}
-\newcommand{\Pong}{\propername{Pong}}
-\newcommand{\Qbert}{\propername{Q*Bert}}
-\newcommand{\Seaquest}{\propername{Seaquest}}
-\newcommand{\SpaceInvaders}{\propername{Space Invaders}}
-\newcommand{\Deepmind}{\propername{Deepmind}}
-\newcommand{\CrazyClimber}{\propername{Crazy\_climber}}
-\newcommand{\Kangaroo}{\propername{Kangaroo}}
-\newcommand{\Pooyan}{\propername{Pooyan}}
 \newcommand{\Berzerk}{\propername{Berzerk}}
 \newcommand{\Bowling}{\propername{Bowling}}
-\newcommand{\Montezuma}{\propername{Montezuma\_revenge}}
-\newcommand{\StarGunner}{\propername{Star\_gunner}}
+\newcommand{\Boxing}{\propername{Boxing}}
+\newcommand{\Breakout}{\propername{Breakout}}
+\newcommand{\Centipede}{\propername{Centipede}}
+\newcommand{\ChopperCommand}{\propername{Chopper Command}}
+\newcommand{\CrazyClimber}{\propername{Crazy Climber}}
+\newcommand{\Enduro}{\propername{Enduro}}
+\newcommand{\Freeway}{\propername{Freeway}}
+\newcommand{\Frostbite}{\propername{Frostbite}}
+\newcommand{\Gravitar}{\propername{Gravitar}}
+\newcommand{\Hero}{\propername{Hero}}
+\newcommand{\JamesBond}{\propername{James Bond}}
+\newcommand{\Kangaroo}{\propername{Kangaroo}}
+\newcommand{\Krull}{\propername{Krull}}
+\newcommand{\Montezuma}{\propername{Montezuma Revenge}}
+\newcommand{\MsPacman}{\propername{Ms Pacman}}
+\newcommand{\Pong}{\propername{Pong}}
+\newcommand{\Pooyan}{\propername{Pooyan}}
+\newcommand{\Qbert}{\propername{Q*Bert}}
+\newcommand{\RiverRaid}{\propername{Riverraid}}
+\newcommand{\Seaquest}{\propername{Seaquest}}
+\newcommand{\SpaceInvaders}{\propername{Space Invaders}}
+\newcommand{\StarGunner}{\propername{Star Gunner}}
+\newcommand{\Tennis}{\propername{Tennis}}
 \newcommand{\Venture}{\propername{Venture}}
+\newcommand{\VideoPinball}{\propername{Video Pinball}}
+\newcommand{\Zaxxon}{\propername{Zaxxon}}
+
+\newcommand{\Deepmind}{\propername{Deepmind}}
+
 
 % AAAI (comment for ECAI)
 % \newtheorem{theorem}{Theorem}
@@ -94,9 +116,9 @@
 %    {\normalsize\url{@unimelb.edu.au}}
 %    \And
 %    Miquel Ramirez \\
-%    RMIT University \\
-%    Melbourne, Australia\\
-%   {\normalsize\url{@rmit.edu.au}}
+%    Australian National University \\
+%    Canberra, Australia\\
+%   {\normalsize\url{@gmail.com}}
 %    \And
 %    Hector Geffner \\
 %    ICREA \&  Universitat Pompeu Fabra \\
@@ -120,7 +142,7 @@
 
 \begin{abstract}
 \begin{quote}
-The Atari  2600 games supported in  the Arcade Learning Environment (Bellemare et. al. 2013)
+The Atari 2600 games supported in  the Arcade Learning Environment~\cite{bellemare:jair2013}
 all feature a known initial (RAM) state and actions that have deterministic effects. Classical planners, however,
 cannot be used  for selecting actions  for  two reasons: first,  no  compact PDDL-model of  the games is given,
 and  more importantly,  the action effects and goals are  not known \emph{a priori}. Moreover, in these games there is usually
@@ -245,7 +267,7 @@ a set of actions applicable in each state, a
 transition function $f$ such that  $s' = f(a,s)$ is
 the state that results from applying action $a$  to the state $s$,
 and rewards $r(a,s)$ represented by real numbers that result from  applying action $a$ in state $s$.
-The transition and reward functions do not need to be known a priori, yet in that case, the
+The transition and reward functions do not need to be known \emph{a priori}, yet in that case, the
 state and  reward that results from the application of an action in a state needs to be \emph{observable}.
 The task is to compute an action sequence $a_0, \ldots, a_m$ for a large horizon $m$
 that generates a state sequence $s_0, \ldots, s_{m+1}$ that  maximizes the accumulated
@@ -372,7 +394,7 @@ Time and  memory outs  after 30 minutes or 2 GB. Table from \cite{nir:ecai2012}.
 
 \subsection{Performance and Width}
 
-\IW\ is a systematic and complete blind-search algorithm like breadth-first search (\BRFS) and iterative deepening (ID),
+\IW\ is a systematic and complete blind-search algorithm like breadth-first search (\BRFS) and iterative deepening (\ID),
 but   unlike these algorithms, it uses the factored representation of the states in terms of variables to structure the
 search in a different way. This structured exploration  has proved to be very
 effective over classical planning benchmark domains  when goals are  single atoms.\footnote{
@@ -392,7 +414,7 @@ on the one hand,  and  with a  Greedy Best First Search guided by the additive h
 to the one used by  the FF planner when hill climbing search fails \cite{hoffmann:ff}),
 it turns out that ``blind'' \IW\ solves as many problems as the informed search, 34,627 vs. 34,849, far ahead
 of the other blind algorithms \BRFS\ and \ID\  that solve 9,010 and 8,762 problems each. This is shown in the bottom
-part of  Table~\ref{table1}. Moreover, \IW\ is  faster and results in shorter plans than a heuristic search algotrithm
+part of  Table~\ref{table1}. Moreover, \IW\ is  faster and results in shorter plans than a heuristic search algorithm
 \cite{nir:ecai2012}.
 
 The min $k$ value for which $\IW(k)$ solves a problem  is bounded and small in most of
@@ -483,19 +505,20 @@ based on lookahead searches.
 \section{Experimental Results}
 
 \input{games-table}
-We tested \IW(1) and \BFS\ over $35$ of the 55 games considered in
+We tested \IW(1) and \BFS\ over \numgames\
+ of the $55$ games considered in
 \cite{bellemare:jair2013}, from now on  abbreviated as BNVB.\footnote{
 Entries marked as  ``--'' in the table are   still running at the time of submission. 
-Each run can take up to 24 hours of CPU time and there are 5 runs per game and algorithm. 
-Eventually all of  the  55 games will  be included in the evaluation.}
+Each run can take up to $24$ hours of CPU time and there are $10$ runs per game and algorithm. 
+Eventually all of  the  $55$ games will  be included in the evaluation.}
 Table~\ref{performance} shows the performance of $\IW(1)$ and \BFS\
 % , characterized by the average score obtained over all episodes, the standard deviation
 % of the score obtained and time (in seconds) per lookahead,
 in comparison  with breadth-first search (\BRFS) and \UCT.
-Videos of selected games played by \IW(1), \BFS, and \UCT\ can be 
+Videos of selected games played by $\IW(1)$, \BFS, and \UCT\ can be 
 seen in Youtube.\footnote{\url{http://www.youtube.com/playlist?list=PLXpQcXUQ_CwenUazUivhXyYvjuS6KQOI0}.}
 The discount factor used by  all the algorithms is $\gamma=0.995$.
-The scores for \BRFS\ and \UCT\ are from BNVB.  
+The scores reported for \BRFS\ and \UCT\ are taken from BNVB.  
 Our experimental setup  follows theirs except that a maximum budget of  $150,000$ simulated frames 
 is applied to \textit{all the algorithms}. \UCT\ uses this budget by running
  $500$   rollouts of depth $300$. % \footnote{In \UCT,  $500$ base policy rollouts
@@ -504,20 +527,20 @@ The bound on the number of simulated frames is like a bound on
 lookahead time, as most of the time in the lookahead  is spent
 in calls to the emulator for computing the next RAM state. 
 This is why the average time per action is similar to all the algorithms
-except \IW(1), that due to its agressive pruning does not always use
+except $\IW(1)$, that due to its aggressive pruning does not always use
 the full budget and takes less time per action on average.
 
 Also,  as reported by  BNVB, all of the algorithms 
-reuse the subtree from the previous lookahead that is rooted in the selected 
+reuse the sub-tree from the previous lookahead that is rooted in the selected 
 child, deleting its siblings and their descendants. More precisely, no calls 
-to the emulator are done for transitions that are cached in that subtree, 
+to the emulator are done for transitions that are cached in that sub-tree, 
 and such reused frames are not discounted from the budget that is thus a bound 
-on the number of ``new'' frames per lookahead. In addition, in \IW(1), the states that 
+on the number of ``new'' frames per lookahead. In addition, in $\IW(1)$, the states that 
 are ``reused'' from the previous searches are ignored in the computation of the novelty of 
-new states so that more states can escape pruning. Otherwise, \IW(1) often
+new states so that more states can escape pruning. Otherwise, $\IW(1)$ often
 uses a fraction of the  budget.  This is not needed in \BFS\ which does 
-no pruning.  \IW(1) and \BFS\ are  limited to  search up to a depth of
-$m=1500$ frames and up to $m=150,000$ frames per root branch. This is
+no pruning.  $\IW(1)$ and \BFS\ are  limited to  search up to a depth of
+$m=1,500$ frames and up to $m=150,000$ frames per root branch. This is
 to avoid the search from  going too deep or being too committed to a
 single root action. 
 % Similarly UCT defines a limit of $m=300$ frames for each rollout. 
@@ -526,20 +549,22 @@ single root action.
 % decrease in order to maintain the same budget of $150,000$ simulated
 % frames. 
 
-Last, \IW(1) and \BFS\ select an action every 5 frames, while UCT  selects 
+Last, \IW(1) and \BFS\ select an action every $5$ frames, while \UCT\  selects 
 an action in every frame.  This means that in order to explore a branch 
-300 frames deep, UCT gets to choose 300 actions, while \IW(1) and \BFS\ 
-get to choose 60 actions, both however using the same 300 frames from the
+$300$ frames deep, UCT gets to choose $300$ actions, while \IW($1$) and \BFS\ 
+get to choose $60$ actions, both however using the same $300$ frames from the
 budget. For this, we  followed the setup  of \BRFS\ in BNVB 
-that also selects  actions every 5 frames. Since the lookahead budget 
-is given by a maximum number of (new) frames, and the time is mostly taken by 
-calls to the emulator, this may not be the best choice  for \IW(1)\ 
-and \BFS\ that are therefore not exploiting all the options afforded
-by the budget. We hope to fix this gap in the future.
+that also selects actions every $5$ frames, matching the behavior
+of the emulator that requests an action also every $5$ frames. Since the 
+lookahead budget is given by a maximum number of (new) frames, and the time 
+is mostly taken by calls to the emulator, this may not be the best choice  
+for $\IW(1)$ and \BFS\ that may therefore not be exploiting all the 
+options afforded by the budget. We hope to investigate the implications of
+this gap in the future.
 
 \Omit{
 The last difference inherited from BNVB between all algorithms
-and UCT, is that UCT selects an action randomly in the rollout every
+and \UCT\, is that \UCT\ selects an action randomly in the rollout every
 single frame, while the others select an action every 5 frames, and
 the remain ones are $no-op$, as is done in the simulation
 environment. Therefore, a node in all algorithms represent $5$ frames,
@@ -551,13 +576,14 @@ by $1500$ frames instead.
 }
 
 
-Table~\ref{performance} shows that both $\IW(1)$ and \BFS\  outperform
-\BRFS, which rarely collects any reward in many domains, as the
-depth of the \BRFS\ search tree results in a lookahead of $0.3$
-seconds ($20$ frames or $4$ nodes deep). On the other hand, both
-$\IW(1)$ and \BFS\ reach states that are up to $350$--$1500$ frames
-deep ($70$--$260$ nodes or $6$--$22$ seconds), even if $\IW(1)$
-doesn't always use all the simulation frames allocated due to its
+Table~\ref{performance} shows that both $\IW(1)$ and \BFS\ generally
+ outperform \BRFS, which rarely collects any reward in many domains, as 
+ the depth of the \BRFS\ search tree results in a lookahead of $0.3$
+seconds ($20$ frames or $4$ nodes deep). The notable exception to this
+is \Centipede\ where abundant reward can be collected with a shallow
+lookahead. On the other hand, both $\IW(1)$ and \BFS\ reach states that 
+are up to $350$--$1,500$ frames deep ($70$--$260$ nodes or $6$--$22$ seconds), 
+even if $\IW(1)$ does not always use all the simulation frames allocated due to its
 pruning. This behaviour can be observed in games such as
 \Breakout, \CrazyClimber, \Kangaroo, and \Pooyan, where the average
 CPU time for each lookahead is up to $10$ times faster than \BFS. 
@@ -567,15 +593,16 @@ frames through the simulator,  and these three  algorithms
 always use  the full budget.
 
 
-More interestingly,  \IW(1) outscores \UCT\  in 17 of the 35 games,
-while \BFS\ outscores \UCT\ in 18.\footnote{These numbers can actually
-improve further as 6  games for \IW(1) and 4 games for \BFS\ are still running.}
-On the other, \UCT\ does better than \IW(1) and \BFS\ in 9 and 11 games respectively.
-The relative performance between \IW(1)\ and \BFS\ is closer with \IW(1) being  the
-best of the two in 12 games, and  \BFS\  in 11. In terms of the number of games 
+More interestingly,  \IW(1) outscores \UCT\  in $17$ of the \numgames\ games,
+while \BFS\ outscores \UCT\ in $18$.
+%\footnote{These numbers can actually
+%improve further as 6  games for \IW(1) and 4 games for \BFS\ are still running.}
+On the other, \UCT\ does better than $\IW(1)$ and \BFS\ in $9$ and $11$ games respectively.
+The relative performance between $\IW(1)$ and \BFS\ is closer with $\IW(1)$ being  the
+best of the two in $12$ games, and  \BFS\  in $11$. In terms of the number of games 
 where an algorithm is the overall winner, the situation is  even: 
-\IW(1) is the overall best in 12 games, \BFS\ in 11 games, and \UCT\ in 12 games. 
-Also, \BRFS\ is best in 1 game (Centipede), while the other three algorithms
+$\IW(1)$ is the overall best in $12$ games, \BFS\ in $11$ games, and \UCT\ in $12$ games. 
+Also, \BRFS\ is best in $1$ game (\Centipede), while the other three algorithms
 are tied in another game (\Pong).
 
 \Omit{As mentioned in the
@@ -587,36 +614,36 @@ search graph. We found that this randomization helps, in particular in
 loops sometimes.}
 
 
-$\IW(1)$ also outperforms the best learning algorithm in
-\cite{deep-mind-atari} in the $7$ games considered, and
-\BFS\ does so in $6$ of the $7$ games. Likewise, in \Freeway, \Berzerk, \Bowling, \Montezuma,
-\StarGunner, and \Venture, both $\IW(1)$ and \BFS\ attain a better
+Likewise, in \Freeway\ and \Berzerk\ both $\IW(1)$ and \BFS\ attain a better
 score than the baseline semi-random algorithm \emph{Perturb} in
-\cite{bellemare:jair2013}.
+\cite{bellemare:jair2013}, that beats \UCT\ on those games.
 %% to say the 2 lines below must add context: .. eg
 %%% ``which in *these games* outperforms both \UCT\ and the reinforcement learning methods.''
 %% add it if that's the case ..
 \emph{Perturb} is a simple algorithm
-that selects  a fixed  action with probability 0.95, and a random
-action with probability 0.05.  For \emph{Perturb}, BNVB do not report 
+that selects  a fixed  action with probability $0.95$, and a random
+action with probability $0.05$.  For \emph{Perturb}, BNVB do not report 
 the average score  but the  best score.  \emph{Perturb} manages to do well in domains where rewards
-are deep but can be  reached by  repeating the same action.
+are deep but can be reached by  repeating the same action.
 This is the case of \Freeway, where a chicken has to run across a ten lane
 highway filled with traffic. Every time the chicken gets across, there is one
 unit of reward. If the chicken is hit by a car, it has to start again. 
-In \Freeway, 12 out of 18 possible actions have an effect:
-6 actions behave as move-up (up-right, up-left, up-fire, up-right-fire, up-left-fire) , 
-6 as  move-down (down-right, down-left, down-fire, down-right-fire, down-left-fire), 
-and 6 actions do nothing.  \emph{Perturb}  does well in this domain 
-when the selected fixed action is move-up.  As seen 
-in Table~\ref{performance}, \UCT\ does not manage to take any chicken
-across the highway. The reason that  \UCT\ performs so erratically 
-and the rollouts do not manage to collect any reward, is that there  is a $1/3$ probability of  
-choosing a move up action,  and   200 move up actions are required  in order to collect a reward. 
+In \Freeway, only $12$ out of $18$ possible actions have an effect:
+$6$ actions in moving the chicken up one lane (up-right, up-left, up-fire, up-right-fire, up-left-fire), 
+$6$ in moving the chicken down one lane (down-right, down-left, down-fire, down-right-fire, down-left-fire), 
+and $6$ actions do nothing.  \emph{Perturb}  does well in this domain 
+when the selected fixed action is one of the $6$ that moves the chicken up.  As noted 
+in Table~\ref{performance} and seen in the provided video, \UCT\ does not manage to take the chicken
+across the highway at all. The reason for \UCT\ to perform erratically 
+is that the roll-outs do not manage to collect any reward. A sequence of actions 
+with at least $10$ actions embedded that move the chicken up are required in order 
+to collect a reward. Since the probability for the roll-out to do an action that moves the chicken up 
+is $1/3$, the likelihood of \UCT\ generating such a sequence of actions with the parameters chosen
+by BNVB is rather low.
 %% the previous number was not correct; no-op actions do not count, and thus needs
 %%% 200 more move up actions than move down actions, although this is not accurate either
 %%%% as move down actions that take chicken below the screen count as no-ops too ..
-\IW\ does not have this limitation and is best in \Freeway.
+$\IW(1)$ does not have this limitation and is best in \Freeway.
 
 %%
 %%% Sobre texto below; no me convence; no sabemos como cambia el RAM aunque podamos suponer
@@ -627,18 +654,25 @@ choosing a move up action,  and   200 move up actions are required  in order to 
 %% node there is at most 3 different new possible bytes in the RAM state
 %% resulting from moving up, down, or do-nothing.
 
-Another challenging game is \Montezuma. In this game rewards are very
-sparse, deep, and most of the actions lead to losing a  life with
-no immediate penalty or consequence.  All algorithms achieve 0 score, 
-except for \BFS\ that achieves an average score of 80, and a score
-of 400 in one of the runs. This means that even \BFS\  is not able to 
+$\IW(1)$ also outperforms the best learning algorithm in
+\cite{deep-mind-atari} in the $7$ games considered there, and
+\BFS\ does so in $6$ of the $7$ games. Comparing 
+with the scores reported for the best Reinforcement Learning algorithm
+in \cite{bellemare:jair2013}, we note that either $\IW(1)$ and \BFS\ 
+are outperforming significantly the best learning algorithm, in those games
+where it is reported to perform better than \UCT\ (\Montezuma, \Venture\
+and \Bowling). In \Montezuma\ rewards are very
+sparse, deep, and most of the actions lead to losing a life with
+no immediate penalty or consequence.  All algorithms achieve $0$ score, 
+except for \BFS\ that achieves an average score of $80$, and a score
+of $400$ in one of the runs. This means that even \BFS\  is not able to 
 consistently find rewards in this game. This game and several other games 
 like \Breakout, and \SpaceInvaders\ could be much simpler by adding
 negative rewards for losing a life. We have indeed observed that
-our planning algorithms don't care much about losing lifes
-until there is just one life left, when they play much better.
-This can be seen in the videos mentioned above, and points
-to a simple form of learning that would be useful both
+our planning algorithms do not care much about losing lives
+until there is just one life left, when their play noticeably improves.
+This can be seen in the videos mentioned above, and suggests that
+ some simple form of learning would be useful both
 for planners and reinforcement learning approaches.
 
 We are not  reporting  the performance of $\IW(k)$ with parameter $k=2$ because  in our
@@ -735,14 +769,18 @@ There are several  issues worth studying, we  mention two of them.
 Regarding planning, the results show the potential of width-based algorithms
 for a broader class of planning problems. As shown, indeed, these algorithms
 do not require PDDL encodings and can deal with state successor functions
-encoded procedurally (as in simulators) as long as the structure of the states 
-is known. Regarding the Atari games, two problems of  all the  planning methods
-in ALE are first,  that by using the RAM state of the Atari console they are ``cheating'', 
-as they use information that is not available to the human player, and second, 
-that they do not get better with experience. In the future, we would like to explore 
-whether  variations of these algorithms  can be used to play  from the information in the  
-screen state as opposed to the RAM state, and potential uses of the  new ideas
-for learning to improve performance. 
+encoded \emph{procedurally} (as in simulators) as long as the structure of the states 
+is known. This suggests to us that the algorithms discussed in the 
+present paper could be applied in a broad variety of settings where only on-line 
+action selection is feasible or suitable.
+
+Regarding the Atari games, we identify two problems in all the planning methods
+discussed. First, by using the RAM state of the Atari console one can consider
+that they are ``cheating'', as they use information that is not readily available to the human player, 
+and second, they do not get better with experience. In the future, we would like to explore 
+whether variations of these algorithms  can be used to play from the information conveyed by the  
+ state of screen pixels as opposed to the RAM state, as well as exploring the potential uses of the novel
+ideas presented for learning, in order to improve performance. 
 
 %%% - Learning in same instance, across diff instances of same game, etc.
 %%%% - Learning controllers vs. on-line planning, etc
