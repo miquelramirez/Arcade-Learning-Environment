@@ -637,9 +637,9 @@ in Table~\ref{performance} and seen in the provided video, \UCT\ does not manage
 across the highway at all. The reason for \UCT\ to perform erratically 
 is that the roll-outs do not manage to collect any reward. A sequence of actions 
 with at least $10$ actions embedded that move the chicken up are required in order 
-to collect a reward. Since the probability for the roll-out to do an action that moves the chicken up 
-is $1/3$, the likelihood of \UCT\ generating such a sequence of actions with the parameters chosen
-by BNVB is rather low.
+to collect a reward. Since the probability for the roll-out to choose an action that moves the chicken up 
+is $1/3$, with the parameters chosen by BNVB, the likelihood of \UCT\ generating such a sequence of actions 
+that \emph{also} avoids incoming traffic in a timely fashion is rather low.
 %% the previous number was not correct; no-op actions do not count, and thus needs
 %%% 200 more move up actions than move down actions, although this is not accurate either
 %%%% as move down actions that take chicken below the screen count as no-ops too ..
