@@ -40,6 +40,11 @@ void MontezumaRevengeSettings::step(const System& system) {
 
     // update terminal status
     int new_lives = readRam(&system, 0xBA);
+    int m_lives = new_lives;
+    // if( new_lives < 5){
+    // 	//std::cout << "new lives" << new_lives << std::endl;
+    // 	m_reward = -10;
+    // }
     int some_byte = readRam(&system, 0xFE);
     m_terminal = new_lives == 0 && some_byte == 0x60;
 }

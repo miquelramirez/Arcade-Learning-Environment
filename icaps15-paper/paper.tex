@@ -532,7 +532,7 @@ seen in Youtube.\footnote{\url{http://www.youtube.com/playlist?list=PLXpQcXUQ_Cw
 The discount factor used by  all the algorithms is $\gamma=0.995$.
 The scores reported for \BRFS\ and \UCT\ are taken from BNVB.  
 Our experimental setup  follows theirs except that a maximum budget of  $150,000$ simulated frames 
-is applied to \textit{all the algorithms}. \UCT\ uses this budget by running
+is applied to $\IW(1)$, \BFS, and \UCT. \UCT\ uses this budget by running
  $500$   rollouts of depth $300$. % \footnote{In \UCT,  $500$ base policy rollouts
 % of depth $300$ is equivalent to a budget of $150,000$ simulated frames.}.
 The bound on the number of simulated frames is like a bound on
@@ -571,8 +571,7 @@ of the emulator that requests an action also every $5$ frames. Since the
 lookahead budget is given by a maximum number of (new) frames, and the time 
 is mostly taken by calls to the emulator, this may not be the best choice  
 for $\IW(1)$ and \BFS\ that may therefore not be exploiting all the 
-options afforded by the budget. We hope to investigate the implications of
-this gap in the future.
+options afforded by the budget. We'll look at this further in the future.
 
 \Omit{
 The last difference inherited from BNVB between all algorithms
@@ -609,7 +608,7 @@ More interestingly,  \IW(1) outscores \UCT\  in $27$ of the \numgames\ games,
 while \BFS\ outscores \UCT\ in $21$.
 %\footnote{These numbers can actually
 %improve further as 6  games for \IW(1) and 4 games for \BFS\ are still running.}
-On the other, \UCT\ does better than $\IW(1)$ and \BFS\ in $15$ and $17$ games respectively.
+On the other hand, \UCT\ does better than $\IW(1)$ and \BFS\ in $15$ and $17$ games respectively.
 The relative performance between $\IW(1)$ and \BFS\ makes $\IW(1)$  the
 best of the two in $22$ games, and  \BFS\  in $12$. In terms of the number of games 
 where an algorithm is the overall winner, $\IW(1)$  domainates the others: 
@@ -637,26 +636,30 @@ that selects  a fixed  action with probability $0.95$, and a random
 action with probability $0.05$.  For \emph{Perturb}, BNVB do not report 
 the average score  but the  best score.  \emph{Perturb} manages to do well in domains where rewards
 are deep but can be reached by  repeating the same action.
-This is the case of \Freeway, where a chicken has to run across a ten lane
-highway filled with traffic. Every time the chicken gets across, there is one
+This is the case of \Freeway, where a chicken has to run to the top of the screen across a ten lane
+highway filled with traffic. Every time the chicken gets across (starting at the bottom), there is one
 unit of reward. If the chicken is hit by a car, it goes back some lanes. 
-In \Freeway, only $12$ out of $18$ possible actions have an effect:
-$6$ actions in moving the chicken up one lane (up-right, up-left, up-fire, up-right-fire, up-left-fire), 
-$6$ in moving the chicken down one lane (down-right, down-left, down-fire, down-right-fire, down-left-fire), 
+In \Freeway, only $12$ out of the $18$ possible actions have an effect:
+$6$ actions move the chicken up (up-right, up-left, up-fire, up-right-fire, up-left-fire), 
+$6$ actions move the chicken down (down-right, down-left, down-fire, down-right-fire, down-left-fire), 
 and $6$ actions do nothing.  \emph{Perturb}  does well in this domain 
-when the selected fixed action is one of the $6$ that moves the chicken up.  As noted 
+when the selected fixed action moves the chicken up.  As noted 
 in Table~\ref{performance} and seen in the provided video, \UCT\ does not manage to take the chicken
-across the highway at all. The reason for \UCT\ to perform erratically 
-is that the roll-outs do not manage to collect any reward. A sequence of actions 
-with at least $48$~\footnote{One needs to move up the chicken up for at least $4$ seconds ($240$ frames) in order to get across the 
-highway.} actions embedded that move the chicken up are required in order 
-to collect a reward. Since the probability for the roll-out to choose an action that moves the chicken up 
-is $1/3$, with the parameters chosen by BNVB, the likelihood of \UCT\ generating such a sequence of actions 
-that \emph{also} avoids incoming traffic in a timely fashion is rather low.
-%% the previous number was not correct; no-op actions do not count, and thus needs
-%%% 200 more move up actions than move down actions, although this is not accurate either
-%%%% as move down actions that take chicken below the screen count as no-ops too ..
-$\IW(1)$ does not have this limitation and is best in \Freeway.
+across the highway at all. 
+%
+The reason that \UCT\ does not collect any reward is that it needs to move the chicken up
+at least 240 times~\footnote{One needs to move the chicken up for at least $4$ seconds ($240$ frames) in order to get across the 
+highway.} something that is very unlikely in a random exploration. $\IW(1)$ does not have this limitation and is best in \Freeway.
+%% The reason for \UCT\ to perform erratically 
+%% is that the roll-outs do not manage to collect any reward. A sequence of actions 
+%% with at least $48$ actions embedded that move the chicken up are required in order 
+%% to collect a reward. Since the probability for the roll-out to choose an action that moves the chicken up 
+%% is $1/3$, with the parameters chosen by BNVB, the likelihood of \UCT\ generating such a sequence of actions 
+%% that \emph{also} avoids incoming traffic in a timely fashion is rather low.
+%% %% the previous number was not correct; no-op actions do not count, and thus needs
+%% %%% 200 more move up actions than move down actions, although this is not accurate either
+%% %%%% as move down actions that take chicken below the screen count as no-ops too ..
+%% $\IW(1)$ does not have this limitation and is best in \Freeway.
 
 %%
 %%% Sobre texto below; no me convence; no sabemos como cambia el RAM aunque podamos suponer
@@ -669,12 +672,10 @@ $\IW(1)$ does not have this limitation and is best in \Freeway.
 
 $\IW(1)$ also outperforms the best learning algorithm in
 \cite{deep-mind-atari} in the $7$ games considered there, and
-\BFS\ does so in $6$ of the $7$ games. Comparing 
-with the scores reported for the best Reinforcement Learning algorithm
-in \cite{bellemare:jair2013}, we note that either $\IW(1)$ and \BFS\ 
-are outperforming significantly the best learning algorithm, in those games
-where it is reported to perform better than \UCT\ (\Montezuma, \Venture\
-and \Bowling). In \Montezuma\ rewards are very
+\BFS\ does so in $6$ of the $7$ games. Comparing with the scores reported for the reinforcement learning algorithms by BNVB,
+we note that both $IW(1)$ and \BFS\ do much better than the best learning algorithm in
+those games where the learning algorithms outperform \UCT\ like \Montezuma, \Venture\
+and \Bowling.  In \Montezuma\ rewards are very
 sparse, deep, and most of the actions lead to losing a life with
 no immediate penalty or consequence.  All algorithms achieve $0$ score, 
 except for \BFS\ that achieves an average score of $80$, and a score
@@ -684,9 +685,9 @@ like \Breakout, and \SpaceInvaders\ could be much simpler by adding
 negative rewards for losing a life. We have indeed observed that
 our planning algorithms do not care much about losing lives
 until there is just one life left, when their play noticeably improves.
-This can be seen in the videos mentioned above, and suggests that
- some simple form of learning would be useful both
-for planners and reinforcement learning approaches.
+This can be seen in the videos mentioned above, and suggest a simple form of learning that would be useful to both planners
+and reinforcement learning algorithms.
+
 
 We are not  reporting  the performance of $\IW(k)$ with parameter $k=2$ because  in our
 preliminary tests and according to the discussion in the previous section,
@@ -752,15 +753,15 @@ The notions of width and the \IW\  algorithm guarantee that  states with low wid
 in low polynomial time through \emph{shortest} paths. In the presence of rewards like the Atari games,
 however, the  interest is not  in the shortest paths but in the \emph{best} paths; i.e, the paths with
 maximum reward.  \IW\ may actually  fail to find such paths even when calling \IW($k$) with a high 
-$k$ parameter. Optimality  could be  achieved then  by replacing the breadth-first search
+$k$ parameter. Optimality  could be  achieved by replacing the breadth-first search
 underlying \IW($k$) by Dijkstra's algorithm yet such a move would make the relation between
 \IW\ and the notion of width less clear. A better  option is to change  \IW\ to comply with 
 a different property; namely, that if there is a ``rewarding'' path made up of states of 
 low width, then \IW\ will find such paths or better ones in time that is exponential 
 in their width. For this,  a simple change in \IW\ suffices: when generating a state 
 $s$ that is a \emph{duplicate} of a state $s'$ that has been previously generated and not pruned, 
-$s'$ is replaced by $s$ if $R(s) > R(s')$. Moreover in such a case, the change in reward 
-must be propagated to the descendants of $R(s')$ that are in memory. This is similar to the change required 
+$s'$ is replaced by $s$ if $R(s) > R(s')$, with the change of reward propagated to the descendants of $s'$
+that are in memory. This is similar to the change required 
 in the  A* search algorithm for preserving optimality when moving from consistent to inconsistent heuristics \cite{pearl:heuristics}. 
 The alternative is to ``reopen'' such nodes. The same change is actually needed in \BFS\ to ensure that, 
 if given enough time, \BFS\ will actually find optimal paths.
@@ -783,17 +784,16 @@ Regarding planning, the results show the potential of width-based algorithms
 for a broader class of planning problems. As shown, indeed, these algorithms
 do not require PDDL encodings and can deal with state successor functions
 encoded \emph{procedurally} (as in simulators) as long as the structure of the states 
-is known. This suggests to us that the algorithms discussed in the 
-present paper could be applied in a broad variety of settings where only on-line 
-action selection is feasible or suitable.
+is known. 
+%% This suggests to us that the algorithms discussed in the 
+%% present paper could be applied in a broad variety of settings where only on-line 
+%% action selection is feasible or suitable.
 
 Regarding the Atari games, we identify two problems in all the planning methods
 discussed. First, by using the RAM state of the Atari console one can consider
-that they are ``cheating'', as they use information that is not readily available to the human player, 
-and second, they do not get better with experience. In the future, we would like to explore 
+that they are ``cheating'', as they use information that is not available to the human player. And second, they do not get better with experience. In the future, we would like to explore 
 whether variations of these algorithms  can be used to play from the information conveyed by the  
- state of screen pixels as opposed to the RAM state, as well as exploring the potential uses of the novel
-ideas presented for learning, in order to improve performance. 
+ state of screen pixels as opposed to the RAM state, and the potential uses of the new ideas for learning to improve performance. 
 
 %%% - Learning in same instance, across diff instances of same game, etc.
 %%%% - Learning controllers vs. on-line planning, etc

@@ -54,6 +54,8 @@ class MontezumaRevengeSettings : public RomSettings {
         bool m_terminal;
         reward_t m_reward;
         reward_t m_score;
+        reward_t m_lives;
+    
 };
 
 #endif // __MONTEZUMAREVENGE_HPP__
