@@ -18,7 +18,7 @@
 \newcolumntype{a}{>{\columncolor{Gray}}c}
 \newcolumntype{b}{>{\columncolor{LightCyan}}c}
 
-\newcommand{\mc}[2]{\multicolumn{#1}{b}{#2}}
+\newcommand{\mc}[2]{\multicolumn{#1}{a}{#2}}
 
 
 
@@ -43,7 +43,7 @@
 \newcommand{\BFS}{{\textsc{2BFS}}}
 \newcommand{\UCT}{{\textsc{UCT}}}
 
-\newcommand{\numgames}{$35$}
+\newcommand{\numgames}{$48$}
 
 \newcommand{\Assault}{\propername{Assault}}
 \newcommand{\Asterix}{\propername{Asterix}}
@@ -56,29 +56,41 @@
 \newcommand{\Bowling}{\propername{Bowling}}
 \newcommand{\Boxing}{\propername{Boxing}}
 \newcommand{\Breakout}{\propername{Breakout}}
+\newcommand{\Carnival}{\propername{Carnival}}
 \newcommand{\Centipede}{\propername{Centipede}}
 \newcommand{\ChopperCommand}{\propername{Chopper Command}}
 \newcommand{\CrazyClimber}{\propername{Crazy Climber}}
+\newcommand{\DoubleDunk}{\propername{Double Dunk}}
 \newcommand{\Enduro}{\propername{Enduro}}
+\newcommand{\FishingDerby}{\propername{Fishing Derby}}
 \newcommand{\Freeway}{\propername{Freeway}}
 \newcommand{\Frostbite}{\propername{Frostbite}}
 \newcommand{\Gravitar}{\propername{Gravitar}}
 \newcommand{\Hero}{\propername{Hero}}
 \newcommand{\JamesBond}{\propername{James Bond}}
+\newcommand{\JourneyEscape}{\propername{Journey Escape}}
 \newcommand{\Kangaroo}{\propername{Kangaroo}}
 \newcommand{\Krull}{\propername{Krull}}
+\newcommand{\KungFuMaster}{\propername{Kung Fu Master}}
 \newcommand{\Montezuma}{\propername{Montezuma Revenge}}
 \newcommand{\MsPacman}{\propername{Ms Pacman}}
+\newcommand{\NameThisGame}{\propername{Name This Game}}
 \newcommand{\Pong}{\propername{Pong}}
 \newcommand{\Pooyan}{\propername{Pooyan}}
+\newcommand{\PrivateEye}{\propername{Private Eye}}
 \newcommand{\Qbert}{\propername{Q*Bert}}
 \newcommand{\RiverRaid}{\propername{Riverraid}}
+\newcommand{\RobotTank}{\propername{Robot Tank}}
 \newcommand{\Seaquest}{\propername{Seaquest}}
 \newcommand{\SpaceInvaders}{\propername{Space Invaders}}
 \newcommand{\StarGunner}{\propername{Star Gunner}}
 \newcommand{\Tennis}{\propername{Tennis}}
+\newcommand{\TimePilot}{\propername{Time Pilot}}
+\newcommand{\Tutankham}{\propername{Tutankham}}
+\newcommand{\UpNDown}{\propername{Up And Down}}
 \newcommand{\Venture}{\propername{Venture}}
 \newcommand{\VideoPinball}{\propername{Video Pinball}}
+\newcommand{\WizardOfWor}{\propername{Wizard Of Wor}}
 \newcommand{\Zaxxon}{\propername{Zaxxon}}
 
 \newcommand{\Deepmind}{\propername{Deepmind}}
@@ -549,7 +561,7 @@ single root action.
 % decrease in order to maintain the same budget of $150,000$ simulated
 % frames. 
 
-Last, \IW(1) and \BFS\ select an action every $5$ frames, while \UCT\  selects 
+Last, \IW(1) and \BFS\  in the lookahead select an action every $5$ frames, while \UCT\  selects 
 an action in every frame.  This means that in order to explore a branch 
 $300$ frames deep, UCT gets to choose $300$ actions, while \IW($1$) and \BFS\ 
 get to choose $60$ actions, both however using the same $300$ frames from the
@@ -593,17 +605,17 @@ frames through the simulator,  and these three  algorithms
 always use  the full budget.
 
 
-More interestingly,  \IW(1) outscores \UCT\  in $17$ of the \numgames\ games,
-while \BFS\ outscores \UCT\ in $18$.
+More interestingly,  \IW(1) outscores \UCT\  in $27$ of the \numgames\ games,
+while \BFS\ outscores \UCT\ in $21$.
 %\footnote{These numbers can actually
 %improve further as 6  games for \IW(1) and 4 games for \BFS\ are still running.}
-On the other, \UCT\ does better than $\IW(1)$ and \BFS\ in $9$ and $11$ games respectively.
-The relative performance between $\IW(1)$ and \BFS\ is closer with $\IW(1)$ being  the
-best of the two in $12$ games, and  \BFS\  in $11$. In terms of the number of games 
-where an algorithm is the overall winner, the situation is  even: 
-$\IW(1)$ is the overall best in $12$ games, \BFS\ in $11$ games, and \UCT\ in $12$ games. 
-Also, \BRFS\ is best in $1$ game (\Centipede), while the other three algorithms
-are tied in another game (\Pong).
+On the other, \UCT\ does better than $\IW(1)$ and \BFS\ in $15$ and $17$ games respectively.
+The relative performance between $\IW(1)$ and \BFS\ makes $\IW(1)$  the
+best of the two in $22$ games, and  \BFS\  in $12$. In terms of the number of games 
+where an algorithm is the overall winner, $\IW(1)$  domainates the others: 
+$\IW(1)$ is the overall best in $23$ games, \BFS\ in $11$ games, and \UCT\ in $18$ games. 
+Also, \BRFS\ is best in $2$ games (\Centipede, tied up in \Boxing), while the other three algorithms
+are tied in another 2 games (\Pong, \Boxing), and $\IW(1)$ and \BFS\ are tied in \TimePilot.
 
 \Omit{As mentioned in the
 previous section, the order in which $\IW(1)$ and \BFS\ generate the
@@ -627,7 +639,7 @@ the average score  but the  best score.  \emph{Perturb} manages to do well in do
 are deep but can be reached by  repeating the same action.
 This is the case of \Freeway, where a chicken has to run across a ten lane
 highway filled with traffic. Every time the chicken gets across, there is one
-unit of reward. If the chicken is hit by a car, it has to start again. 
+unit of reward. If the chicken is hit by a car, it goes back some lanes. 
 In \Freeway, only $12$ out of $18$ possible actions have an effect:
 $6$ actions in moving the chicken up one lane (up-right, up-left, up-fire, up-right-fire, up-left-fire), 
 $6$ in moving the chicken down one lane (down-right, down-left, down-fire, down-right-fire, down-left-fire), 
