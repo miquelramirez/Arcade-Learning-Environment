@@ -43,8 +43,10 @@
 \newcommand{\BFS}{{\textsc{2BFS}}}
 \newcommand{\UCT}{{\textsc{UCT}}}
 
-\newcommand{\numgames}{$48$}
+\newcommand{\numgames}{$54$}
 
+\newcommand{\Alien}{\propername{Alien}}
+\newcommand{\Amidar}{\propername{Amidar}}
 \newcommand{\Assault}{\propername{Assault}}
 \newcommand{\Asterix}{\propername{Asterix}}
 \newcommand{\Asteroids}{\propername{Asteroids}}
@@ -60,13 +62,17 @@
 \newcommand{\Centipede}{\propername{Centipede}}
 \newcommand{\ChopperCommand}{\propername{Chopper Command}}
 \newcommand{\CrazyClimber}{\propername{Crazy Climber}}
+\newcommand{\DemonAttack}{\propername{Demon Attack}}
 \newcommand{\DoubleDunk}{\propername{Double Dunk}}
+\newcommand{\ElevatorAction}{\propername{Elevator Action}}
 \newcommand{\Enduro}{\propername{Enduro}}
 \newcommand{\FishingDerby}{\propername{Fishing Derby}}
 \newcommand{\Freeway}{\propername{Freeway}}
 \newcommand{\Frostbite}{\propername{Frostbite}}
+\newcommand{\Gopher}{\propername{Gopher}}
 \newcommand{\Gravitar}{\propername{Gravitar}}
 \newcommand{\Hero}{\propername{Hero}}
+\newcommand{\IceHockey}{\propername{Ice Hockey}}
 \newcommand{\JamesBond}{\propername{James Bond}}
 \newcommand{\JourneyEscape}{\propername{Journey Escape}}
 \newcommand{\Kangaroo}{\propername{Kangaroo}}
@@ -80,6 +86,7 @@
 \newcommand{\PrivateEye}{\propername{Private Eye}}
 \newcommand{\Qbert}{\propername{Q*Bert}}
 \newcommand{\RiverRaid}{\propername{Riverraid}}
+\newcommand{\RoadRunner}{\propername{Road Runner}}
 \newcommand{\RobotTank}{\propername{Robot Tank}}
 \newcommand{\Seaquest}{\propername{Seaquest}}
 \newcommand{\SpaceInvaders}{\propername{Space Invaders}}
@@ -678,8 +685,8 @@ those games where the learning algorithms outperform \UCT\ like \Montezuma, \Ven
 and \Bowling.  In \Montezuma\ rewards are very
 sparse, deep, and most of the actions lead to losing a life with
 no immediate penalty or consequence.  All algorithms achieve $0$ score, 
-except for \BFS\ that achieves an average score of $80$, and a score
-of $400$ in one of the runs. This means that even \BFS\  is not able to 
+except for \BFS\ that achieves an average score of $540$, and a score
+of $2500$ in one of the runs. This means that even \BFS\  is not able to 
 consistently find rewards in this game. This game and several other games 
 like \Breakout, and \SpaceInvaders\ could be much simpler by adding
 negative rewards for losing a life. We have indeed observed that
