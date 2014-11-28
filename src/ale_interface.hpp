@@ -18,6 +18,7 @@
 
 #include "emucore/FSNode.hxx"
 #include "emucore/OSystem.hxx"
+#include "emucore/Random.hxx"
 #include "os_dependent/SettingsWin32.hxx"
 #include "os_dependent/OSystemWin32.hxx"
 #include "os_dependent/SettingsUNIX.hxx"
@@ -102,12 +103,15 @@ static void createOSystem(int argc, char* argv[],
     // seed random number generator
     if (theOSystem->settings().getString("random_seed") == "time") {
         cerr << "Random Seed: Time" << endl;
+	Random randGen;
         srand((unsigned)time(0));
         //srand48((unsigned)time(0));
     } else {
         int seed = theOSystem->settings().getInt("random_seed");
         assert(seed >= 0);
         cerr << "Random Seed: " << seed << endl;
+	Random::seed(seed);
+
         srand((unsigned)seed);
         //srand48((unsigned)seed);
     }

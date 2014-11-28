@@ -57,7 +57,8 @@ StellaEnvironment::StellaEnvironment(OSystem* osystem, RomSettings* settings):
 /** Resets the system to its start state. */
 void StellaEnvironment::reset() {
   // RNG for generating environments
-  Random randGen;
+  // MRJ: This is done now in src/ale_interface.hpp, at function createOSystem()
+  // Random randGen;
   
   m_state.resetEpisodeFrameNumber();
   // Reset the paddles
