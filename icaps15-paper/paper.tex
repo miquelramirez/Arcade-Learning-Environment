@@ -1,5 +1,4 @@
- 
-\documentclass[letterpaper]{article}
+ \documentclass[letterpaper]{article}
 \usepackage{aaai}
 \usepackage{times}
 \usepackage{helvet}
@@ -89,6 +88,7 @@
 \newcommand{\RoadRunner}{\propername{Road Runner}}
 \newcommand{\RobotTank}{\propername{Robot Tank}}
 \newcommand{\Seaquest}{\propername{Seaquest}}
+\newcommand{\Skiing}{\propername{Skiing}}
 \newcommand{\SpaceInvaders}{\propername{Space Invaders}}
 \newcommand{\StarGunner}{\propername{Star Gunner}}
 \newcommand{\Tennis}{\propername{Tennis}}
@@ -120,30 +120,34 @@
 %
 \pdfinfo{
 /Title (Classical Planning Algorithms on the Atari Video Games)
-/Author ( )}
-% (Nir Lipovetzky, Miquel Ramirez, Hector Geffner)}
+/Author (Nir Lipovetzky, Miquel Ramirez, Hector Geffner)}
 
 \setcounter{secnumdepth}{0}
 
 \title{Classical Planning Algorithms ¡ on the Atari Video Games}
 
-\author{\textbf{ID:} 52 \ \ ; \ \ \textbf{Keywords:} classical planning, video games}
+% \author{\textbf{ID:} 52 \ \ ; \ \ \textbf{Keywords:} classical planning, video games}
 
-% \author{Nir Lipovetzky \\
-%       The University of Melbourne \\
-%    Melbourne, Australia\\
-%    {\normalsize\url{@unimelb.edu.au}}
-%    \And
-%    Miquel Ramirez \\
-%    Australian National University \\
-%    Canberra, Australia\\
-%   {\normalsize\url{@gmail.com}}
-%    \And
-%    Hector Geffner \\
-%    ICREA \&  Universitat Pompeu Fabra \\
-%    Barcelona, SPAIN \\
-%    {\normalsize\url{@upf.edu}}\thanks{firstname.lastname}
-% }
+ \author{Nir Lipovetzky \\
+       The University of Melbourne \\
+    Melbourne, Australia\\
+%     {\normalsize\url{nir.lipovetzky@unimelb.edu.au}}
+%%% footnote doesn't look nice ; this looks better
+%% although can't use Nir's unimelb address that is too long :-)
+%% 
+    {\small\url{nirlipo@gmail.com}}
+    \And
+    Miquel Ramirez \\
+    Australian National University \\
+    Canberra, Australia\\
+   {\small\url{miquel.ramirez@gmail.com}}
+    \And
+    Hector Geffner \\
+    ICREA \&  Universitat Pompeu Fabra \\
+    Barcelona, SPAIN \\
+    {\small\url{hector.geffner@upf.edu}}
+ %%%%% \thanks{firstname.lastname}
+}
 
 
 %AAAI Press\\
@@ -152,7 +156,6 @@
 % Palo Alto, California 94303\\}
 
 \maketitle
-
 
 %% Pending: randomization, discount factor, iw11 ..
 %% iw2 multivalued expands up to 256^2 n^nodes, while iw2 boolean 16^2 n^2 nodes; can iw2 boolean beat iw1 multivalued?
@@ -287,7 +290,7 @@ transition function $f$ such that  $s' = f(a,s)$ is
 the state that results from applying action $a$  to the state $s$,
 and rewards $r(a,s)$ represented by real numbers that result from  applying action $a$ in state $s$.
 The transition and reward functions do not need to be known \emph{a priori}, yet in that case, the
-state and  reward that results from the application of an action in a state needs to be \emph{observable}.
+state and  reward that results from the application of an action in a state need to be \emph{observable}.
 The task is to compute an action sequence $a_0, \ldots, a_m$ for a large horizon $m$
 that generates a state sequence $s_0, \ldots, s_{m+1}$ that  maximizes the accumulated
 reward $\sum_{i=0}^{m} r(a_i,s_i)$, or that provides a good approximation.
@@ -444,22 +447,21 @@ of variables and states in the problem. The min value $k$ for which the iteratio
 the problem cannot exceed the problem width, so  the algorithm \emph{\IW\ runs in time and space
 that are exponential in the problem width.}
 
-Formally, the \emph{width} $w(P)$ of a problem $P$ is $i$
-iff $i$ is the minimum positive integer for which
-there is a sequence of tuples (sets) with at most $i$ atoms each, $t_0, t_1, \ldots, t_n$
-such that 1)~$t_0$ is true in the initial state of $P$, 2)~any shortest plan $\pi$  that achieves $t_i$ in $P$
-can be extended into a shortest plan that achieves $t_{i+1}$ by extending   $\pi$ with one action, and
-3)~any shortest plan that achieves $t_n$ is also a shortest plan for $P$.
+Formally, the \emph{width} $w(P)$ of a problem $P$ is $i$ iff $i$ is the minimum positive integer for which
+there is a sequence $t_0, t_1, \ldots, t_n$ of  atom sets  $t_k$  with at most $i$ atoms each, 
+such that 1)~$t_0$ is true in the initial state of $P$, 2)~any shortest plan $\pi$  that achieves $t_k$ in $P$
+can be extended into a shortest plan that achieves $t_{k+1}$ by extending   $\pi$ with one action, and
+3)~any shortest plan that achieves $t_n$ is  a shortest plan for achieving the goal of $P$.
 
 One way to understand this definition is that the problem  width $w(P)$ is at most  $i$ if  there is a
 ``trail of  stepping stones''  $t_0, t_1, \ldots, t_n$ to reach the problem goal such that
-A)~these ``stepping stones''  contain at most $i$ atoms each, B)~each  stepping stone $t_{i+1}$ is
-at distance 1 from the previous one $t_i$ when $t_i$ has been reached following the ``trail'',
-C)~the ``trail''  preserves ``optimality''; i.e., no  tuple $t_i$ can be reached in less than $i$ steps.
+A)~these ``stepping stones''  contain at most $i$ atoms each, B)~each  stepping stone $t_{k+1}$ is
+at distance 1 from the previous one $t_k$ when $t_k$ has been reached following the ``trail'',
+C)~the ``trail''  preserves ``optimality''; i.e., no  tuple $t_k$ can be reached in less than $k$ steps.
 
 While this notion of width and the iterated  width algorithms that are based on it  have been designed
 for problems where a goal state needs to be reached, the notions remain
-relevant  in  optimization problems as well. Indeed, if a  good path is made of
+relevant  in  optimisation problems as well. Indeed, if a  good path is made of
 states $s_i$ each of which has a low width, \IW\ can be made
 to find such path in low polynomial time for a small value of the $k$ parameter.
 Later on we will discuss  a slight  change  required in \IW\ to enforce this property.
@@ -469,8 +471,8 @@ Later on we will discuss  a slight  change  required in \IW\ to enforce this pro
 \section{The Algorithms for the Atari Games}
 
 The number of nodes \emph{generated} by $\IW(1)$ is $n \times D \times b$ in the worst case,
-where $n$ is the number of variables, $D$ is the size of their domains, and $b$ is the number of
-actions per  state.  This same number in breadth-first search is not linear in $n$
+where $n$ is the number of problem variables, $D$ is the size of their domains, and $b$ is the number of
+actions per  state.  This same number in a  breadth-first search is not linear in $n$
 but exponential. For the Atari games,  $n=128$, $D=256$, and $b=18$, so that the product is
 equal to $589,824$, which is large but feasible. On the other hand, the number
 of nodes generated by $\IW(2)$ in the worst case is  $(n \times D)^2 \times b$, which is
@@ -508,8 +510,8 @@ as \BFS.
 
 For  the experiments below, we added two simple variations to  $\IW(1)$ and \BFS.
 First, in the breadth-first search underlying $\IW(1)$, we generate the children in
-random order. This makes the executions that results from the
-$\IW(1)$ lookahead less susceptible to fall into loops; a potential
+random order. This makes the executions that result from the
+$\IW(1)$ lookahead less susceptible to be trapped into loops; a potential
 problem in local search algorithms with no memory or learning.
 Second, a discount factor $\gamma=0.995$ is used in both algorithms
 for discounting future rewards like in \UCT.
@@ -524,15 +526,15 @@ based on lookahead searches.
 \section{Experimental Results}
 
 \input{games-table}
-We tested \IW(1) and \BFS\ over \numgames\
- of the $55$ games considered in
-\cite{bellemare:jair2013}, from now on  abbreviated as BNVB.\footnote{
-Entries marked as  ``--'' in the table are   still running at the time of submission. 
-Each run can take up to $24$ hours of CPU time and there are $10$ runs per game and algorithm. 
-Eventually all of  the  $55$ games will  be included in the evaluation.}
+We tested \IW(1) and \BFS\ over \numgames\  of the $55$ games 
+considered in \cite{bellemare:jair2013}, from now on  abbreviated as BNVB.\footnote{
+We left out  \textsc{Skiing} as the reported figures apparently use a  different reward structure.}
+%% check
+% \footnote{
+% Entries marked as  ``--'' in the table are   still running at the time of submission. 
+% Each run can take up to $24$ hours of CPU time and there are $10$ runs per game and algorithm. 
+% Eventually all of  the  $55$ games will  be included in the evaluation.}
 Table~\ref{performance} shows the performance of $\IW(1)$ and \BFS\
-% , characterized by the average score obtained over all episodes, the standard deviation
-% of the score obtained and time (in seconds) per lookahead,
 in comparison  with breadth-first search (\BRFS) and \UCT.
 Videos of selected games played by $\IW(1)$, \BFS, and \UCT\ can be 
 seen in Youtube.\footnote{\url{http://www.youtube.com/playlist?list=PLXpQcXUQ_CwenUazUivhXyYvjuS6KQOI0}.}
@@ -550,12 +552,12 @@ except $\IW(1)$, that due to its aggressive pruning does not always use
 the full budget and takes less time per action on average.
 
 Also,  as reported by  BNVB, all of the algorithms 
-reuse the sub-tree from the previous lookahead that is rooted in the selected 
+reuse the frames in the sub-tree of the previous lookahead that is rooted in the selected 
 child, deleting its siblings and their descendants. More precisely, no calls 
 to the emulator are done for transitions that are cached in that sub-tree, 
 and such reused frames are not discounted from the budget that is thus a bound 
-on the number of ``new'' frames per lookahead. In addition, in $\IW(1)$, the states that 
-are ``reused'' from the previous searches are ignored in the computation of the novelty of 
+on the number of \emph{new}  frames per lookahead. In addition, in $\IW(1)$, the states that 
+are reused  from the previous searches are ignored in the computation of the novelty of 
 new states so that more states can escape pruning. Otherwise, $\IW(1)$ often
 uses a fraction of the  budget.  This is not needed in \BFS\ which does 
 no pruning.  $\IW(1)$ and \BFS\ are  limited to  search up to a depth of
@@ -594,34 +596,30 @@ by $1500$ frames instead.
 }
 
 
-Table~\ref{performance} shows that both $\IW(1)$ and \BFS\ generally
- outperform \BRFS, which rarely collects any reward in many domains, as 
- the depth of the \BRFS\ search tree results in a lookahead of $0.3$
+Table~\ref{performance} shows that both $\IW(1)$ and \BFS\ outperform \BRFS, which  rarely collects
+reward in  many domains as  the depth of the \BRFS\ search tree results in a lookahead of $0.3$
 seconds ($20$ frames or $4$ nodes deep). The notable exception to this
 is \Centipede\ where abundant reward can be collected with a shallow
-lookahead. On the other hand, both $\IW(1)$ and \BFS\ reach states that 
-are up to $350$--$1,500$ frames deep ($70$--$260$ nodes or $6$--$22$ seconds), 
-even if $\IW(1)$ does not always use all the simulation frames allocated due to its
-pruning. This behaviour can be observed in games such as
-\Breakout, \CrazyClimber, \Kangaroo, and \Pooyan, where the average
-CPU time for each lookahead is up to $10$ times faster than \BFS. 
-Computation time for \UCT\ and \BRFS\ are  similar to \BFS, as the
-most expensive part of the computation is the  generation of 
-frames through the simulator,  and these three  algorithms 
+lookahead. On the other hand, both $\IW(1)$ and \BFS\ normally 
+reach states that are up to $350$--$1500$ frames deep ($70$--$260$ nodes or 
+$6$--$22$ seconds),  even if $\IW(1)$ does not always use all the simulation frames allocated due to its
+agressive pruning. This can be observed in games such as \Breakout, \CrazyClimber, \Kangaroo, and \Pooyan, where the average
+CPU time for each lookahead is up to $10$ times faster than \BFS.  Computation time for \UCT\ and \BRFS\ are  similar to \BFS, as the
+most expensive part of the computation is the  generation of frames through the simulator,  and these three  algorithms 
 always use  the full budget.
 
-
-More interestingly,  \IW(1) outscores \UCT\  in $27$ of the \numgames\ games,
-while \BFS\ outscores \UCT\ in $21$.
+More interestingly,  \IW(1) outscores \UCT\  in $31$ of the \numgames\ games,
+while \BFS\ outscores \UCT\ in $26$.
 %\footnote{These numbers can actually
 %improve further as 6  games for \IW(1) and 4 games for \BFS\ are still running.}
-On the other hand, \UCT\ does better than $\IW(1)$ and \BFS\ in $15$ and $17$ games respectively.
+On the other hand, \UCT\ does better than $\IW(1)$ and \BFS\ in $19$ and $25$ games respectively.
 The relative performance between $\IW(1)$ and \BFS\ makes $\IW(1)$  the
-best of the two in $22$ games, and  \BFS\  in $12$. In terms of the number of games 
-where an algorithm is the overall winner, $\IW(1)$  domainates the others: 
-$\IW(1)$ is the overall best in $23$ games, \BFS\ in $11$ games, and \UCT\ in $18$ games. 
+best of the two in $34$ games, and  \BFS\  in $16$. In terms of the number of games 
+where an algorithm is the best, % $\IW(1)$  domainates the others: 
+$\IW(1)$ is  the best in $26$ games, \BFS\ in $13$ games, and \UCT\ in $19$ games. 
 Also, \BRFS\ is best in $2$ games (\Centipede, tied up in \Boxing), while the other three algorithms
-are tied in another 2 games (\Pong, \Boxing), and $\IW(1)$ and \BFS\ are tied in \TimePilot.
+are tied in another 2 games (\Pong, \Boxing). 
+% , and $\IW(1)$ and \BFS\ are tied in \TimePilot.
 
 \Omit{As mentioned in the
 previous section, the order in which $\IW(1)$ and \BFS\ generate the
@@ -655,7 +653,7 @@ in Table~\ref{performance} and seen in the provided video, \UCT\ does not manage
 across the highway at all. 
 %
 The reason that \UCT\ does not collect any reward is that it needs to move the chicken up
-at least 240 times~\footnote{One needs to move the chicken up for at least $4$ seconds ($240$ frames) in order to get across the 
+at least 240 times\footnote{One needs to move the chicken up for at least $4$ seconds ($240$ frames) in order to get across the 
 highway.} something that is very unlikely in a random exploration. $\IW(1)$ does not have this limitation and is best in \Freeway.
 %% The reason for \UCT\ to perform erratically 
 %% is that the roll-outs do not manage to collect any reward. A sequence of actions 
@@ -680,15 +678,15 @@ highway.} something that is very unlikely in a random exploration. $\IW(1)$ does
 $\IW(1)$ also outperforms the best learning algorithm in
 \cite{deep-mind-atari} in the $7$ games considered there, and
 \BFS\ does so in $6$ of the $7$ games. Comparing with the scores reported for the reinforcement learning algorithms by BNVB,
-we note that both $IW(1)$ and \BFS\ do much better than the best learning algorithm in
+we note that both $\IW(1)$ and \BFS\ do much better than the best learning algorithm in
 those games where the learning algorithms outperform \UCT\ like \Montezuma, \Venture\
 and \Bowling.  In \Montezuma\ rewards are very
 sparse, deep, and most of the actions lead to losing a life with
 no immediate penalty or consequence.  All algorithms achieve $0$ score, 
 except for \BFS\ that achieves an average score of $540$, and a score
-of $2500$ in one of the runs. This means that even \BFS\  is not able to 
-consistently find rewards in this game. This game and several other games 
-like \Breakout, and \SpaceInvaders\ could be much simpler by adding
+of $2500$ in one of the runs. This means however that even \BFS\  is not able to 
+consistently find rewards in this game. This game and several others
+like \Breakout\ and \SpaceInvaders\ could be much simpler by adding
 negative rewards for losing a life. We have indeed observed that
 our planning algorithms do not care much about losing lives
 until there is just one life left, when their play noticeably improves.
@@ -730,8 +728,6 @@ close it takes the robot to the goal (the greedy measure), but by the distance b
 the locations that are  reachable with it, and the locations reachable with
 the  other controllers in the population (a diversity measure). The novelty measure used by \IW, on the other hand, is domain-independent and it
 is determined by the structure of the states as captured by the problem variables.
-
-
 
 
 
@@ -796,11 +792,18 @@ is known.
 %% present paper could be applied in a broad variety of settings where only on-line 
 %% action selection is feasible or suitable.
 
-Regarding the Atari games, we identify two problems in all the planning methods
+Concerning the Atari games, there are two problems in all the planning methods
 discussed. First, by using the RAM state of the Atari console one can consider
-that they are ``cheating'', as they use information that is not available to the human player. And second, they do not get better with experience. In the future, we would like to explore 
+that they are ``cheating'', as they use information that is not available to the human player. And second, they do not get 
+better with experience. In the future, we would like to explore 
 whether variations of these algorithms  can be used to play from the information conveyed by the  
- state of screen pixels as opposed to the RAM state, and the potential uses of the new ideas for learning to improve performance. 
+state of the screen pixels as opposed to the RAM state, and the potential uses of the new ideas for learning,
+such the use of the  novelty measures for shaping rewards.
+
+\medskip
+
+\noindent \textbf{Acknowledgments.} We thank the people involved in the creation and maintenance of the 
+Arcade Learning Environment  that have made this work possible.
 
 %%% - Learning in same instance, across diff instances of same game, etc.
 %%%% - Learning controllers vs. on-line planning, etc
