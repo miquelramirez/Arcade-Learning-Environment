@@ -660,7 +660,7 @@ The bound on the number of simulated frames is like a bound on
 lookahead time, as most of the time in the lookahead  is spent
 in calls to the emulator for computing the next RAM state. 
 This is why the average time per action is similar to all the algorithms
-except $\IW(1)$, that due to its aggressive pruning does not always use
+except $\IW(1)$, that due to its pruning does not always use
 the full budget and takes less time per action on average.
 
 Also,  as reported by  BNVB, all of the algorithms 
@@ -682,7 +682,7 @@ single root action.
 % decrease in order to maintain the same budget of $150,000$ simulated
 % frames. 
 
-Last, \IW(1) and \BFS\  in the lookahead select an action every $5$ frames, while \UCT\  selects 
+Last, in the lookahead, \IW(1) and \BFS\ select an action every $5$ frames, while \UCT\  selects 
 an action in every frame.  This means that in order to explore a branch 
 $300$ frames deep, UCT gets to choose $300$ actions, while \IW($1$) and \BFS\ 
 get to choose $60$ actions, both however using the same $300$ frames from the
@@ -765,7 +765,7 @@ in Table~\ref{performance} and seen in the provided video, \UCT\ does not manage
 across the highway at all. 
 %
 The reason that \UCT\ does not collect any reward is that it needs to move the chicken up
-at least 240 times\footnote{One needs to move the chicken up for at least $4$ seconds ($240$ frames) in order to get across the 
+at least 240 times\footnote{One needs to move the chicken up for at least $4$ seconds ($240$ frames) in order to get it across the 
 highway.} something that is very unlikely in a random exploration. $\IW(1)$ does not have this limitation and is best in \Freeway.
 %% The reason for \UCT\ to perform erratically 
 %% is that the roll-outs do not manage to collect any reward. A sequence of actions 
@@ -916,8 +916,8 @@ such the use of the  novelty measures for shaping rewards.
 
 \noindent \textbf{Acknowledgments.} We thank the people involved in
 the creation and maintenance of the Arcade Learning Environment that
-have made this work possible. This research was co-funded by the
-Australian Research Council linkage grant LP11010015.
+have made this work possible. The research by Nir Lipovetzky is partially
+funded by the Australian Research Council Linkage grant LP11010015.
 
 %%% - Learning in same instance, across diff instances of same game, etc.
 %%%% - Learning controllers vs. on-line planning, etc
