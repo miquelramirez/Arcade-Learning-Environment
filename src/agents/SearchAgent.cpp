@@ -30,6 +30,7 @@
 #include "BestFirstSearch.hpp"
 #include "Width2BestFirstSearch.hpp"
 #include "UCTSearchTree.hpp"
+#include "UCTNoveltySearchTree.hpp"
 #include "BFS_UCB.hpp"
 #include "time.hxx"
 
@@ -108,6 +109,10 @@ SearchAgent::SearchAgent(OSystem* _osystem, RomSettings* _settings, StellaEnviro
 		search_tree = new UCTSearchTree(_settings, _osystem->settings(),
 					    available_actions, _env);
 		m_trace.open( "uct.search-agent.trace" );
+	}  else if (search_method == "uct_novelty") {
+		search_tree = new UCTNoveltySearchTree(_settings, _osystem->settings(),
+					    available_actions, _env);
+		m_trace.open( "uct_novelty.search-agent.trace" );
 	} else {
 		cerr << "Unknown search Method: " << search_method << endl;
 		exit(-1);

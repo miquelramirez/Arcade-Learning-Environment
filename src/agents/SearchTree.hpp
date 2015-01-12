@@ -91,7 +91,7 @@ class SearchTree {
       *  if discount_return == true, then every 'sim_steps_per_node' we
       *   discount the reward by 'discount_factor'
       */
-    int simulate_game(ALEState & state, Action act, int num_steps, 
+    virtual int simulate_game(ALEState & state, Action act, int num_steps, 
 		      return_t &traj_return, bool &game_ended, bool discount_return = false, bool save_state = true);
 
     /** Normalizes a reward using the first non-zero reward's magnitude */ 
