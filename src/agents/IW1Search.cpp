@@ -9,13 +9,26 @@ IW1Search::IW1Search(RomSettings *rom_settings, Settings &settings,
 	m_stop_on_first_reward = settings.getBool( "iw1_stop_on_first_reward", true );
 
 	int val = settings.getInt( "iw1_reward_horizon", -1 );
+
+	m_novelty_boolean_representation = settings.getBool( "novelty_boolean", false );
+
 	m_reward_horizon = ( val < 0 ? std::numeric_limits<unsigned>::max() : val ); 
 
-	m_ram_novelty_table = new aptk::Bit_Matrix( RAM_SIZE, 256 );
+	if( m_novelty_boolean_representation){
+		m_ram_novelty_table_true = new aptk::Bit_Matrix( RAM_SIZE, 8 );
+		m_ram_novelty_table_false = new aptk::Bit_Matrix( RAM_SIZE, 8 );		
+	}
+	else
+		m_ram_novelty_table = new aptk::Bit_Matrix( RAM_SIZE, 256 );
 }
 
 IW1Search::~IW1Search() {
-	delete m_ram_novelty_table;
+	if(m_novelty_boolean_representation){
+		delete m_ram_novelty_table_true;
+		delete m_ram_novelty_table_false;
+	}
+	else
+		delete m_ram_novelty_table;
 }
 
 /* *********************************************************************
@@ -80,14 +93,43 @@ void IW1Search::update_tree() {
 void IW1Search::update_novelty_table( const ALERAM& machine_state )
 {
 	for ( size_t i = 0; i < machine_state.size(); i++ )
-		m_ram_novelty_table->set( i, machine_state.get(i) );
+		if( m_novelty_boolean_representation ){
+			unsigned char mask = 1;
+			byte_t byte =  machine_state.get(i);
+			for(int j = 0; j < 8; j++) {
+				bool bit_is_set = (byte & (mask << j)) != 0;
+				if( bit_is_set )
+					m_ram_novelty_table_true->set( i, j );
+				else
+					m_ram_novelty_table_false->set( i, j );
+			}
+		}
+		else
+			m_ram_novelty_table->set( i, machine_state.get(i) );
 }
 
 bool IW1Search::check_novelty_1( const ALERAM& machine_state )
 {
-	for ( size_t i = 0; i < machine_state.size(); i++ )
-		if ( !m_ram_novelty_table->isset( i, machine_state.get(i) ) )
-			return true;
+	for ( size_t i = 0; i < machine_state.size(); i++ )	
+		if( m_novelty_boolean_representation ){
+			unsigned char mask = 1;
+			byte_t byte =  machine_state.get(i);
+			for(int j = 0; j < 8; j++) {
+				bool bit_is_set = (byte & (mask << j)) != 0;
+				if( bit_is_set ){
+					if( ! m_ram_novelty_table_true->isset( i, j ) )
+						return true;
+				}
+				else{
+					if( ! m_ram_novelty_table_false->isset( i, j ) )
+						return true;
+
+				}
+			}
+		}
+		else
+			if ( !m_ram_novelty_table->isset( i, machine_state.get(i) ) )
+				return true;
 	return false;
 }
 
@@ -258,13 +300,24 @@ void IW1Search::expand_tree(TreeNode* start_node) {
 void IW1Search::clear()
 {
 	SearchTree::clear();
-	m_ram_novelty_table->clear();
+
+	if(m_novelty_boolean_representation){
+		m_ram_novelty_table_true->clear();
+		m_ram_novelty_table_false->clear();
+	}
+	else
+		m_ram_novelty_table->clear();
 }
 
 void IW1Search::move_to_best_sub_branch() 
 {
 	SearchTree::move_to_best_sub_branch();
-	m_ram_novelty_table->clear();
+	if(m_novelty_boolean_representation){
+		m_ram_novelty_table_true->clear();
+		m_ram_novelty_table_false->clear();
+	}
+	else
+		m_ram_novelty_table->clear();
 
 }
 

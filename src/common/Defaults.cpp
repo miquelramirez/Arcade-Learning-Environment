@@ -69,4 +69,5 @@ void setDefaultSettings(Settings &settings) {
 	settings.setInt("iw1_reward_horizon", 300 );	
 	settings.setBool("randomize_successor_novelty", true );
 
+	settings.setBool("novelty_boolean", false);
 }

@@ -47,10 +47,12 @@ protected:
 	
 	ALERAM 			m_ram;
 	aptk::Bit_Matrix*	m_ram_novelty_table;
+	aptk::Bit_Matrix*	m_ram_novelty_table_true;
+	aptk::Bit_Matrix*	m_ram_novelty_table_false;
 	unsigned		m_pruned_nodes;
 	bool			m_stop_on_first_reward;
 	unsigned		m_reward_horizon;	
-
+	bool                    m_novelty_boolean_representation;
 
 };
 

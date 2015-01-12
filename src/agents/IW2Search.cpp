@@ -9,11 +9,25 @@ IW2Search::IW2Search(RomSettings *rom_settings, Settings &settings,
 	m_stop_on_first_reward = settings.getBool( "iw1_stop_on_first_reward", true );
 
 	int val = settings.getInt( "iw1_reward_horizon", -1 );
+	
+	m_novelty_boolean_representation = settings.getBool( "novelty_boolean", false );
+
 	m_reward_horizon = ( val < 0 ? std::numeric_limits<unsigned>::max() : val ); 
-	m_ram_novelty_table.resize( 0x80ff80ff );	
+	
+	if(m_novelty_boolean_representation){
+		m_ram_novelty_table_bool = new aptk::Bit_Matrix( RAM_SIZE * 8 * 2, RAM_SIZE * 8 * 2 );
+	}
+	
+	else
+		m_ram_novelty_table.resize( 0x80ff80ff );
+
+	
 }
 
 IW2Search::~IW2Search() {
+	if(m_novelty_boolean_representation){
+		delete m_ram_novelty_table_bool;
+	}
 }
 
 /* *********************************************************************
@@ -77,24 +91,92 @@ void IW2Search::update_tree() {
 
 void IW2Search::update_novelty_table( const ALERAM& machine_state )
 {
-	for ( size_t i = 0; i < machine_state.size(); i++ ) {
-		Fluent p_i = std::make_pair( i, machine_state.get(i) ); 
-		for ( size_t j = i ; j < machine_state.size(); j++ ) {
-			Fluent p_j = std::make_pair( j, machine_state.get(j) );
-			m_ram_novelty_table.set( fluent_pair_index( p_i, p_j ) );
-		}	
+
+	if( m_novelty_boolean_representation ){
+		
+		for ( size_t i = 0; i < machine_state.size(); i++ ) {
+			unsigned char mask = 1;
+			byte_t byte =  machine_state.get(i);
+
+			for(int b_i = 0; b_i < 8; b_i++) {
+				bool bit_is_set = (byte & (mask << b_i)) != 0;
+				int p_i =  i * b_i; 
+				if( bit_is_set )
+					p_i *= 2;
+					
+				for ( size_t j = 0 ; j < machine_state.size(); j++ ) {
+					unsigned char mask = 1;
+					byte_t byte =  machine_state.get(j);
+					
+					for(int b_j = 0; b_j < 8; b_j++) {
+						bool bit_is_set = (byte & (mask << b_j)) != 0;
+						int p_j =  j * b_j;
+
+						if( bit_is_set )
+							p_j *= 2;
+						
+						m_ram_novelty_table_bool->set(  p_i, p_j );
+					}	
+				}
+				
+			}
+
+		}
+	}
+	else{
+		for ( size_t i = 0; i < machine_state.size(); i++ ) {
+			Fluent p_i = std::make_pair( i, machine_state.get(i) ); 
+			for ( size_t j = i ; j < machine_state.size(); j++ ) {
+				Fluent p_j = std::make_pair( j, machine_state.get(j) );
+				m_ram_novelty_table.set( fluent_pair_index( p_i, p_j ) );
+			}	
+		}
+		
 	}
 }
 
 bool IW2Search::check_novelty( const ALERAM& machine_state )
 {
-	for ( size_t i = 0; i < machine_state.size(); i++ ) {
-		Fluent p_i = std::make_pair( i, machine_state.get(i) ); 
-		for ( size_t j = i ; j < machine_state.size(); j++ ) {
-			Fluent p_j = std::make_pair( j, machine_state.get(j) );
-			if( !m_ram_novelty_table.isset( fluent_pair_index( p_i, p_j ) ) )
-				return true;
-		}	
+	if( m_novelty_boolean_representation ){				
+		for ( size_t i = 0; i < machine_state.size(); i++ ) {
+			unsigned char mask = 1;
+			byte_t byte =  machine_state.get(i);
+
+			for(int b_i = 0; b_i < 8; b_i++) {
+				bool bit_is_set = (byte & (mask << b_i)) != 0;
+				int p_i =  i * b_i; 
+				if( bit_is_set )
+					p_i *= 2;
+					
+				for ( size_t j = 0 ; j < machine_state.size(); j++ ) {
+					unsigned char mask = 1;
+					byte_t byte =  machine_state.get(j);
+					
+					for(int b_j = 0; b_j < 8; b_j++) {
+						bool bit_is_set = (byte & (mask << b_j)) != 0;
+						int p_j =  j * b_j;
+
+						if( bit_is_set )
+							p_j *= 2;
+						
+						if( ! m_ram_novelty_table_bool->isset(  p_i, p_j ) )
+							return true;
+					}	
+				}
+				
+			}
+
+		}
+	}
+	else{
+		for ( size_t i = 0; i < machine_state.size(); i++ ) {
+			Fluent p_i = std::make_pair( i, machine_state.get(i) ); 
+			for ( size_t j = i ; j < machine_state.size(); j++ ) {
+				Fluent p_j = std::make_pair( j, machine_state.get(j) );
+				if( !m_ram_novelty_table.isset( fluent_pair_index( p_i, p_j ) ) )
+					return true;
+			}	
+		}
 	}
 
 	return false;
@@ -111,7 +193,7 @@ int IW2Search::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 		curr_node->v_children.resize( num_actions );
 		curr_node->available_actions = available_actions;
 		if(m_randomize_successor)
-		    std::random_shuffle ( curr_node->available_actions.begin()+1, curr_node->available_actions.end() );
+		    std::random_shuffle ( curr_node->available_actions.begin(), curr_node->available_actions.end() );
 	
 	}
 	for (int a = 0; a < num_actions; a++) {
@@ -257,13 +339,21 @@ void IW2Search::expand_tree(TreeNode* start_node) {
 void IW2Search::clear()
 {
 	SearchTree::clear();
-	m_ram_novelty_table.reset();	
+	if(m_novelty_boolean_representation){
+		m_ram_novelty_table_bool->clear();
+	}
+	else
+		m_ram_novelty_table.reset();	
 }
 
 void IW2Search::move_to_best_sub_branch() 
 {
 	SearchTree::move_to_best_sub_branch();
-	m_ram_novelty_table.reset();	
+	if(m_novelty_boolean_representation){
+		m_ram_novelty_table_bool->clear();
+	}
+	else
+		m_ram_novelty_table.reset();	
 }
 
 /* *********************************************************************

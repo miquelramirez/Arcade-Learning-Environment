@@ -87,6 +87,8 @@ protected:
 
 	typedef 			std::map< unsigned, bool >		Novelty_Table;
 	aptk::Bit_Array			m_ram_novelty_table;
+	aptk::Bit_Matrix*		m_ram_novelty_table_bool;
+	bool                            m_novelty_boolean_representation;
 };
 
 
