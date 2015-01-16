@@ -37,6 +37,9 @@ class ALERAM {
     byte_t get(unsigned int x) const;
     byte_t *byte(unsigned int x);
    
+    /** Bit accessor */
+    byte_t get(unsigned int byte, unsigned int bit ) const;
+
     /** Returns the whole array (equivalent to byte(0)). */
     byte_t *array() const { return (byte_t*)(m_ram); }
 
@@ -117,9 +120,18 @@ inline byte_t ALERAM::get(unsigned int x) const {
   return m_ram[x & 0x7F]; 
 }
 
+
+
 inline byte_t* ALERAM::byte(unsigned int x) {
   return &m_ram[x & 0x7F]; 
 }
+
+// Bit accessors
+inline byte_t ALERAM::get(unsigned int byte, unsigned int  bit ) const {
+  // Wrap RAM around the first 128 bytes
+    return (m_ram[byte & 0x7F] & (1 << bit) ) > 0; 
+}
+
 
 #endif // __ALE_RAM_HPP__
 
