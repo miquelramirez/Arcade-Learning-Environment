@@ -88,6 +88,19 @@ void IW1Search::print_path(TreeNode * node, int a) {
 
 void IW1Search::update_tree() {
 	expand_tree(p_root);
+	// for(unsigned byte = 0; byte < RAM_SIZE; byte++){
+	//     std::cout << "Byte: " << byte << std::endl;
+	//     int count = 0;
+	//     for( unsigned i = 0; i < 255; i++){
+	// 	if ( m_ram_novelty_table->isset( byte,i ) ){
+	// 	    count++;			
+	// 	    std::cout << "\t element: "<< i << std::endl;
+	// 	}
+
+	//     }
+	//     std::cout << "\t num_elements " << count << std::endl;
+	// }
+	// std::exit(0);
 }
 
 void IW1Search::update_novelty_table( const ALERAM& machine_state )

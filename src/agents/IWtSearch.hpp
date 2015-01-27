@@ -12,19 +12,20 @@ typedef std::pair< unsigned, unsigned> BitIndex;
 class VarGroup {
  
 public:
-	VarGroup( ) : m_novelty_table(1) {
-		m_last_num_values_reached = 0;
+	VarGroup( ) : m_novelty_table(1), m_novelty_max_value(1) {
+		m_last_num_values_reached = 1;
 	};
 
-	VarGroup( unsigned byte, unsigned bit) : m_novelty_table(1) {
+	VarGroup( unsigned byte, unsigned bit) : m_novelty_table(1), m_novelty_max_value(1) {
 		m_bit_indexes.push_back( std::make_pair( byte, bit) );
-		m_last_num_values_reached = 0;
+		m_last_num_values_reached = 1;
 	};
 
 	VarGroup( const VarGroup& v){
 		m_bit_indexes = v.bit_indexes();
 		m_novelty_table = v.novelty_table_size();
 		m_last_num_values_reached = v.last_num_values_reached();
+		m_novelty_max_value = v.m_novelty_max_value;
 	}
 	
 	
@@ -36,10 +37,9 @@ protected:
 		unsigned value = 0;
 		unsigned bit_pos = 0;
 		for( auto idx : m_bit_indexes ){
-			value |= (machine_state.get( idx.first, idx.second ) << bit_pos);			
+			value |= (machine_state.get( (size_t) idx.first, idx.second ) << bit_pos);			
 			bit_pos++;
 		}
-	
 		return value;
 	}
 public:
@@ -52,7 +52,9 @@ public:
 
 	void add_bit_index( unsigned byte, unsigned bit){
 		m_bit_indexes.push_back( std::make_pair( byte, bit) );
-		m_novelty_table.resize( m_novelty_table.size() * 2);
+		m_novelty_max_value *= 2;
+		m_novelty_table.resize( m_novelty_max_value );
+
 	}
 	
 	void clear(){
@@ -77,6 +79,7 @@ protected:
 	std::vector< BitIndex > m_bit_indexes;
 	aptk::Bit_Array	        m_novelty_table;
 	unsigned                m_last_num_values_reached;
+	unsigned                m_novelty_max_value;
 	
 };
 
@@ -129,6 +132,7 @@ protected:
 	unsigned                m_num_simulated_steps;
         std::vector<VarGroup*>  m_var_groups;
 	std::vector<VarGroup*>  m_candidate_var_groups;
+	std::vector<VarGroup*>  m_ignored_candidate_var_groups;
 };
 
 

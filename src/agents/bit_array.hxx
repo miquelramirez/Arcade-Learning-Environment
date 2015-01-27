@@ -23,6 +23,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include <cstring>
 #include <cassert>
+#include <iostream>
 
 namespace aptk
 {
@@ -131,8 +132,13 @@ public:
 	int count_elements() const
 	{
 		int count = 0;
-		for ( unsigned i = 0; i < m_max_idx; i++ )
-			if ( isset( i ) ) count++;			
+		for ( unsigned i = 0; i < m_max_idx; i++ ){
+		    if ( isset( i ) ){
+			count++;			
+			//std::cout << "\t element: "<< i << std::endl;
+		    }
+		}
+		//std::cout << "\t count: "<< count << std::endl;
 		return count;
 		
 	}

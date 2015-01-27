@@ -14,6 +14,7 @@ IWtSearch::IWtSearch(RomSettings *rom_settings, Settings &settings,
 
 	m_max_var_group = 32;
 	set_candidates();
+
 }
 
 IWtSearch::~IWtSearch() {
@@ -30,17 +31,71 @@ void IWtSearch::set_candidates(){
 		for(unsigned byte = 0; byte < RAM_SIZE; byte++)
 			for( unsigned bit = 0; bit < 8; bit++)
 				m_candidate_var_groups.push_back( new VarGroup( byte, bit) );
+
+		/** 
+		 * Original 8 bit
+		 */
+		
+		// for(unsigned byte = 0; byte < RAM_SIZE; byte++){
+		// 	VarGroup* new_v = new VarGroup(  );
+		// 	for( unsigned bit = 0; bit < 8; bit++){
+		// 		new_v->add_bit_index( byte, bit );
+		// 	}
+		// 	m_candidate_var_groups.push_back( new_v );
+		// }
+		
 		
 	}
 	else{
+		/** 
+		 * EXHAUSTIVE
+		 */
+		// for( auto v : m_var_groups){
+		// 	for(unsigned byte = 0; byte < RAM_SIZE; byte++){
+		// 		for( unsigned bit = 0; bit < 8; bit++){
+		// 			VarGroup* new_v = new VarGroup( *v );
+		// 			new_v->add_bit_index( byte, bit );
+		// 			m_candidate_var_groups.push_back( new_v );
+		// 		}
+		// 	}
+		// }
+
+		// /** 
+		//  * Original 8 bit
+		//  */
+		
+		// for(unsigned byte = 0; byte < RAM_SIZE; byte++){
+		// 	VarGroup* new_v = new VarGroup(  );
+		// 	for( unsigned bit = 0; bit < 8; bit++){
+		// 		new_v->add_bit_index( byte, bit );
+		// 	}
+		// 	m_candidate_var_groups.push_back( new_v );
+		// }
+		/**
+		 * one ignored * one none ignored
+		 */
+		// unsigned nvars = m_var_groups.size();
+		// unsigned curr_var = 0;
+		// for( auto v : m_ignored_candidate_var_groups){
+		// 	VarGroup* new_v = new VarGroup( *(m_var_groups[ curr_var ]) );
+		// 	for( auto bit_idx : v->bit_indexes() ){
+		// 		new_v->add_bit_index( bit_idx.first, bit_idx.second );
+		// 	}
+		// 	m_candidate_var_groups.push_back( new_v );
+		// 	curr_var = ( curr_var == nvars ) ? 0 : curr_var+1;
+		// }
+
+		/**
+		 * 1 ignored * all non ignored. Like exhaustive but incrementally
+		 */
+		VarGroup* curr = m_ignored_candidate_var_groups.back();
+		m_ignored_candidate_var_groups.pop_back();
 		for( auto v : m_var_groups){
-			for(unsigned byte = 0; byte < RAM_SIZE; byte++){
-				for( unsigned bit = 0; bit < 8; bit++){
-					VarGroup* new_v = new VarGroup( *v );
-					new_v->add_bit_index( byte, bit );
-					m_candidate_var_groups.push_back( new_v );
-				}
+			VarGroup* new_v = new VarGroup( *v );
+			for( auto bit_idx : curr->bit_indexes() ){
+				new_v->add_bit_index( bit_idx.first, bit_idx.second );
 			}
+			m_candidate_var_groups.push_back( new_v );
 		}
 	}
 	
@@ -49,6 +104,9 @@ void IWtSearch::set_candidates(){
 }
 
  bool IWtSearch::keep_candidates(){
+
+	 
+	std::cout << "num_candidates: " << m_candidate_var_groups.size() << " OLD_var_groups: " << m_var_groups.size() << std::endl;
 	for ( auto v : m_var_groups){
 		unsigned num_values = v->count_num_values_reached();
 		if( num_values > v->last_num_values_reached() )
@@ -57,20 +115,33 @@ void IWtSearch::set_candidates(){
 		
 	bool new_vars = false;
 	for ( auto v : m_candidate_var_groups){
+		//std::cout << "Byte:" << v->bit_indexes()[0].first << std::endl;
 		unsigned num_values = v->count_num_values_reached();
 		if( num_values > v->last_num_values_reached() ){
 			v->set_last_num_values_reached( num_values );
 			m_var_groups.push_back( v );
 			new_vars = true;
+			
 		}else{
-			delete v;
-			v = nullptr;
+			if( v->bit_indexes().size() == 1)
+				m_ignored_candidate_var_groups.push_back( v );
+			else{
+				delete v;
+				v = nullptr;
+			}
 		}
 			
 		
 	}
 	
+
+	//std::exit(0);
 	m_candidate_var_groups.clear();
+	
+	std::cout << "ignored_candidates: " << m_ignored_candidate_var_groups.size() << " NEW_var_groups: " << m_var_groups.size() << std::endl;
+	
+	 if( ! m_ignored_candidate_var_groups.empty() )
+	 	new_vars = true;
 	
 	return new_vars;
 	
@@ -146,6 +217,7 @@ void IWtSearch::update_tree() {
 
 void IWtSearch::update_novelty_table( const ALERAM& machine_state )
 {
+
  	for(auto v : m_candidate_var_groups){
 		v->update_novelty_table( machine_state );			
 	}
@@ -168,12 +240,13 @@ bool IWtSearch::check_novelty( const ALERAM& machine_state )
 			return true;
 	}
 
+
 	return false;
 }
 
 int IWtSearch::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 {
-	
+	int num_simulated_steps =0;
 	int num_actions = available_actions.size();
 	bool leaf_node = (curr_node->v_children.empty());
 	static     int max_nodes_per_frame = max_sim_steps_per_frame / sim_steps_per_node;
@@ -211,7 +284,7 @@ int IWtSearch::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 				//continue;				
 			}
 			if (child->depth() > m_max_depth ) m_max_depth = child->depth();
-			m_num_simulated_steps += child->num_simulated_steps;
+			num_simulated_steps += child->num_simulated_steps;
 					
 			curr_node->v_children[a] = child;
 		}
@@ -251,7 +324,7 @@ int IWtSearch::expand_node( TreeNode* curr_node, queue<TreeNode*>& q )
 				q.push(child);
 		}
 	}
-	return m_num_simulated_steps;
+	return num_simulated_steps;
 }
 
 /* *********************************************************************
@@ -278,7 +351,6 @@ void IWtSearch::expand_tree(TreeNode* start_node) {
 	pivots.push_back( start_node );
 
 	update_novelty_table( start_node->state.getRAM() );
-	int num_simulated_steps = 0;
 
 	m_expanded_nodes = 0;
 	m_generated_nodes = 0;
@@ -291,9 +363,9 @@ void IWtSearch::expand_tree(TreeNode* start_node) {
 		std::cout << "First pivot reward: " << pivots.front()->node_reward << std::endl;
 		pivots.front()->m_depth = 0;
 		int steps = expand_node( pivots.front(), q );
-		num_simulated_steps += steps;
+		m_num_simulated_steps += steps;
 
-		if (num_simulated_steps >= max_sim_steps_per_frame) {
+		if (m_num_simulated_steps >= max_sim_steps_per_frame) {
 			break;
 		}
 
@@ -311,9 +383,9 @@ void IWtSearch::expand_tree(TreeNode* start_node) {
 				continue;
 			}
 			steps = expand_node( curr_node, q );	
-			num_simulated_steps += steps;
+			m_num_simulated_steps += steps;
 			// Stop once we have simulated a maximum number of steps
-			if (num_simulated_steps >= max_sim_steps_per_frame) {
+			if (m_num_simulated_steps >= max_sim_steps_per_frame) {
 				break;
 			}
 		
@@ -324,7 +396,7 @@ void IWtSearch::expand_tree(TreeNode* start_node) {
 
 		if (q.empty()) std::cout << "Search Space Exhausted!" << std::endl;
 		// Stop once we have simulated a maximum number of steps
-		if (num_simulated_steps >= max_sim_steps_per_frame) {
+		if (m_num_simulated_steps >= max_sim_steps_per_frame) {
 			break;
 		}
 
