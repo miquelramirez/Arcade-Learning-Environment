@@ -89,6 +89,9 @@ class UCTNoveltySearchTree : public SearchTree {
       return_t &mc_return);
 
 	reward_t get_exploration_bonus( const ALERAM& machine_state, unsigned depth );
+
+	bool is_novel(ALEState &state, Action a, unsigned depth);
+
 	virtual int simulate_game( UCTNoveltyTreeNode* node, Action act, int num_steps, 
 				  return_t &traj_return, bool &game_ended, bool discount_return = false, bool save_state = true);
 
@@ -104,6 +107,7 @@ class UCTNoveltySearchTree : public SearchTree {
   protected:
 	int uct_max_simulations;
 	int uct_search_depth;// Number of frames to simulate to when performing
+	bool uct_novelty_pruning;
 
 	float reward_weight;
 	float exploration_weight;

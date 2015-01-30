@@ -27,6 +27,9 @@ UCTNoveltySearchTree::UCTNoveltySearchTree(RomSettings * rom_settings, Settings 
 	uct_search_depth = settings.getInt("uct_search_depth", true);
 	uct_exploration_constant = 
 		settings.getFloat("uct_exploration_constant", true);
+
+	uct_novelty_pruning = 
+		settings.getFloat("uct_novelty_pruning", true);
 	
 	novelty_depth.resize( RAM_SIZE * 256, UNDEFINED_DEPTH );
 	novelty_reward.resize( uct_search_depth+1 );
@@ -68,9 +71,11 @@ void UCTNoveltySearchTree::update_tree(void) {
 
 	for(unsigned i = 0; i < RAM_SIZE * 256; i++)
 		novelty_depth[i] = UNDEFINED_DEPTH;
-	for(int i = 0; i < uct_search_depth+1; i++)
-		for(unsigned j = 0; j < RAM_SIZE * 256; j++)
-			novelty_reward[i][j] = 0;
+
+	if(uct_novelty_pruning)
+		for(int i = 0; i < uct_search_depth+1; i++)
+			for(unsigned j = 0; j < RAM_SIZE * 256; j++)
+				novelty_reward[i][j] = 0;
 	
 	std::cout << "starting with " << simulation_steps << " simulation steps" <<std::endl;
 	
@@ -387,6 +392,39 @@ int UCTNoveltySearchTree::do_monte_carlo(UCTNoveltyTreeNode* start_node,
 	return steps;
 }
 
+bool UCTNoveltySearchTree::is_novel(ALEState& state, Action a, unsigned depth){
+
+        // Move state forward using action a
+	m_env->set_player_B( m_player_B );
+	if(m_player_B)
+		m_env->oneStepAct( PLAYER_A_NOOP, a );
+	else
+		m_env->oneStepAct(a, PLAYER_B_NOOP);
+
+	const ALERAM& machine_state = m_env->getRAM();
+	
+
+	for ( size_t i_byte = 0; i_byte < machine_state.size(); i_byte++ ){
+		unsigned byte_value = machine_state.get(i_byte);
+		unsigned index = byte_value * i_byte;
+		
+		if( depth < novelty_depth[ index ] ){
+		//if( novelty_depth[ index ] == UNDEFINED_DEPTH){
+
+			
+			/**
+			 * update min depth found
+			 */
+			novelty_depth[ index ] = depth;
+			m_env->restoreState( state );
+	
+			return true;
+		}
+	}
+
+	m_env->restoreState( state );	
+	return false;
+}
 
 int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, int num_steps, 
 			       	return_t &traj_return, bool &game_ended, 
@@ -396,6 +434,7 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 	m_env->restoreState( node->state );
 
 	
+
 	// For discounting purposes
 	float g = 1.0;
 	traj_return = 0.0;
@@ -407,12 +446,40 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 	else a = act; 
 
 	int i;
-
+	bool found_novel_action = false;
+	int probe_depth = 0;
 	for (i = 0; i < num_steps; i++) {
-		 if (act == RANDOM && i % sim_steps_per_node == 0)
+		if (act == RANDOM && i % sim_steps_per_node == 0){
 			a = choice(&available_actions);
-
+			
+			if( uct_novelty_pruning ){
+				ALEState state = m_env->cloneState();
+				if( ! is_novel(state, a, node->depth() + probe_depth ) ){
+					ActionVect shuffled_available_actions = available_actions;
+					std::random_shuffle ( shuffled_available_actions.begin(), shuffled_available_actions.end() );
+					
+					found_novel_action = false;
+					for(auto b : shuffled_available_actions){
+						if(b == a) continue;
+						
+						//count it in num_steps
+						i++;
+						
+						if( is_novel( state, b, node->depth() + probe_depth ) ){
+							found_novel_action = true;
+							a = b;
+							break;
+						}
+					}
+					
+					if( ! found_novel_action)
+						break;
+				}
+			}
+		}
+		 
 		// Move state forward using action a
+		probe_depth++;
 		m_env->set_player_B( m_player_B );
 		reward_t curr_reward;
 		if(m_player_B)
@@ -420,7 +487,7 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 		else
 			curr_reward = m_env->oneStepAct(a, PLAYER_B_NOOP);
 
-		reward_t curr_novelty = get_exploration_bonus( m_env->getRAM(), node->depth() );
+		reward_t curr_novelty = (!uct_novelty_pruning) ? get_exploration_bonus( m_env->getRAM(), node->depth() + probe_depth ) : 0;
 
 		game_ended = m_env->isTerminal();
 			

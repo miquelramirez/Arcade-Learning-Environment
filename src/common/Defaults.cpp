@@ -53,6 +53,7 @@ void setDefaultSettings(Settings &settings) {
     settings.setInt("uct_monte_carlo_steps", -1); // DON'T KNOW WHAT THEY USE IT FOR. Number of times a node is visited in UCT? I cannot find what the 500 number means in Appendix C: simulations per action: 500. In the code they use the same limit as in FullTree: max_sim_steps_per_frame
     settings.setFloat("uct_exploration_constant", 0.1);
     settings.setFloat("uct_search_depth", 300);
+    settings.setBool("uct_novelty_pruning", true);
     
     	// Agent settings
     	settings.setString("player_agent", "search_agent");
