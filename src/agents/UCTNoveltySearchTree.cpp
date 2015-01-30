@@ -178,6 +178,8 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
 				}
 			}
 
+			if(all_dups)
+				std::cout << "Node depth:" << node->m_depth << std::endl;
 			assert(!all_dups);
 
 			int unvisited_child = get_child_with_count_zero(node);
@@ -217,6 +219,13 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
 
 		node->init(this, leaf_choice, sim_steps_per_node); 
 
+		if( ! is_novel( (UCTNoveltyTreeNode*) node ) ){
+			//node->duplicate = true;
+			node->novelty = 2;
+			//continue;
+		}
+		else
+			std::cout << "Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice ) << "is Novel"<< std::endl;
 		// Before declaring ourselves done, ensure that this is not a duplicate
 		//  of another action
 		if (ignore_duplicates)
@@ -294,7 +303,7 @@ int UCTNoveltySearchTree::get_best_branch(UCTNoveltyTreeNode* node, bool add_uct
 			float bias = sqrt(log(node->visit_count + 0.0) / child->visit_count);
 			bias *= uct_exploration_constant;
 
-			v = v + bias; 
+			v = v + bias - child->novelty;
 		}
 
 		// Set the return to the computed value -- note! This is only used
@@ -394,15 +403,18 @@ int UCTNoveltySearchTree::do_monte_carlo(UCTNoveltyTreeNode* start_node,
 
 bool UCTNoveltySearchTree::is_novel(ALEState& state, Action a, unsigned depth){
 
-        // Move state forward using action a
+	
+	// Move state forward using action a
 	m_env->set_player_B( m_player_B );
 	if(m_player_B)
 		m_env->oneStepAct( PLAYER_A_NOOP, a );
 	else
 		m_env->oneStepAct(a, PLAYER_B_NOOP);
 
-	const ALERAM& machine_state = m_env->getRAM();
+
+	const ALERAM& machine_state = m_env->getRAM();       
 	
+	bool is_novel = false;
 
 	for ( size_t i_byte = 0; i_byte < machine_state.size(); i_byte++ ){
 		unsigned byte_value = machine_state.get(i_byte);
@@ -418,13 +430,47 @@ bool UCTNoveltySearchTree::is_novel(ALEState& state, Action a, unsigned depth){
 			novelty_depth[ index ] = depth;
 			m_env->restoreState( state );
 	
-			return true;
+			is_novel = true;
+			
 		}
 	}
 
 	m_env->restoreState( state );	
-	return false;
+	return is_novel;
 }
+
+
+
+bool UCTNoveltySearchTree::is_novel(UCTNoveltyTreeNode* node){
+
+	
+	
+	const ALERAM& machine_state = node->state.getRAM();
+	
+	bool is_novel = false;
+
+	for ( size_t i_byte = 0; i_byte < machine_state.size(); i_byte++ ){
+		unsigned byte_value = machine_state.get(i_byte);
+		unsigned index = byte_value * i_byte;
+		
+		if( node->m_depth < novelty_depth[ index ] ){
+		//if( novelty_depth[ index ] == UNDEFINED_DEPTH){
+
+			
+			/**
+			 * update min depth found
+			 */
+			novelty_depth[ index ] = node->m_depth;
+	
+			is_novel = true;
+
+		}
+	}
+
+	return is_novel;
+
+}
+
 
 int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, int num_steps, 
 			       	return_t &traj_return, bool &game_ended, 

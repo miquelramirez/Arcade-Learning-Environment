@@ -92,6 +92,8 @@ class UCTNoveltySearchTree : public SearchTree {
 
 	bool is_novel(ALEState &state, Action a, unsigned depth);
 
+	bool is_novel(UCTNoveltyTreeNode* node);
+
 	virtual int simulate_game( UCTNoveltyTreeNode* node, Action act, int num_steps, 
 				  return_t &traj_return, bool &game_ended, bool discount_return = false, bool save_state = true);
 
