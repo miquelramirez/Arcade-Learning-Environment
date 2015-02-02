@@ -90,7 +90,7 @@ class UCTNoveltySearchTree : public SearchTree {
 
 	reward_t get_exploration_bonus( const ALERAM& machine_state, unsigned depth );
 
-	bool is_novel(ALEState &state, Action a, unsigned depth);
+	bool is_local_novel(ALEState &state, Action a, unsigned depth, 	std::vector<int>& local_novelty_depth);
 
 	bool is_novel(UCTNoveltyTreeNode* node);
 

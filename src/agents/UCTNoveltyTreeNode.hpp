@@ -18,28 +18,37 @@
 
 #include "TreeNode.hpp"
 
-class UCTNoveltyTreeNode: public TreeNode  {
-  public:
-    UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState); 
-    
-    UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState, 
-      int num_simulate_steps, Action a, SearchTree *tree);	
+#define UNDEFINED_DEPTH std::numeric_limits<int>::max()
 
-    int num_steps() {
-	int num_steps = 0;
-	
-	for (size_t a = 0; a < v_children.size(); a++) {
-	    if (v_children[a]->is_initialized())
-		num_steps += ((UCTNoveltyTreeNode*)v_children[a])->num_steps();
+class UCTNoveltyTreeNode: public TreeNode  {
+public:
+	UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState); 
+    
+	UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState, 
+			   int num_simulate_steps, Action a, SearchTree *tree);	
+
+	void init_novelty()
+	{
+		local_novelty_depth.resize( RAM_SIZE * 256, UNDEFINED_DEPTH );
 	}
 	
-	return num_steps + sim_steps;
-    }
+	int num_steps() {
+		int num_steps = 0;
+	
+		for (size_t a = 0; a < v_children.size(); a++) {
+			if (v_children[a]->is_initialized())
+				num_steps += ((UCTNoveltyTreeNode*)v_children[a])->num_steps();
+		}
+	
+		return num_steps + sim_steps;
+	}
     
-    /** Additional UCTNovelty-specific variables */
-    int visit_count; // The number of visits to this node
-    float sum_returns; // The sum of the returns received from this node
-    int sim_steps; // The Simulation of the rollout steps
+	/** Additional UCTNovelty-specific variables */
+	int visit_count; // The number of visits to this node
+	float sum_returns; // The sum of the returns received from this node
+	int sim_steps; // The Simulation of the rollout steps
+
+ 	std::vector<int>      local_novelty_depth;
 };
 
 #endif // __UCT_NOVELTY_TREE_NODE_HPP__

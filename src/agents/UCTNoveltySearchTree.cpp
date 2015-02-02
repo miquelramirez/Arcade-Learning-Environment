@@ -17,8 +17,6 @@
 #include "random_tools.h"
 #include "misc_tools.h"
 
-#define UNDEFINED_DEPTH std::numeric_limits<int>::max()
-
 UCTNoveltySearchTree::UCTNoveltySearchTree(RomSettings * rom_settings, Settings &settings,
 			     ActionVect &actions, StellaEnvironment* _env):
 	SearchTree(rom_settings, settings, actions, _env) {
@@ -29,15 +27,16 @@ UCTNoveltySearchTree::UCTNoveltySearchTree(RomSettings * rom_settings, Settings 
 		settings.getFloat("uct_exploration_constant", true);
 
 	uct_novelty_pruning = 
-		settings.getFloat("uct_novelty_pruning", true);
+		settings.getBool("uct_novelty_pruning", true);
 	
 	novelty_depth.resize( RAM_SIZE * 256, UNDEFINED_DEPTH );
-	novelty_reward.resize( uct_search_depth+1 );
-	for(int i = 0; i < uct_search_depth+1; i++)
+
+	novelty_reward.resize( uct_search_depth+2 );
+	for(int i = 0; i < uct_search_depth+2; i++)
 		novelty_reward[i].resize( RAM_SIZE * 256, 0);
 	exploration_weight = 1;
 	reward_weight = 1;
-	novelty_factor = 2;
+	novelty_factor = 1.001;
 }
 
 /* *********************************************************************
@@ -131,7 +130,7 @@ Action UCTNoveltySearchTree::get_best_action(void) {
 	//  for all children of p_root
 	int best_branch;
   
-	// best_branch = get_best_branch((UCTNoveltyTreeNode*)p_root, false);
+	//best_branch = get_best_branch((UCTNoveltyTreeNode*)p_root, false);
 	// Select based on most explored action
 	best_branch = get_most_visited_branch((UCTNoveltyTreeNode*)p_root);
   
@@ -178,8 +177,12 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
 				}
 			}
 
-			if(all_dups)
-				std::cout << "Node depth:" << node->m_depth << std::endl;
+			// if(all_dups){
+			// 	//std::cout << "Node depth:" << node->m_depth << std::endl;
+			// 	update_values((UCTNoveltyTreeNode*)node, -1);
+			// 	node = p_root;
+			// 	continue;
+			// }
 			assert(!all_dups);
 
 			int unvisited_child = get_child_with_count_zero(node);
@@ -218,10 +221,13 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
 		if (node->depth() > m_max_depth ) m_max_depth = node->depth();		
 
 		node->init(this, leaf_choice, sim_steps_per_node); 
+		//((UCTNoveltyTreeNode*)node)->init_novelty(); 
+		
 
 		if( ! is_novel( (UCTNoveltyTreeNode*) node ) ){
 			//node->duplicate = true;
 			node->novelty = 2;
+			//update_values((UCTNoveltyTreeNode*)node, -1);				
 			//continue;
 		}
 		else
@@ -265,7 +271,7 @@ int UCTNoveltySearchTree::get_child_with_count_zero(const TreeNode* node) const 
 	for (size_t c = 0; c < node->v_children.size(); c++) {
 		UCTNoveltyTreeNode * child = (UCTNoveltyTreeNode*)node->v_children[c];
 
-		if (!child->is_duplicate() && child->visit_count == 0)
+		if (!child->is_duplicate() && child->visit_count == 0)// && child->novelty < 2)
 			unvisited_children.push_back(c);
 	}
 
@@ -300,11 +306,16 @@ int UCTNoveltySearchTree::get_best_branch(UCTNoveltyTreeNode* node, bool add_uct
 
 		if (add_uct_bias) {
 			// The UCTNovelty bias (see Kocsis & Szepesvari (2006))
-			float bias = sqrt(log(node->visit_count + 0.0) / child->visit_count);
+			float bias = sqrt(log(node->visit_count + 0.0) / child->visit_count);			
 			bias *= uct_exploration_constant;
 
-			v = v + bias - child->novelty;
+			v = v + bias;
+			
+			//v = v - child->novelty;
 		}
+		
+
+
 
 		// Set the return to the computed value -- note! This is only used
 		//  for computation purposes; branch_return is not guaranteed to be
@@ -401,7 +412,7 @@ int UCTNoveltySearchTree::do_monte_carlo(UCTNoveltyTreeNode* start_node,
 	return steps;
 }
 
-bool UCTNoveltySearchTree::is_novel(ALEState& state, Action a, unsigned depth){
+bool UCTNoveltySearchTree::is_local_novel(ALEState& state, Action a, unsigned depth, std::vector<int>& local_novelty_depth){
 
 	
 	// Move state forward using action a
@@ -428,11 +439,22 @@ bool UCTNoveltySearchTree::is_novel(ALEState& state, Action a, unsigned depth){
 			 * update min depth found
 			 */
 			novelty_depth[ index ] = depth;
-			m_env->restoreState( state );
+
 	
 			is_novel = true;
 			
 		}
+		// //if( local_novelty_depth[ index ] == UNDEFINED_DEPTH){
+		// if( depth < local_novelty_depth[ index ] ){		
+			
+		// 	/**
+		// 	 * update min depth found
+		// 	 */
+		// 	local_novelty_depth[ index ] = depth;
+	
+		// 	is_novel = true;
+			
+		// }
 	}
 
 	m_env->restoreState( state );	
@@ -479,7 +501,12 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 	// Load the state into the emulator - a copy of the parent state
 	m_env->restoreState( node->state );
 
-	
+	// for(unsigned i = 0; i < RAM_SIZE * 256; i++)
+	// 	local_novelty_depth[i] = UNDEFINED_DEPTH;
+
+ 
+
+	int start_depth = uct_search_depth -  num_steps;
 
 	// For discounting purposes
 	float g = 1.0;
@@ -500,7 +527,7 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 			
 			if( uct_novelty_pruning ){
 				ALEState state = m_env->cloneState();
-				if( ! is_novel(state, a, node->depth() + probe_depth ) ){
+				if( ! is_local_novel(state, a, start_depth + probe_depth, node->local_novelty_depth ) ){
 					ActionVect shuffled_available_actions = available_actions;
 					std::random_shuffle ( shuffled_available_actions.begin(), shuffled_available_actions.end() );
 					
@@ -511,7 +538,7 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 						//count it in num_steps
 						i++;
 						
-						if( is_novel( state, b, node->depth() + probe_depth ) ){
+						if( is_local_novel( state, b, start_depth + probe_depth, node->local_novelty_depth ) ){
 							found_novel_action = true;
 							a = b;
 							break;
@@ -533,7 +560,8 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 		else
 			curr_reward = m_env->oneStepAct(a, PLAYER_B_NOOP);
 
-		reward_t curr_novelty = (!uct_novelty_pruning) ? get_exploration_bonus( m_env->getRAM(), node->depth() + probe_depth ) : 0;
+		//reward_t curr_novelty = (!uct_novelty_pruning) ? get_exploration_bonus( m_env->getRAM(), start_depth + probe_depth ) : 0;
+		reward_t curr_novelty = get_exploration_bonus( m_env->getRAM(), start_depth + probe_depth );
 
 		game_ended = m_env->isTerminal();
 			

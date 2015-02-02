@@ -14,6 +14,7 @@
  */
 #include "UCTNoveltyTreeNode.hpp"
 
+
 UCTNoveltyTreeNode::UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState): 
   TreeNode(parent, parentState),
   visit_count(0),
@@ -29,3 +30,4 @@ UCTNoveltyTreeNode::UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState,
   sum_returns(0),
   sim_steps(0) {
 }
+
