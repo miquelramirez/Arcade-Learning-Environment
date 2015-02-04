@@ -19,6 +19,7 @@ UCTNoveltyTreeNode::UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState):
   TreeNode(parent, parentState),
   visit_count(0),
   sum_returns(0),
+  return_achieved(0),
   sim_steps(0)
 {
 }
@@ -28,6 +29,7 @@ UCTNoveltyTreeNode::UCTNoveltyTreeNode(TreeNode *parent, ALEState &parentState,
   TreeNode(parent, parentState, tree, a, num_simulate_steps),
   visit_count(0),
   sum_returns(0),
+  return_achieved(0),
   sim_steps(0) {
 }
 

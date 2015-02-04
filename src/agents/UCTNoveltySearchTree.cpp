@@ -34,9 +34,9 @@ UCTNoveltySearchTree::UCTNoveltySearchTree(RomSettings * rom_settings, Settings 
 	novelty_reward.resize( uct_search_depth+2 );
 	for(int i = 0; i < uct_search_depth+2; i++)
 		novelty_reward[i].resize( RAM_SIZE * 256, 0);
-	exploration_weight = 1;
-	reward_weight = 1;
-	novelty_factor = 1.001;
+	exploration_weight = 1;//.0001;
+	reward_weight = 100000;
+	novelty_factor = 2.0;
 }
 
 /* *********************************************************************
@@ -71,11 +71,20 @@ void UCTNoveltySearchTree::update_tree(void) {
 	for(unsigned i = 0; i < RAM_SIZE * 256; i++)
 		novelty_depth[i] = UNDEFINED_DEPTH;
 
-	if(uct_novelty_pruning)
-		for(int i = 0; i < uct_search_depth+1; i++)
-			for(unsigned j = 0; j < RAM_SIZE * 256; j++)
-				novelty_reward[i][j] = 0;
+	for(unsigned j = 0; j < RAM_SIZE * 256; j++)
+		novelty_reward[ uct_search_depth + 1][j] = 1;		
+
+	for(int i = uct_search_depth; i >= 0; i--){				
+		for(unsigned j = 0; j < RAM_SIZE * 256; j++){								
+			novelty_reward[i][j] = novelty_reward[ i + 1 ][ j ] * novelty_factor;
+		}
+		
+	}
 	
+	
+	
+	get_exploration_bonus( m_env->getRAM(), 0 );
+
 	std::cout << "starting with " << simulation_steps << " simulation steps" <<std::endl;
 	
 	int num_iterations = 0;
@@ -217,21 +226,35 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
 		assert(!node->is_initialized());
 		
 		
-		node->m_depth = node->p_parent->m_depth + 1;
+		node->m_depth = node->p_parent->m_depth + sim_steps_per_node;
 		if (node->depth() > m_max_depth ) m_max_depth = node->depth();		
 
-		node->init(this, leaf_choice, sim_steps_per_node); 
+		//node->init(this, leaf_choice, sim_steps_per_node); 
+
+		return_t step_return;
+		int steps = simulate_game( (UCTNoveltyTreeNode*) node, leaf_choice, sim_steps_per_node, 
+				  step_return, node->is_terminal, true, true);
+		if( node->p_parent != NULL)
+			((UCTNoveltyTreeNode*)node)->return_achieved = ((UCTNoveltyTreeNode*)node->p_parent)->return_achieved;
+		
+
+		((UCTNoveltyTreeNode*)node)->return_achieved += step_return;		
+		node->initialized = true;
+		
 		//((UCTNoveltyTreeNode*)node)->init_novelty(); 
 		
 
-		if( ! is_novel( (UCTNoveltyTreeNode*) node ) ){
-			//node->duplicate = true;
-			node->novelty = 2;
-			//update_values((UCTNoveltyTreeNode*)node, -1);				
-			//continue;
-		}
-		else
-			std::cout << "Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice ) << "is Novel"<< std::endl;
+		// if( ! is_novel( (UCTNoveltyTreeNode*) node ) ){
+		// 	//node->duplicate = true;
+		// 	node->novelty = 2;
+		// 	//update_values((UCTNoveltyTreeNode*)node, -1);				
+		// 	//continue;
+		// }
+		// else
+		// std::cout << "Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice ) << "is Novel"<< std::endl;
+
+		// if( ((UCTNoveltyTreeNode*)node)->return_achieved > 0)
+		// 	std::cout << "Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice )  << " return: " << ((UCTNoveltyTreeNode*)node)->return_achieved << std::endl;
 		// Before declaring ourselves done, ensure that this is not a duplicate
 		//  of another action
 		if (ignore_duplicates)
@@ -440,7 +463,19 @@ bool UCTNoveltySearchTree::is_local_novel(ALEState& state, Action a, unsigned de
 			 */
 			novelty_depth[ index ] = depth;
 
-	
+			/**
+			 * update bonus for all possible depths
+			 */
+			novelty_reward[ depth + 1 ][ index ] = 1;// / (depth+1);
+			for( int i = depth; i >= 0; i-- ){
+				novelty_reward[ i ][ index ] = novelty_reward[ i + 1 ][ index ] * novelty_factor;
+			}
+
+			for( int i = depth+2; i <= uct_search_depth; i++ ){
+				novelty_reward[ i ][ index ] = novelty_reward[ i - 1 ][ index ] / novelty_factor;
+				
+			}
+
 			is_novel = true;
 			
 		}
@@ -482,8 +517,9 @@ bool UCTNoveltySearchTree::is_novel(UCTNoveltyTreeNode* node){
 			/**
 			 * update min depth found
 			 */
-			novelty_depth[ index ] = node->m_depth;
-	
+			//novelty_depth[ index ] = node->m_depth;
+			return true;
+			
 			is_novel = true;
 
 		}
@@ -505,14 +541,17 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 	// 	local_novelty_depth[i] = UNDEFINED_DEPTH;
 
  
-
-	int start_depth = uct_search_depth -  num_steps;
+	int start_depth = node->state.getFrameNumber() - 
+		p_root->state.getFrameNumber();
 
 	// For discounting purposes
 	float g = 1.0;
-	traj_return = 0.0;
+	//traj_return = 0.0;
+	traj_return = node->return_achieved;
 	game_ended = false;
 	Action a;
+
+
 
 	// So that the compiler doesn't complain
 	if (act == RANDOM) a = PLAYER_A_NOOP; 
@@ -570,7 +609,7 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 		// Add curr_reward to the trajectory return
 		if (discount_return) {
 			traj_return += r * g  * reward_weight;
-			traj_return += curr_novelty * g  * exploration_weight;
+			traj_return += curr_novelty * g/2.0  * exploration_weight;
 			
 			// Update the discount factor every sim_steps_per_ndoe
 			if ((i+1) % sim_steps_per_node == 0)
@@ -589,6 +628,11 @@ int UCTNoveltySearchTree::simulate_game(UCTNoveltyTreeNode* node, Action act, in
 		}
 	}
 
+
+	// Save the result
+	if(save_state)
+		node->state = m_env->cloneState();
+
 	return i;
 }
 
@@ -598,29 +642,41 @@ reward_t UCTNoveltySearchTree::get_exploration_bonus( const ALERAM& machine_stat
 	for ( size_t i_byte = 0; i_byte < machine_state.size(); i_byte++ ){
 		unsigned byte_value = machine_state.get(i_byte);
 		unsigned index = byte_value * i_byte;
+
+
+		if( novelty_reward[ depth ][ index ] > max_rew )
+			{				
+				max_rew = novelty_reward[ depth ][ index ];
+			}
+		
+
 		if( depth < novelty_depth[ index ] ){
 			
 			/**
 			 * update min depth found
 			 */
+
+			//			std::cout << "Byte: " << i_byte << " val: "<< byte_value << " before depth "<< 	novelty_depth[ index ] << " now " << depth <<std::endl;
+			
 			novelty_depth[ index ] = depth;
 			
 			/**
 			 * update bonus for all possible depths
 			 */
-			novelty_reward[ depth + 1 ][ index ] = 1;
+			novelty_reward[ depth + 1 ][ index ] = 1;// / (depth+1);
 			for( int i = depth; i >= 0; i-- ){
 				novelty_reward[ i ][ index ] = novelty_reward[ i + 1 ][ index ] * novelty_factor;
 			}
 
 			for( int i = depth+2; i <= uct_search_depth; i++ ){
 				novelty_reward[ i ][ index ] = novelty_reward[ i - 1 ][ index ] / novelty_factor;
-			}
 				
+			}
+			//max_rew = 1;
+			
 		}
 		
-		if( novelty_reward[ depth ][ index ] > max_rew )
-			max_rew = novelty_reward[ depth ][ index ];
+		
 		
 		
 	}
@@ -641,6 +697,9 @@ void UCTNoveltySearchTree::update_values(UCTNoveltyTreeNode* node, return_t mc_r
 	//  node's immediate reward
 	return_t total_return = discount_factor * mc_return + node->node_reward;
 
+	//if(total_return > node->sum_returns )
+	//	node->sum_returns = total_return; 
+	
 	node->sum_returns += total_return; 
 
 	// Recursively update the parent (this can also be done in a loop at the 

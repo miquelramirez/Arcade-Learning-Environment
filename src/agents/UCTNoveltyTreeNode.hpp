@@ -46,6 +46,7 @@ public:
 	/** Additional UCTNovelty-specific variables */
 	int visit_count; // The number of visits to this node
 	float sum_returns; // The sum of the returns received from this node
+	return_t return_achieved; //return from root up to current node
 	int sim_steps; // The Simulation of the rollout steps
 
  	std::vector<int>      local_novelty_depth;
