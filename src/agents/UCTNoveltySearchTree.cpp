@@ -84,8 +84,13 @@ void UCTNoveltySearchTree::update_tree(void) {
 	
 	
 	get_exploration_bonus( m_env->getRAM(), 0 );
+	
+	float mc_return;
+	do_monte_carlo((UCTNoveltyTreeNode*)p_root, uct_search_depth, mc_return);
 
 	std::cout << "starting with " << simulation_steps << " simulation steps" <<std::endl;
+	
+	p_root->m_depth = 0;
 	
 	int num_iterations = 0;
 	while (true) {
@@ -237,10 +242,10 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
 		if( node->p_parent != NULL)
 			((UCTNoveltyTreeNode*)node)->return_achieved = ((UCTNoveltyTreeNode*)node->p_parent)->return_achieved;
 		
-
 		((UCTNoveltyTreeNode*)node)->return_achieved += step_return;		
 		node->initialized = true;
-		
+		node->act = leaf_choice;
+
 		//((UCTNoveltyTreeNode*)node)->init_novelty(); 
 		
 
@@ -253,8 +258,8 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
 		// else
 		// std::cout << "Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice ) << "is Novel"<< std::endl;
 
-		// if( ((UCTNoveltyTreeNode*)node)->return_achieved > 0)
-		// 	std::cout << "Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice )  << " return: " << ((UCTNoveltyTreeNode*)node)->return_achieved << std::endl;
+		//if( ((UCTNoveltyTreeNode*)node)->return_achieved > 0)
+		// 	std::cout << "\t New Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice )  << " return: " << ((UCTNoveltyTreeNode*)node)->return_achieved << std::endl;
 		// Before declaring ourselves done, ensure that this is not a duplicate
 		//  of another action
 		if (ignore_duplicates)
@@ -273,6 +278,16 @@ int UCTNoveltySearchTree::single_uct_iteration(void) {
   
 	int mc_steps = uct_search_depth - node_depth; 
   
+	//if( ((UCTNoveltyTreeNode*)node)->return_achieved > 0)
+		// {
+		// 	std::cout << "\t\tRoot Node depth:" << node->m_depth << "action: " << action_to_string( leaf_choice );
+		// 	UCTNoveltyTreeNode* n = (UCTNoveltyTreeNode*)(node->p_parent);
+		// 	while( n->p_parent != NULL ){
+		// 		std::cout << "  " << action_to_string( n->act );
+		// 		n = (UCTNoveltyTreeNode*)(n->p_parent);
+		// 	}
+		// 	std::cout << " return: " << ((UCTNoveltyTreeNode*)node)->return_achieved << std::endl;
+		// }
 	sim_steps += do_monte_carlo((UCTNoveltyTreeNode*)node, mc_steps, mc_return);
 	
 	
@@ -457,6 +472,8 @@ bool UCTNoveltySearchTree::is_local_novel(ALEState& state, Action a, unsigned de
 		if( depth < novelty_depth[ index ] ){
 		//if( novelty_depth[ index ] == UNDEFINED_DEPTH){
 
+			m_env->restoreState( state );	
+			return true;
 			
 			/**
 			 * update min depth found
@@ -644,10 +661,10 @@ reward_t UCTNoveltySearchTree::get_exploration_bonus( const ALERAM& machine_stat
 		unsigned index = byte_value * i_byte;
 
 
-		if( novelty_reward[ depth ][ index ] > max_rew )
-			{				
-				max_rew = novelty_reward[ depth ][ index ];
-			}
+		// if( novelty_reward[ depth ][ index ] > max_rew )
+		// 	{				
+		// 		max_rew = novelty_reward[ depth ][ index ];
+		// 	}
 		
 
 		if( depth < novelty_depth[ index ] ){
@@ -656,7 +673,7 @@ reward_t UCTNoveltySearchTree::get_exploration_bonus( const ALERAM& machine_stat
 			 * update min depth found
 			 */
 
-			//			std::cout << "Byte: " << i_byte << " val: "<< byte_value << " before depth "<< 	novelty_depth[ index ] << " now " << depth <<std::endl;
+			//std::cout << "Byte: " << i_byte << " val: "<< byte_value << " before depth "<< 	novelty_depth[ index ] << " now " << depth <<std::endl;
 			
 			novelty_depth[ index ] = depth;
 			
@@ -673,7 +690,7 @@ reward_t UCTNoveltySearchTree::get_exploration_bonus( const ALERAM& machine_stat
 				
 			}
 			//max_rew = 1;
-			
+			max_rew++;
 		}
 		
 		
