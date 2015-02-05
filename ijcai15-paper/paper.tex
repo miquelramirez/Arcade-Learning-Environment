@@ -705,16 +705,18 @@ highway.} something that is very unlikely in a random exploration. $\IW(1)$ does
 %% node there is at most 3 different new possible bytes in the RAM state
 %% resulting from moving up, down, or do-nothing.
 
-$\IW(1)$ also outperforms the best learning algorithm in
+$\IW(1)$ obtains better scores than the best learning algorithm in
 \cite{deep-mind-atari} in the $7$ games considered there, and
-\BFS\ does so in $6$ of the $7$ games. Comparing with the scores reported for the reinforcement learning algorithms by BNVB,
+\BFS\ does so in $6$ of the $7$ games. Comparing with the scores reported for the reinforcement learning algorithms in BNVB,
 we note that both $\IW(1)$ and \BFS\ do much better than the best learning algorithm in
-those games where the learning algorithms outperform \UCT\ like \Montezuma, \Venture\
-and \Bowling.  In \Montezuma\ rewards are very
-sparse, deep, and most of the actions lead to losing a life with
-no immediate penalty or consequence.  All algorithms achieve $0$ score, 
+those games where the learning algorithms outperform \UCT\, namely, \Montezuma, \Venture\
+and \Bowling. We take this as evidence that $\IW(1)$ and \BFS\ are as at least as good as learning
+algorithms at finding rewards in games where \UCT\ is not very effective.
+
+For instance, in \Montezuma\ rewards are very sparse, deep, and most of the actions lead to losing a life with
+no immediate penalty or consequence.  In our experiments, all algorithms achieve $0$ score, 
 except for \BFS\ that achieves an average score of $540$, and a score
-of $2500$ in one of the runs. This means however that even \BFS\  is not able to 
+of $2,500$ in one of the runs. This means however that even \BFS\  is not able to 
 consistently find rewards in this game. This game and several others
 like \Breakout\ and \SpaceInvaders\ could be much simpler by adding
 negative rewards for losing a life. We have indeed observed that
