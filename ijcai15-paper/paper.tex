@@ -8,7 +8,7 @@
 \usepackage{times}
 
 \usepackage{todonotes}
-\newcommand{\nir}{\todo[inline,color=orange!10]}
+\newcommand{\nir}{\todo[color=orange!10]}
 \newcommand{\hg}{\todo[color=blue!10]}
 \newcommand{\mrj}{\todo[inline,color=green!10]}
 
@@ -21,6 +21,8 @@
 \frenchspacing
 % \setlength{\pdfpagewidth}{8.5in}
 % \setlength{\pdfpageheight}{11in}
+\usepackage{enumitem}
+%\setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
 
 
 %Table stuff
@@ -141,7 +143,7 @@
 
 \title{Classical Planning with Simulators: \\ Results on the Atari Video Games}
 
-\author{\textbf{ID:} \ldots  \ \ ; \ \ \textbf{Keywords:} classical planning, search, video games}
+\author{\textbf{ID:} 320  \ \ ; \ \ \textbf{Keywords:} classical planning, search, video games}
 
 % \author{Nir Lipovetzky \\
 %        The University of Melbourne \\
@@ -205,9 +207,10 @@ returns successor states and rewards.
 The action selection problem in the Atari games can be seen as a \emph{reinforcement learning} problem
 \cite{sutton:book} over a deterministic MDP where the state transitions and rewards are not known, or alternatively,
 as a  \emph{net-benefit planning problem} \cite{coles2012survey,keyder:jair09} with unknown state transitions  and  rewards. 
-\Omit{Namely}
-\nir{While the \emph{reinforcement learning} problem seeks to synthesize a controller as a policy/function that maximizes 
-the reward of any trajectory}, we seek  an action sequence $a_0, a_1, \ldots, a_m$ from the  current  state $s_0$ that generates
+%\Omit{Namely} \Omit{While the \emph{reinforcement learning} problem seeks to synthesize a controller as a policy/function that maximizes 
+%the reward of any trajectory\nir{NIR remark}}
+While in the former a policy mapping every state $s$ to an action $a$ that maximizes expected reward is sought, in the latter one 
+seeks an action sequence $a_0, a_1, \ldots, a_m$ from the  \emph{current}  state $s_0$ that generates
 a state sequence $s_0, s_1, \ldots, s_{m+1}$ with  maximum  total reward $\sum_{i=0}^{m} r(a_i,s_i)$,
 where $m$ is a sufficiently large planning horizon, and the rewards $r(a_i,s_i)$ and the  state-transitions $s_{i+1}=f(a_i,s_i)$
 are known only after  action $a_i$ is applied in the state $s_i$.
@@ -223,7 +226,7 @@ transition and cost functions  $f(a,s)$ and $c(a,s)$ are not known a priori does
 Dijkstra's algorithm, which requires the value of these functions precisely when  the action $a$
 is applied in the state $s$.
 
-The limitation of the   basic blind search  methods is that they are not effective  over large  spaces, neither
+The limitation of the   basic blind search  methods is that they are not effective  over large state spaces, neither
 for solving problems off-line, nor for guiding  a lookahead search for solving problems on-line.
 In this work, we thus turn to a recent class of  planning algorithms that combine the scope of blind search
 methods with the performance of state-of-the-art classical planners: namely, like ``blind'' search algorithms
@@ -310,19 +313,20 @@ The procedure $\IW(i)$  is a plain forward-state \emph{breadth-first search} wit
 $s$ is generated, the state is  pruned if it doesn't pass a simple \emph{novelty test}.
 More precisely,
 
-\begin{itemize}
+\begin{itemize}[noitemsep]
 \item The \emph{novelty of a newly generate state $s$  in a  search algorithm}
 is   $1$ if  $s$ is the first state generated in the search that makes true some  atom $X=x$,
 else it is $2$ if  $s$ is the first state that makes a \emph{pair} of atoms $X=x$ and $Y=y$ true,
 and so on.
 
-\item  $\IW(i)$ is a breadth-first search that prunes newly generated states when their novelty measure
+\item  $\IW(i)$ is a breadth-first search that prunes newly generated states when their novelty \Omit{measure}
 is greater than $i$.
 
 \item $\IW$  calls $\IW(i)$ sequentially for $i=1,2,\ldots$ until a termination condition is reached,
 returning then the best path found.
 \end{itemize}
 
+\medskip
 For classical planning, the termination condition is the achievement of the goal. In the \emph{on-line setting,}
 as in the Atari games, the termination condition is given by a time window or a maximum number of generated nodes.
 The  best path found by \IW \ is then the  path  that has a  maximum accumulated reward. The accumulated reward $R(s)$  
@@ -377,7 +381,7 @@ C)~the ``trail''  preserves ``optimality''; i.e., no  tuple $t_k$ can be reached
 
 While this notion of width and the iterated  width algorithms that are based on it  have been designed
 for problems where a goal state needs to be reached, the notions remain
-relevant  in  optimisation problems as well. Indeed, if a  good path is made of
+relevant  in  optimization problems as well. Indeed, if a  good path is made of
 states $s_i$ each of which has a low width, \IW\ can be made
 to find such path in low polynomial time for a small value of the $k$ parameter.
 Later on we will discuss  a slight  change  required in \IW\ to enforce this property.
@@ -458,7 +462,7 @@ considered by BNVB; namely, breadth-first search and \UCT. ALE supports also a \
 where the goal is to learn controllers that map  states into actions without
 doing any lookahead. Algorithms across  the two settings are thus not directly comparable
 as they compute different things. Learning controllers appears as a more challenging problem
-and it is thus not surprising that planning algorithms like UCT tend to achieve a higher score than 
+and it is thus not surprising that planning algorithms like \UCT\ tend to achieve a higher score than 
 learning algorithms. In addition, the learning algorithms reported by BNVB tend to use 
 the state of the screen pixels, while the planning algorithms,  use the state
 of the RAM memory. It is not clear however whether one input representation is
@@ -519,7 +523,7 @@ and \UCT\, is that \UCT\ selects an action randomly in the rollout every
 single frame, while the others select an action every 5 frames, and
 the remain ones are $no-op$, as is done in the simulation
 environment. Therefore, a node in all algorithms represent $5$ frames,
-but in UCT represents $1$ frame. As a result, a UCT rollout of depth
+but in UCT represents $1$ frame. As a result, a \UCT\ rollout of depth
 $300$ frames involve the selection of 300 actions, decreasing the
 budget of simulated frames by $300$, while the other algorithms need a
 branch of $1500$ frames to select $300$ actions, decreasing the budget
@@ -656,7 +660,7 @@ loops sometimes.}
 \end{tabular}
 }
 
- \caption{\small Performance that results from various  lookahead algorithms in \numgames\  Atari games. The algorithms, \BRFS, $\IW(1)$, \BFS, and \UCT, are evaluated
+ \caption{\small Performance that results from various  lookahead algorithms in \numgames\  Atari 2600 games. The algorithms, \BRFS, $\IW(1)$, \BFS, and \UCT, are evaluated
  over $10$ runs (episodes) for each game. 
 The maximum episode duration is  $18,000$  frames and every algorithm is limited to a lookahead budget of 150,000 simulated frames.
 Figures for \BRFS\ and \UCT\ taken from Bellemare et al. Average  CPU times per action in seconds, rounded to nearest integer, shown for  $\IW(1)$ and \BFS. 
@@ -751,8 +755,8 @@ easy too, as the goals can often be achieved one at a time after a simple goal o
 
 In the iterated width algorithm, the key notion is the \emph{novelty measure} of a state in the underlying
 breadth-first search. These novelty measures make use of the factored representation of the states for
-providing a structure to the search: states that have width 1 are explored first in linear time,
-then states that have  width 2  are explored in quadratic time, and so on. In classical planning problems
+providing a structure to the search: states that have width $1$ are explored first in linear time,
+then states that have  width $2$ are explored in quadratic time, and so on. In classical planning problems
 with atomic goals, this way of organizing the search  pays off both theoretically and practically.
 
 The use of ``novelty measures'' for guiding an optimization search while ignoring the function that is being
@@ -765,11 +769,9 @@ in such a case is domain-dependent; for example, in the evolution of a controlle
 for guiding a robot in a maze, an individual controller  will not be ranked by how
 close it takes the robot to the goal (the greedy measure), but by the distance between
 the locations that are  reachable with it, and the locations reachable with
-the  other controllers in the population (a diversity measure). The novelty measure used by \IW, on the other hand, is domain-independent and it
+the  other controllers in the population (a diversity measure). The novelty measure used by 
+\IW, on the other hand, is domain-independent and it
 is determined by the structure of the states as captured by the problem variables.
-
-
-
 
 The balance between exploration and exploitation has received considerable attention in
 reinforcement learning \cite{sutton:book}, where both are required for converging to an
