@@ -7,6 +7,10 @@
 % Use the postscript times font!
 \usepackage{times}
 
+\usepackage{todonotes}
+\newcommand{\nir}{\todo[inline,color=orange!10]}
+\newcommand{\hg}{\todo[color=blue!10]}
+\newcommand{\mrj}{\todo[inline,color=green!10]}
 
 % \usepackage{aaai}
 % \usepackage{times}
@@ -135,7 +139,7 @@
 
 \setcounter{secnumdepth}{0}
 
-\title{Classical Planning with Simulations: \\ Results on the Atari Video Games}
+\title{Classical Planning with Simulators: \\ Results on the Atari Video Games}
 
 \author{\textbf{ID:} \ldots  \ \ ; \ \ \textbf{Keywords:} classical planning, search, video games}
 
@@ -201,7 +205,9 @@ returns successor states and rewards.
 The action selection problem in the Atari games can be seen as a \emph{reinforcement learning} problem
 \cite{sutton:book} over a deterministic MDP where the state transitions and rewards are not known, or alternatively,
 as a  \emph{net-benefit planning problem} \cite{coles2012survey,keyder:jair09} with unknown state transitions  and  rewards. 
-Namely, we seek  an action sequence $a_0, a_1, \ldots, a_m$ from the  current  state $s_0$ that generates
+\Omit{Namely}
+\nir{While the \emph{reinforcement learning} problem seeks to synthesize a controller as a policy/function that maximizes 
+the reward of any trajectory}, we seek  an action sequence $a_0, a_1, \ldots, a_m$ from the  current  state $s_0$ that generates
 a state sequence $s_0, s_1, \ldots, s_{m+1}$ with  maximum  total reward $\sum_{i=0}^{m} r(a_i,s_i)$,
 where $m$ is a sufficiently large planning horizon, and the rewards $r(a_i,s_i)$ and the  state-transitions $s_{i+1}=f(a_i,s_i)$
 are known only after  action $a_i$ is applied in the state $s_i$.
