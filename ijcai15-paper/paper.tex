@@ -21,9 +21,10 @@
 \frenchspacing
 % \setlength{\pdfpagewidth}{8.5in}
 % \setlength{\pdfpageheight}{11in}
-\usepackage{enumitem}
-\setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
 
+% \usepackage{enumitem}
+% \setlist{nosep} % or \setlist{noitemsep} to leave space around whole list
+% HG: better not play with spacing .. doesn't look as nice
 
 %Table stuff
 \usepackage{xcolor,colortbl}
@@ -143,7 +144,7 @@
 
 \title{Classical Planning with Simulators: \\ Results on the Atari Video Games}
 
-\author{\textbf{ID:} 320  \ \ ; \ \ \textbf{Keywords:} classical planning, search, video games}
+\author{\textbf{ID:} 320  \ \ ; \ \ \textbf{Keywords:} classical planning, search, video games, application}
 
 % \author{Nir Lipovetzky \\
 %        The University of Melbourne \\
@@ -204,16 +205,13 @@ returns successor states and rewards.
 %\footnote{Actually, in the Atari games, the rewards $r(a,s)$ depend only
 % on the state $f(a,s)$ that results from doing action $a$ in the state $s$.}
 
-The action selection problem in the Atari games can be seen as a \emph{reinforcement learning} problem
+The action selection problem in the Atari games can be addressed  as a \emph{reinforcement learning} problem
 \cite{sutton:book} over a deterministic MDP where the state transitions and rewards are not known, or alternatively,
 as a  \emph{net-benefit planning problem} \cite{coles2012survey,keyder:jair09} with unknown state transitions  and  rewards. 
-%\Omit{Namely} \Omit{While the \emph{reinforcement learning} problem seeks to synthesize a controller as a policy/function that maximizes 
-%the reward of any trajectory\nir{NIR remark}}
-While in the former a policy mapping every state $s$ to an action $a$ that maximizes expected reward is sought, in the latter one 
-seeks an action sequence $a_0, a_1, \ldots, a_m$ from the  \emph{current}  state $s_0$ that generates
-a state sequence $s_0, s_1, \ldots, s_{m+1}$ with  maximum  total reward $\sum_{i=0}^{m} r(a_i,s_i)$,
-where $m$ is a sufficiently large planning horizon, and the rewards $r(a_i,s_i)$ and the  state-transitions $s_{i+1}=f(a_i,s_i)$
-are known only after  action $a_i$ is applied in the state $s_i$.
+ALE supports the two settings: an \emph{on-line plannning setting} where  actions are selected
+after a lookahead, and a \emph{learning setting}  that  must produce   controllers for mapping  states into
+actions reactively without any lookahead. In this work we pursue the on-line planning approach where the lookahead
+seeks  action sequences with  maximum  reward up to a certain horizon.
 
 The presence of unknown transition and  rewards in  the Atari games does not preclude the use of blind-search
 methods like breadth-first search, Dijkstra's algorithm \cite{dijkstra},  or learning methods  such as
@@ -313,15 +311,13 @@ The procedure $\IW(i)$  is a plain forward-state \emph{breadth-first search} wit
 $s$ is generated, the state is  pruned if it doesn't pass a simple \emph{novelty test}.
 More precisely,
 
-\begin{itemize}[noitemsep]
+\begin{itemize}
 \item The \emph{novelty of a newly generate state $s$  in a  search algorithm}
 is   $1$ if  $s$ is the first state generated in the search that makes true some  atom $X=x$,
 else it is $2$ if  $s$ is the first state that makes a \emph{pair} of atoms $X=x$ and $Y=y$ true,
 and so on.
-
 \item  $\IW(i)$ is a breadth-first search that prunes newly generated states when their novelty \Omit{measure}
 is greater than $i$.
-
 \item $\IW$  calls $\IW(i)$ sequentially for $i=1,2,\ldots$ until a termination condition is reached,
 returning then the best path found.
 \end{itemize}
@@ -351,7 +347,7 @@ Yet, this changes the definition of the domain.} For example, $37\%$ of the 37,9
 considered  in \cite{nir:ecai2012} are solved by $\IW(1)$ while $51.3\%$ are  solved by $\IW(2)$.
 These are instances obtained from 37 benchmark domains by splitting problems with $N$ atomic
 goals into $N$ problems with one atomic goal each.  Since $\IW(k)$ runs in time that is exponential in $k$, 
-this mean that almost $90\%$ of the 37,921 instances are  solved in time that is either linear or quadratic in the number of problem variables, 
+this means that almost $90\%$ of the 37,921 instances are  solved in time that is either linear or quadratic in the number of problem variables, 
 which in such encodings are all \emph{boolean}. Furthermore, when the performance of \IW\   is compared with  
 a  Greedy Best First Search guided by the additive heuristic $h_{add}$, it turns out that ``blind'' \IW\ solves as many problems as the informed 
 search, 34,627 vs. 34,849, far ahead of  other blind search  algorithms like \BRFS\ and \ID\  that solve 9,010 and 8,762 problems each. 
