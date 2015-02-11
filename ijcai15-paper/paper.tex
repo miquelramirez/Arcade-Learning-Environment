@@ -492,7 +492,7 @@ are reused  from the previous searches are ignored in the computation of the nov
 new states so that more states can escape pruning. Otherwise, $\IW(1)$ often
 uses a fraction of the  budget.  This is not needed in \BFS\ which does 
 no pruning.  $\IW(1)$ and \BFS\ are  limited to  search up to a depth of
-$m=1,500$ frames and up to $m=150,000$ frames per root branch. This is
+$1,500$ frames and up to $150,000$ frames per root branch. This is
 to avoid the search from  going too deep or being too committed to a
 single root action. 
 % Similarly UCT defines a limit of $m=300$ frames for each rollout. 
@@ -712,7 +712,7 @@ highway.} something that is very unlikely in a random exploration. $\IW(1)$ does
 %% node there is at most 3 different new possible bytes in the RAM state
 %% resulting from moving up, down, or do-nothing.
 
-$\IW(1)$ obtains better scores than the best learning algorithm in
+$\IW(1)$ obtains better scores than the best learning algorithm
 \cite{deep-mind-atari} in the $7$ games considered there, and
 \BFS\ does so in $6$ of the $7$ games. Comparing with the scores reported for the reinforcement learning algorithms in BNVB,
 we note that both $\IW(1)$ and \BFS\ do much better than the best learning algorithm in
