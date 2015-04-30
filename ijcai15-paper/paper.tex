@@ -15,8 +15,8 @@
 % \usepackage{aaai}
 % \usepackage{times}
 
-\usepackage{helvet}
-\usepackage{courier}
+%\usepackage{helvet}
+%\usepackage{courier}
 \usepackage{url}
 \frenchspacing
 % \setlength{\pdfpagewidth}{8.5in}
@@ -171,19 +171,49 @@
 \maketitle
 
 \begin{abstract}
-The Atari 2600 games supported in  the Arcade Learning Environment~\cite{bellemare:jair2013}
-all feature a known initial (RAM) state and actions that have deterministic effects. Classical planners, however,
-cannot be used  off-the-shelf as there is no  compact PDDL-model of  the games, and action effects and goals are  not
-known \emph{a priori}. Indeed, there are no explicit goals, and the planner must select actions on-line while interacting 
-with a simulator that returns successor states and rewards. None of this precludes  the use of  blind lookahead algorithms 
-for action selection like breadth-first search or  Dijkstra's yet such methods are not effective over large  state spaces. 
-We thus turn to a different class of  planning methods  introduced recently  that  have been shown to be  effective for solving
-large planning problems but which do not require  prior knowledge of state transitions and costs (rewards) or goals.
-The simplest such algorithm, called Iterated Width or \IW, consists of  a sequence of calls  $\IW(1)$, $\IW(2)$, \ldots,
-where  $\IW(k)$ is  a breadth-first search in which a state is  pruned when it is not the first state in the  search  to make true 
-a subset of $k$ atoms. The  empirical results over \numgames\ Atari games show that  $\IW(1)$ performs at the level of UCT, 
-the state-of-the-art planning method in this domain, and suggest the potential of width-based methods for planning with
-simulators when factored, compact action models are not available.
+The Atari 2600 games supported in the Arcade Learning
+Environment~\cite{bellemare:jair2013} all feature a known initial
+(RAM) state and actions that have deterministic effects. Classical
+planners, however, cannot be used off-the-shelf as there is no compact
+PDDL-model of the games, and action effects and goals are not known
+\emph{a priori}. Indeed, there are no explicit goals, and the planner
+must select actions on-line while interacting with a simulator that
+returns successor states and rewards. None of this precludes the use
+of blind lookahead algorithms for action selection like breadth-first
+search or Dijkstra's yet such methods are not effective over large
+state spaces.  We thus turn to a different class of
+planning methods introduced recently that have been shown to be
+effective for solving large planning problems but which do not require
+prior knowledge of state transitions and costs (rewards) or goals. The
+empirical results over \numgames\ Atari games show that the simplest
+such algorithm performs at the level of UCT, the state-of-the-art
+planning method in this domain, and suggest the potential of
+width-based methods for planning with simulators when factored,
+compact action models are not available.
+
+%% The Atari 2600 games supported in the Arcade Learning
+%% Environment~\cite{bellemare:jair2013} all feature a known initial
+%% (RAM) state and actions that have deterministic effects. Classical
+%% planners, however, cannot be used off-the-shelf as there is no compact
+%% PDDL-model of the games, and action effects and goals are not known
+%% \emph{a priori}. Indeed, there are no explicit goals, and the planner
+%% must select actions on-line while interacting with a simulator that
+%% returns successor states and rewards. None of this precludes the use
+%% of blind lookahead algorithms for action selection like breadth-first
+%% search or Dijkstra's yet such methods are not effective over large
+%% state spaces.  We thus turn to a different class of planning methods
+%% introduced recently that have been shown to be effective for solving
+%% large planning problems but which do not require prior knowledge of
+%% state transitions and costs (rewards) or goals.  The simplest such
+%% algorithm, called Iterated Width or \IW, consists of a sequence of
+%% calls $\IW(1)$, $\IW(2)$, \ldots, where $\IW(k)$ is a breadth-first
+%% search in which a state is pruned when it is not the first state in
+%% the search to make true a subset of $k$ atoms. The empirical results
+%% over \numgames\ Atari games show that $\IW(1)$ performs at the level
+%% of UCT, the state-of-the-art planning method in this domain, and
+%% suggest the potential of width-based methods for planning with
+%% simulators when factored, compact action models are not available.
+
 \end{abstract}
 
 \section{Introduction}
@@ -199,7 +229,7 @@ While all  these games feature a known initial (RAM) state and actions that
 have deterministic effects, the problem of selecting the next action
 to be done cannot be addressed with off-the-shelf classical planners 
 \cite{planning:book,geffner:book}. This is because there is  no compact PDDL-like encoding of the domain and 
-the goal to be achieved in each game  is not given. Indeed, there are no goals but rewards, and 
+the goal to be achieved in each game  is not given, precluding the automatic derivation of heuristic functions and other powerful inferences. Indeed, there are no goals but rewards, and 
 the planner must select actions on-line while interacting with a simulator that just
 returns successor states and rewards.
 %\footnote{Actually, in the Atari games, the rewards $r(a,s)$ depend only
@@ -464,7 +494,7 @@ the state of the screen pixels, while the planning algorithms,  use the state
 of the RAM memory. It is not clear however whether one input representation is
 more challenging than the other; for the learning algorithms, BNVB mention
 that the results tend to be better for the screen inputs. Experiments were
-run on a high-performance computation cluster run by the University of Melbourne, where each computing node consists of a $6$-core Intel Xeon 
+run on a cluster, where each computing node consists of a $6$-core Intel Xeon 
 E5-2440, with $2.4$ GHz clock speed, with 64 GBytes of RAM installed.
 
 Table~\ref{performance} shows the performance of $\IW(1)$ and \BFS\
@@ -842,11 +872,12 @@ such the use of the  novelty measures for shaping rewards.
 
 \medskip
 
-\noindent \textbf{Acknowledgments.} We thank the people involved in
+\noindent }
+
+\section*{Acknowledgments} We thank the people involved in
 the creation and maintenance of the Arcade Learning Environment that
 have made this work possible. The research by Nir Lipovetzky is partially
 funded by the Australian Research Council Linkage grant LP11010015.
-}
 
 %%% - Learning in same instance, across diff instances of same game, etc.
 %%%% - Learning controllers vs. on-line planning, etc
