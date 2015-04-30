@@ -146,46 +146,52 @@
 
 %\author{ \textbf{Keywords:} classical planning, search, video games, application}
 
-% \author{Nir Lipovetzky \\
-%        The University of Melbourne \\
-%     Melbourne, Australia\\
-%     {\normalsize\url{nir.lipovetzky@unimelb.edu.au}}
-%%% footnote doesn't look nice ; this looks better
-%% although can't use Nir's unimelb address that is too long :-)
-%% 
-%    {\small\url{nirlipo@gmail.com}}
-%    \And
-%    Miquel Ramirez \\
-%    Australian National University \\
-%    Canberra, Australia\\
-%   {\small\url{miquel.ramirez@gmail.com}}
-%    \And
-%    Hector Geffner \\
-%    ICREA \&  Universitat Pompeu Fabra \\
-%    Barcelona, SPAIN \\
-%    {\small\url{hector.geffner@upf.edu}}
- %%%%% \thanks{firstname.lastname}
-%}
-
+ \author{Nir Lipovetzky \\
+        { The University of Melbourne }\\
+     { Melbourne, Australia}\\
+     {\footnotesize\url{nir.lipovetzky@unimelb.edu.au}}
+%% footnote doesn't look nice ; this looks better
+% although can't use Nir's unimelb address that is too long :-)
+% 
+%    {\tiny\url{nirlipo@gmail.com}}
+    \And
+    Miquel Ramirez \\
+    { Australian National University} \\
+    { Canberra, Australia}\\
+   {\footnotesize\url{miquel.ramirez@anu.edu.au}}
+    \And
+    Hector Geffner \\
+    { ICREA \& U. Pompeu Fabra }\\
+    { Barcelona, Spain }\\
+    {\footnotesize\url{hector.geffner@upf.edu}}
+ %%%% \thanks{firstname.lastname}
+}
 
 \maketitle
-
 \begin{abstract}
-The Atari 2600 games supported in  the Arcade Learning Environment~\cite{bellemare:jair2013}
-all feature a known initial (RAM) state and actions that have deterministic effects. Classical planners, however,
-cannot be used  off-the-shelf as there is no  compact PDDL-model of  the games, and action effects and goals are  not
-known \emph{a priori}. Indeed, there are no explicit goals, and the planner must select actions on-line while interacting 
-with a simulator that returns successor states and rewards. None of this precludes  the use of  blind lookahead algorithms 
-for action selection like breadth-first search or  Dijkstra's yet such methods are not effective over large  state spaces. 
-We thus turn to a different class of  planning methods  introduced recently  that  have been shown to be  effective for solving
-large planning problems but which do not require  prior knowledge of state transitions and costs (rewards) or goals.
-The simplest such algorithm, called Iterated Width or \IW, consists of  a sequence of calls  $\IW(1)$, $\IW(2)$, \ldots,
-where  $\IW(k)$ is  a breadth-first search in which a state is  pruned when it is not the first state in the  search  to make true 
-a subset of $k$ atoms. The  empirical results over \numgames\ Atari games show that  $\IW(1)$ performs at the level of UCT, 
-the state-of-the-art planning method in this domain, and suggest the potential of width-based methods for planning with
-simulators when factored, compact action models are not available.
+The Atari 2600 games supported in the Arcade Learning
+Environment~\cite{bellemare:jair2013} all feature a known initial
+(RAM) state and actions that have deterministic effects. Classical
+planners, however, cannot be used off-the-shelf as there is no compact
+PDDL-model of the games, and action effects and goals are not known
+\emph{a priori}. Indeed, there are no explicit goals, and the planner
+must select actions on-line while interacting with a simulator that
+returns successor states and rewards. None of this precludes the use
+of blind lookahead algorithms for action selection like breadth-first
+search or Dijkstra's yet such methods are not effective over large
+state spaces.  We thus turn to a different class of
+planning methods introduced recently that have been shown to be
+effective for solving large planning problems but which do not require
+prior knowledge of state transitions, costs (rewards) or goals. The
+empirical results over \numgames\ Atari games show that the simplest
+such algorithm performs at the level of UCT, the state-of-the-art
+planning method in this domain, and suggest the potential of
+width-based methods for planning with simulators when factored,
+compact action models are not available.
+
 \end{abstract}
 
+\noindent \emph{A version of this short paper has been accepted at IJCAI \cite{lipo:ijcai15}}
 \section{Introduction}
 
 The Arcade Learning Environment (ALE)  provides a challenging  platform for evaluating general, domain-independent AI planners and
@@ -199,7 +205,7 @@ While all  these games feature a known initial (RAM) state and actions that
 have deterministic effects, the problem of selecting the next action
 to be done cannot be addressed with off-the-shelf classical planners 
 \cite{planning:book,geffner:book}. This is because there is  no compact PDDL-like encoding of the domain and 
-the goal to be achieved in each game  is not given. Indeed, there are no goals but rewards, and 
+the goal to be achieved in each game  is not given, precluding the automatic derivation of heuristic functions and other inferences. Indeed, there are no goals but rewards, and 
 the planner must select actions on-line while interacting with a simulator that just
 returns successor states and rewards.
 %\footnote{Actually, in the Atari games, the rewards $r(a,s)$ depend only
@@ -210,8 +216,7 @@ The action selection problem in the Atari games can be addressed  as a \emph{rei
 as a  \emph{net-benefit planning problem} \cite{coles2012survey,keyder:jair09} with unknown state transitions  and  rewards. 
 ALE supports the two settings: an \emph{on-line plannning setting} where  actions are selected
 after a lookahead, and a \emph{learning setting}  that  must produce   controllers for mapping  states into
-actions reactively without any lookahead. In this work we pursue the on-line planning approach where the lookahead
-seeks  action sequences with  maximum  reward up to a certain horizon.
+actions reactively without any lookahead. In this work, we are interested in the on-line planning setting.
 
 The presence of unknown transition and  rewards in  the Atari games does not preclude the use of blind-search
 methods like breadth-first search, Dijkstra's algorithm \cite{dijkstra},  or learning methods  such as
@@ -277,8 +282,7 @@ additive reward measure  to be optimized, like in the Atari games, is direct.
 % }
 
 The paper is organized as follows. We review the iterated width  algorithm and its properties,
-look at the    variations of the algorithm that we used in the Atari games, present and analyze the  
-experimental results, and discuss related and future work.
+look at the    variations of the algorithm that we used in the Atari games, and present the experimental results.
 
 
 \section{Iterated Width}
@@ -343,7 +347,7 @@ but   unlike these algorithms, it uses the factored representation of the states
 search. This structured exploration  has proved to be very effective over classical planning benchmark domains  when goals are  single atoms.\footnote{
 Any conjunctive goal can be mapped into a single dummy atomic goal by adding an action that
 achieves the dummy goal and that has the original conjunctive goal as a precondition.
-Yet, this changes the definition of the domain.} For example, $37\%$ of the 37,921 problems
+Yet, this mapping changes the definition of the domain.} For example, $37\%$ of the 37,921 problems
 considered  in \cite{nir:ecai2012} are solved by $\IW(1)$ while $51.3\%$ are  solved by $\IW(2)$.
 These are instances obtained from 37 benchmark domains by splitting problems with $N$ atomic
 goals into $N$ problems with one atomic goal each.  Since $\IW(k)$ runs in time that is exponential in $k$, 
@@ -389,25 +393,23 @@ Later on we will discuss  a slight  change  required in \IW\ to enforce this pro
 
 
 
-The number of nodes \emph{generated} by $\IW(1)$ is $n \times D \times b$ in the worst case,
-where $n$ is the number of problem variables, $D$ is the size of their domains, and $b$ is the number of
-actions per  state.  This same number in a  breadth-first search is not linear in $n$
-but exponential. For the Atari games,  $n=128$, $D=256$, and $b=18$, so that the product is
-equal to $589,824$, which is large but feasible. On the other hand, the number
-of nodes generated by $\IW(2)$ in the worst case is  $(n \times D)^2 \times b$, which is
-equal to $19,327,352,832$ which is too large, forcing us to consider only a tiny fraction of
-such states. For classical planning problems, the growth in the number of nodes from
-$\IW(1)$ to $\IW(2)$ is not that large, as the variables are boolean. Indeed, we could have
-taken the state vector for the Atari games as a vector of 1024 boolean variables,
-and apply these algorithms to that representation. The results would be different.
-In such a case, $\IW(1)$ and $\IW(2)$  would generate $n' \times D' \times b$ and
-$(n' \times D')^2 \times b$ states, which for $n'=1024$ and $D=2$
-represent  $36,864$ and $75,497,472$ states respectively.
-These are feasible numbers, but we haven't used  this representation 
-under the assumption that the correlations among the bits in each one of
-the 128 words of the state vectors are meaningful.
-In summary, from the basic \IW\ algorithm we are testing only the first
-call $\IW(1)$.
+The number of nodes \emph{generated} by $\IW(1)$ is $n \times D \times
+b$ in the worst case, where $n$ is the number of problem variables,
+$D$ is the size of their domains, and $b$ is the number of actions per
+state.  This same number in a breadth-first search is not linear in
+$n$ but exponential. For the Atari games, $n=128$, $D=256$, and
+$b=18$, so that the product is equal to $589,824$, which is large but
+feasible. On the other hand, the number of nodes generated by $\IW(2)$
+in the worst case is $(n \times D)^2 \times b$, which is equal to
+$19,327,352,832$ which is too large, forcing us to consider only a
+tiny fraction of such states. For classical planning problems, the
+growth in the number of nodes from $\IW(1)$ to $\IW(2)$ is not that
+large, as the variables are boolean. Indeed, we could have taken the
+state vector for the Atari games as a vector of 1024 boolean
+variables, and apply these algorithms to that representation. The
+number of atoms would indeed be much smaller, and both IW(1) and IW(2)
+would run faster then. However by ignoring the correlations among bits
+in each one of the 128 words, the results would be weaker.
 
 
 \IW\ is a purely exploration algorithm that does not take into account  the accumulated
@@ -461,9 +463,11 @@ as they compute different things. Learning controllers appears as a more challen
 and it is thus not surprising that planning algorithms like \UCT\ tend to achieve a higher score than 
 learning algorithms. In addition, the learning algorithms reported by BNVB tend to use 
 the state of the screen pixels, while the planning algorithms,  use the state
-of the RAM memory. It is not clear however whether one input representation is
-more challenging than the other; for the learning algorithms, BNVB mention
-that the results tend to be better for the screen inputs. 
+of the RAM memory. It is not clear however whether the use of one input representation is
+more challenging than the use of the other. For the learning algorithms, BNVB mention
+that the results tend to be better for the screen inputs. Experiments were
+run on a cluster, where each computing node consists of a $6$-core Intel Xeon 
+E5-2440, with $2.4$ GHz clock speed, with 64 GBytes of RAM installed.
 
 Table~\ref{performance} shows the performance of $\IW(1)$ and \BFS\
 in comparison  with breadth-first search (\BRFS) and \UCT.
@@ -501,17 +505,21 @@ single root action.
 % decrease in order to maintain the same budget of $150,000$ simulated
 % frames. 
 
-Last, in the lookahead, \IW(1) and \BFS\ select an action every $5$ frames, while \UCT\  selects 
-an action in every frame.  This means that in order to explore a branch 
-$300$ frames deep, UCT gets to choose $300$ actions, while \IW($1$) and \BFS\ 
-get to choose $60$ actions, both however using the same $300$ frames from the
-budget. For this, we  followed the setup  of \BRFS\ in BNVB 
-that also selects actions every $5$ frames, matching the behavior
-of the emulator that requests an action also every $5$ frames. Since the 
-lookahead budget is given by a maximum number of (new) frames, and the time 
-is mostly taken by calls to the emulator, this may not be the best choice  
-for $\IW(1)$ and \BFS\ that may therefore not be exploiting all the 
-options afforded by the budget. We'll look at this further in the future.
+Last, in the lookahead, \IW(1) and \BFS\ select an action every $5$
+frames, while \UCT\ selects an action every frame.  This means that in
+order to explore a branch $300$ frames deep, UCT gets to choose $300$
+actions, while \IW($1$) and \BFS\ get to choose $60$ actions, both
+however using the same $300$ frames from the budget. For this, we
+followed the setup of \BRFS\ in BNVB that also selects actions every
+$5$ frames, matching the behavior of the emulator that requests an
+action also every $5$ frames. Since the lookahead budget is given by a
+maximum number of (new) frames, and the time is mostly taken by calls
+to the emulator, this may not be the best choice for $\IW(1)$ and
+\BFS\ that may therefore not be exploiting all the options afforded by
+the budget. Interestingly, when \UCT\ is limited to one action every
+$5$ frames, its performance is reduced by up to a $50$\% in games
+where it performs very well (\CrazyClimber), and does not appear to
+improve in those games where it performs very poorly (\Freeway).
 
 \Omit{
 The last difference inherited from BNVB between all algorithms
@@ -823,9 +831,6 @@ is broader than those of heuristic-search planning methods that require proposit
 encodings of actions and goals, and with suitable extensions, 
 may potentially  approach the scope of \MCTS\ methods like \UCT\ that work on simulators as well. 
 
-\newpage
-
-
 %% This suggests to us that the algorithms discussed in the 
 %% present paper could be applied in a broad variety of settings where only on-line 
 %% action selection is feasible or suitable.
@@ -841,11 +846,12 @@ such the use of the  novelty measures for shaping rewards.
 
 \medskip
 
-\noindent \textbf{Acknowledgments.} We thank the people involved in
-the creation and maintenance of the Arcade Learning Environment that
-have made this work possible. The research by Nir Lipovetzky is partially
-funded by the Australian Research Council Linkage grant LP11010015.
-}
+\noindent }
+
+\section*{Acknowledgments} 
+We thank the people who created the ALE.  Nir Lipovetzky is partially
+funded by the ARC Linkage grant LP11010015.
+
 
 %%% - Learning in same instance, across diff instances of same game, etc.
 %%%% - Learning controllers vs. on-line planning, etc
