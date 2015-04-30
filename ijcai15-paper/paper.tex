@@ -144,28 +144,28 @@
 
 \title{Classical Planning with Simulators: \\ Results on the Atari Video Games}
 
-\author{\textbf{ID:} 320  \ \ ; \ \ \textbf{Keywords:} classical planning, search, video games, application}
+%\author{\textbf{ID:} 320  \ \ ; \ \ \textbf{Keywords:} classical planning, search, video games, application}
 
-% \author{Nir Lipovetzky \\
-%        The University of Melbourne \\
-%     Melbourne, Australia\\
-%     {\normalsize\url{nir.lipovetzky@unimelb.edu.au}}
-%%% footnote doesn't look nice ; this looks better
-%% although can't use Nir's unimelb address that is too long :-)
-%% 
-%    {\small\url{nirlipo@gmail.com}}
-%    \And
-%    Miquel Ramirez \\
-%    Australian National University \\
-%    Canberra, Australia\\
-%   {\small\url{miquel.ramirez@gmail.com}}
-%    \And
-%    Hector Geffner \\
-%    ICREA \&  Universitat Pompeu Fabra \\
-%    Barcelona, SPAIN \\
-%    {\small\url{hector.geffner@upf.edu}}
- %%%%% \thanks{firstname.lastname}
-%}
+ \author{Nir Lipovetzky \\
+        {\small The University of Melbourne }\\
+     {\small Melbourne, Australia}\\
+     {\footnotesize\url{nir.lipovetzky@unimelb.edu.au}}
+%% footnote doesn't look nice ; this looks better
+% although can't use Nir's unimelb address that is too long :-)
+% 
+%    {\tiny\url{nirlipo@gmail.com}}
+    \And
+    Miquel Ramirez \\
+    {\small Australian National University} \\
+    {\small Canberra, Australia}\\
+   {\footnotesize\url{miquel.ramirez@anu.edu.au}}
+    \And
+    Hector Geffner \\
+    {\small ICREA \& Universitat Pompeu Fabra }\\
+    {\small Barcelona, Spain }\\
+    {\footnotesize\url{hector.geffner@upf.edu}}
+ %%%% \thanks{firstname.lastname}
+}
 
 
 \maketitle
@@ -463,7 +463,9 @@ learning algorithms. In addition, the learning algorithms reported by BNVB tend 
 the state of the screen pixels, while the planning algorithms,  use the state
 of the RAM memory. It is not clear however whether one input representation is
 more challenging than the other; for the learning algorithms, BNVB mention
-that the results tend to be better for the screen inputs. 
+that the results tend to be better for the screen inputs. Experiments were
+run on a high-performance computation cluster run by the University of Melbourne, where each computing node consists of a $6$-core Intel Xeon 
+E5-2440, with $2.4$ GHz clock speed, with 64 GBytes of RAM installed.
 
 Table~\ref{performance} shows the performance of $\IW(1)$ and \BFS\
 in comparison  with breadth-first search (\BRFS) and \UCT.
@@ -511,7 +513,9 @@ of the emulator that requests an action also every $5$ frames. Since the
 lookahead budget is given by a maximum number of (new) frames, and the time 
 is mostly taken by calls to the emulator, this may not be the best choice  
 for $\IW(1)$ and \BFS\ that may therefore not be exploiting all the 
-options afforded by the budget. We'll look at this further in the future.
+options afforded by the budget. Interestingly, when \UCT\ is limited to one
+action each $5$ frames, its performance is reduced by up to a $50$\% in
+games where it performs very well (\CrazyClimber), and does not a difference in those games where it does very poorly (\Freeway). We'll look at this further in the future.
 
 \Omit{
 The last difference inherited from BNVB between all algorithms
@@ -822,9 +826,6 @@ compact action models are not available. In this sense, the scope of these plann
 is broader than those of heuristic-search planning methods that require propositional
 encodings of actions and goals, and with suitable extensions, 
 may potentially  approach the scope of \MCTS\ methods like \UCT\ that work on simulators as well. 
-
-\newpage
-
 
 %% This suggests to us that the algorithms discussed in the 
 %% present paper could be applied in a broad variety of settings where only on-line 
