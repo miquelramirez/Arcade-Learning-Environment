@@ -504,7 +504,7 @@ single root action.
 % frames. 
 
 Last, in the lookahead, \IW(1) and \BFS\ select an action every $5$ frames, while \UCT\  selects 
-an action in every frame.  This means that in order to explore a branch 
+an action every frame.  This means that in order to explore a branch 
 $300$ frames deep, UCT gets to choose $300$ actions, while \IW($1$) and \BFS\ 
 get to choose $60$ actions, both however using the same $300$ frames from the
 budget. For this, we  followed the setup  of \BRFS\ in BNVB 
@@ -514,8 +514,8 @@ lookahead budget is given by a maximum number of (new) frames, and the time
 is mostly taken by calls to the emulator, this may not be the best choice  
 for $\IW(1)$ and \BFS\ that may therefore not be exploiting all the 
 options afforded by the budget. Interestingly, when \UCT\ is limited to one
-action each $5$ frames, its performance is reduced by up to a $50$\% in
-games where it performs very well (\CrazyClimber), and does not a difference in those games where it does very poorly (\Freeway). We'll look at this further in the future.
+action every $5$ frames, its performance is reduced by up to a $50$\% in
+games where it performs very well (\CrazyClimber), and does not improve in those games where it performs very poorly (\Freeway).
 
 \Omit{
 The last difference inherited from BNVB between all algorithms
